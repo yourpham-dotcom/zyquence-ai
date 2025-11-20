@@ -45,9 +45,12 @@ const Hero = () => {
             <Button 
               size="lg" 
               className="bg-cyber-blue hover:bg-cyber-blue/90 text-lg px-8 h-14 group"
+              asChild
             >
-              Start Your Journey
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <a href="/studio">
+                Start Your Journey
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
             </Button>
             <Button 
               size="lg" 
