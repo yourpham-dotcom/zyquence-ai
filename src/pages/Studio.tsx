@@ -28,9 +28,15 @@ const Studio = () => {
   const [showGames, setShowGames] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(64);
   const [isResizing, setIsResizing] = useState(false);
+  const [mediaPlayerHeight, setMediaPlayerHeight] = useState(80);
+  const [isResizingPlayer, setIsResizingPlayer] = useState(false);
 
   const handleMouseDown = () => {
     setIsResizing(true);
+  };
+
+  const handlePlayerMouseDown = () => {
+    setIsResizingPlayer(true);
   };
 
   useEffect(() => {
@@ -41,13 +47,20 @@ const Studio = () => {
           setSidebarWidth(newWidth);
         }
       }
+      if (isResizingPlayer) {
+        const newHeight = window.innerHeight - e.clientY;
+        if (newHeight >= 80 && newHeight <= 400) {
+          setMediaPlayerHeight(newHeight);
+        }
+      }
     };
 
     const handleGlobalMouseUp = () => {
       setIsResizing(false);
+      setIsResizingPlayer(false);
     };
 
-    if (isResizing) {
+    if (isResizing || isResizingPlayer) {
       document.addEventListener('mousemove', handleGlobalMouseMove);
       document.addEventListener('mouseup', handleGlobalMouseUp);
     }
@@ -56,7 +69,7 @@ const Studio = () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [isResizing]);
+  }, [isResizing, isResizingPlayer]);
 
   const tools = [
     { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
@@ -211,16 +224,30 @@ const Studio = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {renderTool()}
-          
-          {/* Mini Game Overlay */}
-          {activeGame && (
-            <MiniGame game={activeGame} onClose={() => setActiveGame(null)} />
-          )}
-        </div>
+          <div className="flex-1 overflow-hidden">
+            {renderTool()}
+            
+            {/* Mini Game Overlay */}
+            {activeGame && (
+              <MiniGame game={activeGame} onClose={() => setActiveGame(null)} />
+            )}
+          </div>
 
-        {/* Bottom Media Player */}
-        <MediaPlayer />
+          {/* Media Player Resizer Handle */}
+          <div 
+            className="h-1 bg-border hover:bg-primary cursor-row-resize relative group transition-colors"
+            onMouseDown={handlePlayerMouseDown}
+          >
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 flex items-center justify-center">
+              <div className="h-1 w-12 rounded-full bg-muted-foreground/20 group-hover:bg-primary/50 transition-colors" />
+            </div>
+          </div>
+
+          {/* Bottom Media Player */}
+          <div style={{ height: `${mediaPlayerHeight}px` }}>
+            <MediaPlayer />
+          </div>
+        </div>
       </div>
     </TooltipProvider>
   );

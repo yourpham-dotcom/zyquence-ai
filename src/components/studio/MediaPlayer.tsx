@@ -10,7 +10,7 @@ const MediaPlayer = () => {
   const [mediaType, setMediaType] = useState<"spotify" | "movies">("spotify");
 
   return (
-    <div className="h-20 border-t border-border bg-card px-6 flex items-center gap-6">
+    <div className="h-full border-t border-border bg-card px-6 flex items-center gap-6 overflow-hidden">
       <Tabs value={mediaType} onValueChange={(v) => setMediaType(v as "spotify" | "movies")} className="flex-1">
         <div className="flex items-center gap-6">
           <TabsList className="bg-transparent border-0 h-auto p-0">
