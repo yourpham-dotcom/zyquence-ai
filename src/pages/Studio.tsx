@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import StudioSidebar from "@/components/studio/StudioSidebar";
 import ChatInterface from "@/components/studio/ChatInterface";
 import CodeEditor from "@/components/studio/CodeEditor";
@@ -11,6 +14,7 @@ export type ToolType = "chat" | "code" | "python" | "journal";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
+  const navigate = useNavigate();
   const [activeTool, setActiveTool] = useState<ToolType>("chat");
   const [activeGame, setActiveGame] = useState<GameType>(null);
 
@@ -34,6 +38,16 @@ const Studio = () => {
       {/* Header */}
       <header className="h-14 border-b border-border flex items-center justify-between px-6">
         <h1 className="text-xl font-bold text-foreground">Zyquence Creative Studio</h1>
+        
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={() => navigate("/")}
+          className="hover:bg-accent"
+        >
+          <Home className="h-5 w-5" />
+        </Button>
+
         <select 
           value={activeTool}
           onChange={(e) => setActiveTool(e.target.value as ToolType)}
