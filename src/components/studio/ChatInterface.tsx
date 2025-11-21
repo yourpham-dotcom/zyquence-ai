@@ -37,30 +37,30 @@ const ChatInterface = () => {
     <div className="h-full flex flex-col bg-background">
       {/* Messages Area */}
       <ScrollArea className="flex-1 p-6">
-        <div className="max-w-3xl mx-auto space-y-6">
+        <div className="max-w-4xl mx-auto space-y-6 py-4">
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`flex gap-4 ${
+              className={`flex gap-3 ${
                 message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
               {message.role === "assistant" && (
-                <div className="w-8 h-8 rounded-full bg-cyber-blue/20 flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-cyber-blue" />
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-primary" />
                 </div>
               )}
               <div
-                className={`rounded-2xl px-4 py-3 max-w-[80%] ${
+                className={`rounded-lg px-4 py-3 max-w-[75%] ${
                   message.role === "user"
-                    ? "bg-cyber-blue text-white"
-                    : "bg-muted text-foreground"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card border border-border"
                 }`}
               >
-                <p className="text-sm leading-relaxed">{message.content}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
               </div>
               {message.role === "user" && (
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-foreground" />
                 </div>
               )}
@@ -70,24 +70,33 @@ const ChatInterface = () => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="border-t border-border p-4">
-        <div className="max-w-3xl mx-auto flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask anything... (Python help, coding questions, journal prompts)"
-            className="resize-none bg-muted border-border"
-            rows={2}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-          />
-          <Button onClick={handleSend} size="icon" className="bg-cyber-blue hover:bg-cyber-blue/90">
-            <Send className="w-4 h-4" />
-          </Button>
+      <div className="border-t border-border bg-card p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex gap-3 items-end">
+            <div className="flex-1 relative">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask anything..."
+                className="resize-none bg-background border-border rounded-xl pr-12 min-h-[52px]"
+                rows={1}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+              />
+            </div>
+            <Button 
+              onClick={handleSend} 
+              size="icon" 
+              className="h-[52px] w-[52px] bg-primary hover:bg-primary/90 rounded-xl"
+              disabled={!input.trim()}
+            >
+              <Send className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>

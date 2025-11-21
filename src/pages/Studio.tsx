@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home } from "lucide-react";
+import { 
+  Home, MessageSquare, Code, BookOpen, Book, Video, 
+  Image, Shield, Database, Palette, Gamepad2, Music 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import StudioSidebar from "@/components/studio/StudioSidebar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ChatInterface from "@/components/studio/ChatInterface";
 import CodeEditor from "@/components/studio/CodeEditor";
 import Journal from "@/components/studio/Journal";
@@ -22,6 +25,25 @@ const Studio = () => {
   const navigate = useNavigate();
   const [activeTool, setActiveTool] = useState<ToolType>("chat");
   const [activeGame, setActiveGame] = useState<GameType>(null);
+  const [showGames, setShowGames] = useState(false);
+
+  const tools = [
+    { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
+    { id: "code" as ToolType, icon: Code, label: "Code Editor" },
+    { id: "python" as ToolType, icon: BookOpen, label: "Python Practice" },
+    { id: "journal" as ToolType, icon: Book, label: "Journal" },
+    { id: "video" as ToolType, icon: Video, label: "Video Editor" },
+    { id: "photo" as ToolType, icon: Image, label: "Photo Studio" },
+    { id: "security" as ToolType, icon: Shield, label: "Cybersecurity Lab" },
+    { id: "sql" as ToolType, icon: Database, label: "SQL Practice" },
+    { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
+  ];
+
+  const games = [
+    { id: "pingpong" as GameType, label: "Ping Pong" },
+    { id: "basketball" as GameType, label: "Basketball" },
+    { id: "racing" as GameType, label: "Racing" },
+  ];
 
   const renderTool = () => {
     switch (activeTool) {
@@ -49,44 +71,100 @@ const Studio = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="h-14 border-b border-border flex items-center justify-between px-6">
-        <h1 className="text-xl font-bold text-foreground">Zyquence Creative Studio</h1>
-        
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={() => navigate("/")}
-          className="hover:bg-accent"
-        >
-          <Home className="h-5 w-5" />
-        </Button>
+    <TooltipProvider>
+      <div className="h-screen flex bg-background">
+        {/* Left Sidebar */}
+        <div className="w-16 border-r border-border flex flex-col items-center py-4 gap-2 bg-card">
+          {/* Home Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/")}
+                className="hover:bg-accent"
+              >
+                <Home className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Home</TooltipContent>
+          </Tooltip>
 
-        <select 
-          value={activeTool}
-          onChange={(e) => setActiveTool(e.target.value as ToolType)}
-          className="bg-muted text-foreground px-4 py-2 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-cyber-blue"
-        >
-          <option value="chat">AI Chat</option>
-          <option value="code">Code Editor</option>
-          <option value="python">Python Practice</option>
-          <option value="journal">Journal</option>
-          <option value="video">Video Editor</option>
-          <option value="photo">Photo Studio</option>
-          <option value="security">Cybersecurity Lab</option>
-          <option value="sql">SQL Practice</option>
-          <option value="art">Artist Studio</option>
-        </select>
-      </header>
+          <div className="w-8 h-px bg-border my-2" />
 
-      {/* Main Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar with Mini Games */}
-        <StudioSidebar activeGame={activeGame} setActiveGame={setActiveGame} />
+          {/* Tool Icons */}
+          {tools.map((tool) => (
+            <Tooltip key={tool.id}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setActiveTool(tool.id)}
+                  className={activeTool === tool.id ? "bg-primary text-primary-foreground" : "hover:bg-accent"}
+                >
+                  <tool.icon className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">{tool.label}</TooltipContent>
+            </Tooltip>
+          ))}
+
+          <div className="w-8 h-px bg-border my-2" />
+
+          {/* Games Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowGames(!showGames)}
+                className={showGames ? "bg-primary text-primary-foreground" : "hover:bg-accent"}
+              >
+                <Gamepad2 className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Mini Games</TooltipContent>
+          </Tooltip>
+
+          {/* Media Player Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="mt-auto hover:bg-accent"
+              >
+                <Music className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Media Player</TooltipContent>
+          </Tooltip>
+        </div>
+
+        {/* Games Sidebar (collapsible) */}
+        {showGames && (
+          <div className="w-64 border-r border-border bg-card p-4">
+            <h3 className="font-semibold mb-4">Mini Games</h3>
+            <div className="space-y-2">
+              {games.map((game) => (
+                <Button
+                  key={game.id}
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setActiveGame(game.id);
+                    setShowGames(false);
+                  }}
+                >
+                  {game.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Main Content Area */}
-        <div className="flex-1 relative">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {renderTool()}
           
           {/* Mini Game Overlay */}
@@ -94,11 +172,11 @@ const Studio = () => {
             <MiniGame game={activeGame} onClose={() => setActiveGame(null)} />
           )}
         </div>
-      </div>
 
-      {/* Bottom Media Player */}
-      <MediaPlayer />
-    </div>
+        {/* Bottom Media Player */}
+        <MediaPlayer />
+      </div>
+    </TooltipProvider>
   );
 };
 
