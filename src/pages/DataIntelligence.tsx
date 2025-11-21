@@ -89,7 +89,7 @@ const DataIntelligence = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen bg-background overflow-y-auto">
       <div className="container mx-auto p-6 space-y-8">
         {/* Header */}
         <div className="space-y-2">
