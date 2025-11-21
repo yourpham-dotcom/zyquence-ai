@@ -116,8 +116,8 @@ const RecruitingProfile = () => {
         )}
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 p-6 bg-card border-border flex flex-col">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
+        <Card className="lg:col-span-2 p-6 bg-card border-border flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto space-y-4 mb-4">
             {messages.map((msg, idx) => (
               <div
