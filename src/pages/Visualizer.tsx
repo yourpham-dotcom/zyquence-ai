@@ -147,7 +147,7 @@ const Visualizer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="h-screen bg-background p-6 overflow-y-auto">
       <div className="container mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
