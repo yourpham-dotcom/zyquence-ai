@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
-  Image, Shield, Database, Palette, Gamepad2, Music 
+  Image, Shield, Database, Palette, Gamepad2, Music, Sparkles 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -18,8 +18,9 @@ import CybersecurityLab from "@/components/studio/CybersecurityLab";
 import SQLPractice from "@/components/studio/SQLPractice";
 import ArtistStudio from "@/components/studio/ArtistStudio";
 import MusicStudio from "@/components/studio/MusicStudio";
+import IdentityStyleIntelligence from "@/components/studio/IdentityStyleIntelligence";
 
-export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music";
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -80,6 +81,7 @@ const Studio = () => {
     { id: "music" as ToolType, icon: Music, label: "Music Studio" },
     { id: "video" as ToolType, icon: Video, label: "Video Editor" },
     { id: "photo" as ToolType, icon: Image, label: "Photo Studio" },
+    { id: "style" as ToolType, icon: Sparkles, label: "Style Intelligence" },
     { id: "security" as ToolType, icon: Shield, label: "Cybersecurity Lab" },
     { id: "sql" as ToolType, icon: Database, label: "SQL Practice" },
     { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
@@ -107,6 +109,8 @@ const Studio = () => {
         return <VideoEditor />;
       case "photo":
         return <PhotoStudio />;
+      case "style":
+        return <IdentityStyleIntelligence />;
       case "security":
         return <CybersecurityLab />;
       case "sql":
