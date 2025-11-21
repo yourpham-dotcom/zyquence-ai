@@ -17,8 +17,9 @@ import PhotoStudio from "@/components/studio/PhotoStudio";
 import CybersecurityLab from "@/components/studio/CybersecurityLab";
 import SQLPractice from "@/components/studio/SQLPractice";
 import ArtistStudio from "@/components/studio/ArtistStudio";
+import MusicStudio from "@/components/studio/MusicStudio";
 
-export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art";
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -76,6 +77,7 @@ const Studio = () => {
     { id: "code" as ToolType, icon: Code, label: "Code Editor" },
     { id: "python" as ToolType, icon: BookOpen, label: "Python Practice" },
     { id: "journal" as ToolType, icon: Book, label: "Journal" },
+    { id: "music" as ToolType, icon: Music, label: "Music Studio" },
     { id: "video" as ToolType, icon: Video, label: "Video Editor" },
     { id: "photo" as ToolType, icon: Image, label: "Photo Studio" },
     { id: "security" as ToolType, icon: Shield, label: "Cybersecurity Lab" },
@@ -99,6 +101,8 @@ const Studio = () => {
         return <PythonPractice />;
       case "journal":
         return <Journal />;
+      case "music":
+        return <MusicStudio />;
       case "video":
         return <VideoEditor />;
       case "photo":
