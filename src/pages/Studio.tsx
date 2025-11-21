@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
@@ -26,6 +26,37 @@ const Studio = () => {
   const [activeTool, setActiveTool] = useState<ToolType>("chat");
   const [activeGame, setActiveGame] = useState<GameType>(null);
   const [showGames, setShowGames] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(64);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleMouseDown = () => {
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (isResizing) {
+        const newWidth = e.clientX;
+        if (newWidth >= 64 && newWidth <= 300) {
+          setSidebarWidth(newWidth);
+        }
+      }
+    };
+
+    const handleGlobalMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isResizing]);
 
   const tools = [
     { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
@@ -72,9 +103,12 @@ const Studio = () => {
 
   return (
     <TooltipProvider>
-      <div className="h-screen flex bg-background">
+      <div className="h-screen flex bg-background select-none">
         {/* Left Sidebar */}
-        <div className="w-16 border-r border-border flex flex-col items-center py-4 gap-2 bg-card">
+        <div 
+          className="border-r border-border flex flex-col items-center py-4 gap-2 bg-card transition-all"
+          style={{ width: `${sidebarWidth}px` }}
+        >
           {/* Home Button */}
           <Tooltip>
             <TooltipTrigger asChild>
@@ -98,14 +132,16 @@ const Studio = () => {
               <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size={sidebarWidth > 64 ? "default" : "icon"}
                   onClick={() => setActiveTool(tool.id)}
-                  className={activeTool === tool.id ? "bg-primary text-primary-foreground" : "hover:bg-accent"}
+                  className={`${activeTool === tool.id ? "bg-primary text-primary-foreground" : "hover:bg-accent"} ${sidebarWidth > 64 ? "w-full justify-start px-4" : ""}`}
+                  style={sidebarWidth > 64 ? { width: `${sidebarWidth - 16}px` } : {}}
                 >
                   <tool.icon className="h-5 w-5" />
+                  {sidebarWidth > 100 && <span className="ml-2 text-sm">{tool.label}</span>}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">{tool.label}</TooltipContent>
+              {sidebarWidth <= 100 && <TooltipContent side="right">{tool.label}</TooltipContent>}
             </Tooltip>
           ))}
 
@@ -139,6 +175,16 @@ const Studio = () => {
             </TooltipTrigger>
             <TooltipContent side="right">Media Player</TooltipContent>
           </Tooltip>
+        </div>
+
+        {/* Resizer Handle */}
+        <div 
+          className="w-1 bg-border hover:bg-primary cursor-col-resize relative group transition-colors"
+          onMouseDown={handleMouseDown}
+        >
+          <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-3 flex items-center justify-center">
+            <div className="w-1 h-12 rounded-full bg-muted-foreground/20 group-hover:bg-primary/50 transition-colors" />
+          </div>
         </div>
 
         {/* Games Sidebar (collapsible) */}
