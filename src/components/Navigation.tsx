@@ -24,6 +24,9 @@ const Navigation = () => {
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
+            <a href="/data-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
+              Data Intelligence
+            </a>
             <Button variant="default" className="bg-cyber-blue hover:bg-cyber-blue/90" asChild>
               <a href="/studio">Launch Studio</a>
             </Button>
@@ -47,6 +50,9 @@ const Navigation = () => {
             </a>
             <a href="#features" className="block text-muted-foreground hover:text-foreground transition-colors">
               Features
+            </a>
+            <a href="/data-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
+              Data Intelligence
             </a>
             <Button variant="default" className="w-full bg-cyber-blue hover:bg-cyber-blue/90" asChild>
               <a href="/studio">Launch Studio</a>
