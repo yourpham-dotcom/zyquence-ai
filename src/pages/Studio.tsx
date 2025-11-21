@@ -9,8 +9,13 @@ import Journal from "@/components/studio/Journal";
 import PythonPractice from "@/components/studio/PythonPractice";
 import MediaPlayer from "@/components/studio/MediaPlayer";
 import MiniGame from "@/components/studio/MiniGame";
+import VideoEditor from "@/components/studio/VideoEditor";
+import PhotoStudio from "@/components/studio/PhotoStudio";
+import CybersecurityLab from "@/components/studio/CybersecurityLab";
+import SQLPractice from "@/components/studio/SQLPractice";
+import ArtistStudio from "@/components/studio/ArtistStudio";
 
-export type ToolType = "chat" | "code" | "python" | "journal";
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -28,6 +33,16 @@ const Studio = () => {
         return <PythonPractice />;
       case "journal":
         return <Journal />;
+      case "video":
+        return <VideoEditor />;
+      case "photo":
+        return <PhotoStudio />;
+      case "security":
+        return <CybersecurityLab />;
+      case "sql":
+        return <SQLPractice />;
+      case "art":
+        return <ArtistStudio />;
       default:
         return <ChatInterface />;
     }
@@ -57,6 +72,11 @@ const Studio = () => {
           <option value="code">Code Editor</option>
           <option value="python">Python Practice</option>
           <option value="journal">Journal</option>
+          <option value="video">Video Editor</option>
+          <option value="photo">Photo Studio</option>
+          <option value="security">Cybersecurity Lab</option>
+          <option value="sql">SQL Practice</option>
+          <option value="art">Artist Studio</option>
         </select>
       </header>
 
