@@ -81,8 +81,8 @@ const AthleteAppBuilder = () => {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card className="p-6 bg-card border-border flex flex-col">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
+        <Card className="p-6 bg-card border-border flex flex-col min-h-0">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">AI Copilot Chat</h3>
@@ -152,7 +152,7 @@ const AthleteAppBuilder = () => {
           </div>
         </Card>
 
-        <Card className="p-6 bg-card border-border flex flex-col">
+        <Card className="p-6 bg-card border-border flex flex-col min-h-0">
           <div className="flex items-center gap-3 mb-4">
             <Code className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">App Preview</h3>
