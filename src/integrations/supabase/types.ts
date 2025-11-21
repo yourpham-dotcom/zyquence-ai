@@ -14,7 +14,121 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      music_projects: {
+        Row: {
+          bpm: number | null
+          created_at: string
+          id: string
+          time_signature: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bpm?: number | null
+          created_at?: string
+          id?: string
+          time_signature?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bpm?: number | null
+          created_at?: string
+          id?: string
+          time_signature?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      music_tracks: {
+        Row: {
+          audio_url: string | null
+          color: string | null
+          created_at: string
+          effects: Json | null
+          id: string
+          muted: boolean | null
+          name: string
+          order_index: number
+          pan: number | null
+          project_id: string
+          solo: boolean | null
+          volume: number | null
+        }
+        Insert: {
+          audio_url?: string | null
+          color?: string | null
+          created_at?: string
+          effects?: Json | null
+          id?: string
+          muted?: boolean | null
+          name: string
+          order_index: number
+          pan?: number | null
+          project_id: string
+          solo?: boolean | null
+          volume?: number | null
+        }
+        Update: {
+          audio_url?: string | null
+          color?: string | null
+          created_at?: string
+          effects?: Json | null
+          id?: string
+          muted?: boolean | null
+          name?: string
+          order_index?: number
+          pan?: number | null
+          project_id?: string
+          solo?: boolean | null
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_tracks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "music_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_collaborators: {
+        Row: {
+          created_at: string
+          id: string
+          permission: string | null
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission?: string | null
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission?: string | null
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_collaborators_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "music_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
