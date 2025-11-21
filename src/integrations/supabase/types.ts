@@ -14,6 +14,351 @@ export type Database = {
   }
   public: {
     Tables: {
+      di_dashboards: {
+        Row: {
+          charts: Json
+          created_at: string
+          dataset_id: string | null
+          description: string | null
+          id: string
+          layout: Json
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          charts?: Json
+          created_at?: string
+          dataset_id?: string | null
+          description?: string | null
+          id?: string
+          layout?: Json
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          charts?: Json
+          created_at?: string
+          dataset_id?: string | null
+          description?: string | null
+          id?: string
+          layout?: Json
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "di_dashboards_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "di_datasets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      di_datasets: {
+        Row: {
+          column_count: number | null
+          created_at: string
+          data: Json
+          description: string | null
+          id: string
+          name: string
+          row_count: number | null
+          schema: Json
+          source: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          column_count?: number | null
+          created_at?: string
+          data?: Json
+          description?: string | null
+          id?: string
+          name: string
+          row_count?: number | null
+          schema?: Json
+          source?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          column_count?: number | null
+          created_at?: string
+          data?: Json
+          description?: string | null
+          id?: string
+          name?: string
+          row_count?: number | null
+          schema?: Json
+          source?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      di_experiments: {
+        Row: {
+          created_at: string
+          description: string | null
+          group_a_dataset_id: string | null
+          group_b_dataset_id: string | null
+          hypothesis: string | null
+          id: string
+          metrics: Json
+          name: string
+          p_value: number | null
+          results: Json | null
+          significance_level: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          group_a_dataset_id?: string | null
+          group_b_dataset_id?: string | null
+          hypothesis?: string | null
+          id?: string
+          metrics?: Json
+          name: string
+          p_value?: number | null
+          results?: Json | null
+          significance_level?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          group_a_dataset_id?: string | null
+          group_b_dataset_id?: string | null
+          hypothesis?: string | null
+          id?: string
+          metrics?: Json
+          name?: string
+          p_value?: number | null
+          results?: Json | null
+          significance_level?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "di_experiments_group_a_dataset_id_fkey"
+            columns: ["group_a_dataset_id"]
+            isOneToOne: false
+            referencedRelation: "di_datasets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "di_experiments_group_b_dataset_id_fkey"
+            columns: ["group_b_dataset_id"]
+            isOneToOne: false
+            referencedRelation: "di_datasets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      di_mission_completions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          mission_id: string | null
+          progress: number | null
+          status: Database["public"]["Enums"]["mission_status"]
+          submission: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mission_id?: string | null
+          progress?: number | null
+          status?: Database["public"]["Enums"]["mission_status"]
+          submission?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mission_id?: string | null
+          progress?: number | null
+          status?: Database["public"]["Enums"]["mission_status"]
+          submission?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "di_mission_completions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "di_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      di_missions: {
+        Row: {
+          created_at: string
+          dataset_template: Json | null
+          description: string
+          difficulty: Database["public"]["Enums"]["mission_difficulty"]
+          id: string
+          objectives: Json
+          order_index: number
+          title: string
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string
+          dataset_template?: Json | null
+          description: string
+          difficulty?: Database["public"]["Enums"]["mission_difficulty"]
+          id?: string
+          objectives?: Json
+          order_index?: number
+          title: string
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string
+          dataset_template?: Json | null
+          description?: string
+          difficulty?: Database["public"]["Enums"]["mission_difficulty"]
+          id?: string
+          objectives?: Json
+          order_index?: number
+          title?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
+      di_portfolio_items: {
+        Row: {
+          content: Json
+          created_at: string
+          description: string | null
+          featured: boolean | null
+          id: string
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          tags?: string[] | null
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          description?: string | null
+          featured?: boolean | null
+          id?: string
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      di_sql_queries: {
+        Row: {
+          created_at: string
+          dataset_id: string | null
+          id: string
+          name: string
+          query: string
+          results: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dataset_id?: string | null
+          id?: string
+          name: string
+          query: string
+          results?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dataset_id?: string | null
+          id?: string
+          name?: string
+          query?: string
+          results?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "di_sql_queries_dataset_id_fkey"
+            columns: ["dataset_id"]
+            isOneToOne: false
+            referencedRelation: "di_datasets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      di_user_stats: {
+        Row: {
+          created_at: string
+          dashboards_created: number | null
+          experiments_run: number | null
+          level: number | null
+          missions_completed: number | null
+          queries_executed: number | null
+          total_xp: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dashboards_created?: number | null
+          experiments_run?: number | null
+          level?: number | null
+          missions_completed?: number | null
+          queries_executed?: number | null
+          total_xp?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dashboards_created?: number | null
+          experiments_run?: number | null
+          level?: number | null
+          missions_completed?: number | null
+          queries_executed?: number | null
+          total_xp?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       music_projects: {
         Row: {
           bpm: number | null
@@ -137,7 +482,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      chart_type: "bar" | "line" | "scatter" | "pie" | "heatmap" | "correlation"
+      mission_difficulty: "beginner" | "intermediate" | "advanced" | "expert"
+      mission_status: "locked" | "available" | "in_progress" | "completed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -264,6 +611,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      chart_type: ["bar", "line", "scatter", "pie", "heatmap", "correlation"],
+      mission_difficulty: ["beginner", "intermediate", "advanced", "expert"],
+      mission_status: ["locked", "available", "in_progress", "completed"],
+    },
   },
 } as const
