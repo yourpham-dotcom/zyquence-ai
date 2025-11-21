@@ -202,23 +202,38 @@ const Studio = () => {
 
         {/* Games Sidebar (collapsible) */}
         {showGames && (
-          <div className="w-64 border-r border-border bg-card p-4">
-            <h3 className="font-semibold mb-4">Mini Games</h3>
-            <div className="space-y-2">
-              {games.map((game) => (
-                <Button
-                  key={game.id}
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => {
-                    setActiveGame(game.id);
-                    setShowGames(false);
-                  }}
+          <div className="w-64 border-r border-border bg-card p-4 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold">Mini Games</h3>
+              {activeGame && (
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setActiveGame(null)}
                 >
-                  {game.label}
+                  Back
                 </Button>
-              ))}
+              )}
             </div>
+            
+            {!activeGame ? (
+              <div className="space-y-2">
+                {games.map((game) => (
+                  <Button
+                    key={game.id}
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => setActiveGame(game.id)}
+                  >
+                    {game.label}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="flex-1 overflow-hidden">
+                <MiniGame game={activeGame} onClose={() => setActiveGame(null)} compact />
+              </div>
+            )}
           </div>
         )}
 
@@ -226,11 +241,6 @@ const Studio = () => {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-hidden">
             {renderTool()}
-            
-            {/* Mini Game Overlay */}
-            {activeGame && (
-              <MiniGame game={activeGame} onClose={() => setActiveGame(null)} />
-            )}
           </div>
 
           {/* Media Player Resizer Handle */}

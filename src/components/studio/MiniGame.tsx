@@ -5,9 +5,10 @@ import { GameType } from "@/pages/Studio";
 interface MiniGameProps {
   game: GameType;
   onClose: () => void;
+  compact?: boolean;
 }
 
-const MiniGame = ({ game, onClose }: MiniGameProps) => {
+const MiniGame = ({ game, onClose, compact = false }: MiniGameProps) => {
   const gameContent = {
     pingpong: {
       title: "🏓 Ping Pong",
@@ -27,6 +28,24 @@ const MiniGame = ({ game, onClose }: MiniGameProps) => {
   };
 
   const currentGame = game && gameContent[game] ? gameContent[game] : gameContent.pingpong;
+
+  if (compact) {
+    return (
+      <div className={`h-full bg-gradient-to-br ${currentGame.color} rounded-lg border border-border p-4 flex flex-col`}>
+        <div className="mb-4">
+          <h3 className="font-semibold text-foreground">{currentGame.title}</h3>
+          <p className="text-xs text-muted-foreground">{currentGame.description}</p>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center bg-muted/50 rounded-lg border border-border">
+          <div className="text-center space-y-3 p-4">
+            <div className="text-5xl">{game === "pingpong" ? "🏓" : game === "basketball" ? "🏀" : "🏎️"}</div>
+            <p className="text-sm text-muted-foreground">Game coming soon!</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center p-6">
