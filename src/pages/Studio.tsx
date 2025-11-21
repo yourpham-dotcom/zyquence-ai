@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
-  Image, Shield, Database, Palette, Gamepad2, Music, Sparkles 
+  Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
+  Brain, UserPlus, Wand2, DollarSign, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -19,8 +20,14 @@ import SQLPractice from "@/components/studio/SQLPractice";
 import ArtistStudio from "@/components/studio/ArtistStudio";
 import MusicStudio from "@/components/studio/MusicStudio";
 import IdentityStyleIntelligence from "@/components/studio/IdentityStyleIntelligence";
+import AthleteMentalHealth from "@/components/studio/AthleteMentalHealth";
+import RecruitingProfile from "@/components/studio/RecruitingProfile";
+import AthleteAppBuilder from "@/components/studio/AthleteAppBuilder";
+import SportsCybersecurity from "@/components/studio/SportsCybersecurity";
+import FinancialLiteracy from "@/components/studio/FinancialLiteracy";
+import AthleteImageEngineer from "@/components/studio/AthleteImageEngineer";
 
-export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style";
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -75,16 +82,22 @@ const Studio = () => {
 
   const tools = [
     { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
-    { id: "code" as ToolType, icon: Code, label: "Code Editor" },
-    { id: "python" as ToolType, icon: BookOpen, label: "Python Practice" },
-    { id: "journal" as ToolType, icon: Book, label: "Journal" },
+    { id: "mental" as ToolType, icon: Brain, label: "Mental Health" },
+    { id: "recruiting" as ToolType, icon: UserPlus, label: "Recruiting Profile" },
+    { id: "appbuilder" as ToolType, icon: Wand2, label: "App Builder" },
+    { id: "cybersec" as ToolType, icon: Shield, label: "Sports Cybersecurity" },
+    { id: "financial" as ToolType, icon: DollarSign, label: "Financial Literacy" },
+    { id: "branding" as ToolType, icon: Star, label: "Image Engineer" },
+    { id: "style" as ToolType, icon: Sparkles, label: "Style Intelligence" },
     { id: "music" as ToolType, icon: Music, label: "Music Studio" },
     { id: "video" as ToolType, icon: Video, label: "Video Editor" },
     { id: "photo" as ToolType, icon: Image, label: "Photo Studio" },
-    { id: "style" as ToolType, icon: Sparkles, label: "Style Intelligence" },
-    { id: "security" as ToolType, icon: Shield, label: "Cybersecurity Lab" },
+    { id: "code" as ToolType, icon: Code, label: "Code Editor" },
+    { id: "python" as ToolType, icon: BookOpen, label: "Python Practice" },
     { id: "sql" as ToolType, icon: Database, label: "SQL Practice" },
+    { id: "security" as ToolType, icon: Shield, label: "Cybersecurity Lab" },
     { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
+    { id: "journal" as ToolType, icon: Book, label: "Journal" },
   ];
 
   const games = [
@@ -97,26 +110,38 @@ const Studio = () => {
     switch (activeTool) {
       case "chat":
         return <ChatInterface />;
-      case "code":
-        return <CodeEditor />;
-      case "python":
-        return <PythonPractice />;
-      case "journal":
-        return <Journal />;
+      case "mental":
+        return <AthleteMentalHealth />;
+      case "recruiting":
+        return <RecruitingProfile />;
+      case "appbuilder":
+        return <AthleteAppBuilder />;
+      case "cybersec":
+        return <SportsCybersecurity />;
+      case "financial":
+        return <FinancialLiteracy />;
+      case "branding":
+        return <AthleteImageEngineer />;
+      case "style":
+        return <IdentityStyleIntelligence />;
       case "music":
         return <MusicStudio />;
       case "video":
         return <VideoEditor />;
       case "photo":
         return <PhotoStudio />;
-      case "style":
-        return <IdentityStyleIntelligence />;
-      case "security":
-        return <CybersecurityLab />;
+      case "code":
+        return <CodeEditor />;
+      case "python":
+        return <PythonPractice />;
       case "sql":
         return <SQLPractice />;
+      case "security":
+        return <CybersecurityLab />;
       case "art":
         return <ArtistStudio />;
+      case "journal":
+        return <Journal />;
       default:
         return <ChatInterface />;
     }
