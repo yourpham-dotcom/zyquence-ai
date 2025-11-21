@@ -7,6 +7,11 @@ import Index from "./pages/Index";
 import Studio from "./pages/Studio";
 import DataIntelligence from "./pages/DataIntelligence";
 import DataUpload from "./pages/DataUpload";
+import GamingIntelligence from "./pages/GamingIntelligence";
+import MentalWellness from "./pages/gaming/MentalWellness";
+import CodePractice from "./pages/gaming/CodePractice";
+import ArtistCareer from "./pages/gaming/ArtistCareer";
+import FoodIntelligence from "./pages/gaming/FoodIntelligence";
 import SQLLab from "./pages/SQLLab";
 import Visualizer from "./pages/Visualizer";
 import Experiments from "./pages/Experiments";
@@ -32,6 +37,11 @@ const App = () => (
           <Route path="/data-intelligence/experiments" element={<Experiments />} />
           <Route path="/data-intelligence/missions" element={<Missions />} />
           <Route path="/data-intelligence/portfolio" element={<Portfolio />} />
+          <Route path="/gaming-intelligence" element={<GamingIntelligence />} />
+          <Route path="/gaming-intelligence/mental-wellness" element={<MentalWellness />} />
+          <Route path="/gaming-intelligence/code-practice" element={<CodePractice />} />
+          <Route path="/gaming-intelligence/artist-career" element={<ArtistCareer />} />
+          <Route path="/gaming-intelligence/food-intelligence" element={<FoodIntelligence />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
