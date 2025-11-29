@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Studio from "./pages/Studio";
+import Auth from "./pages/Auth";
 import DataIntelligence from "./pages/DataIntelligence";
 import DataUpload from "./pages/DataUpload";
 import GamingIntelligence from "./pages/GamingIntelligence";
@@ -29,6 +30,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/studio" element={<Studio />} />
           <Route path="/data-intelligence" element={<DataIntelligence />} />
           <Route path="/data-intelligence/upload" element={<DataUpload />} />
