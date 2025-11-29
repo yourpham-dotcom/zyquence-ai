@@ -1,5 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Menu, User } from "lucide-react";
 import { useState } from "react";
 
 const Navigation = () => {
@@ -33,6 +39,18 @@ const Navigation = () => {
             <Button variant="default" className="bg-cyber-blue hover:bg-cyber-blue/90" asChild>
               <a href="/studio">Launch Studio</a>
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="w-5 h-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-background border-border">
+                <DropdownMenuItem asChild>
+                  <a href="/auth" className="cursor-pointer">Login</a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <button
@@ -62,6 +80,9 @@ const Navigation = () => {
             </a>
             <Button variant="default" className="w-full bg-cyber-blue hover:bg-cyber-blue/90" asChild>
               <a href="/studio">Launch Studio</a>
+            </Button>
+            <Button variant="outline" className="w-full" asChild>
+              <a href="/auth">Login</a>
             </Button>
           </div>
         )}
