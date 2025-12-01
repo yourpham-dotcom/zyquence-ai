@@ -13,6 +13,14 @@ import MentalWellness from "./pages/gaming/MentalWellness";
 import CodePractice from "./pages/gaming/CodePractice";
 import ArtistCareer from "./pages/gaming/ArtistCareer";
 import FoodIntelligence from "./pages/gaming/FoodIntelligence";
+import MiniGames from "./pages/gaming/MiniGames";
+import CreativeSuperpower from "./pages/gaming/CreativeSuperpower";
+import ConcertBuilder from "./pages/gaming/ConcertBuilder";
+import SportsArena from "./pages/gaming/SportsArena";
+import RealEstate from "./pages/gaming/RealEstate";
+import CarBuilder from "./pages/gaming/CarBuilder";
+import Journal from "./pages/gaming/Journal";
+import ProjectManager from "./pages/gaming/ProjectManager";
 import SQLLab from "./pages/SQLLab";
 import Visualizer from "./pages/Visualizer";
 import Experiments from "./pages/Experiments";
@@ -44,6 +52,14 @@ const App = () => (
           <Route path="/gaming-intelligence/code-practice" element={<CodePractice />} />
           <Route path="/gaming-intelligence/artist-career" element={<ArtistCareer />} />
           <Route path="/gaming-intelligence/food-intelligence" element={<FoodIntelligence />} />
+          <Route path="/gaming-intelligence/mini-games" element={<MiniGames />} />
+          <Route path="/gaming-intelligence/creative-superpower" element={<CreativeSuperpower />} />
+          <Route path="/gaming-intelligence/concert-builder" element={<ConcertBuilder />} />
+          <Route path="/gaming-intelligence/sports-arena" element={<SportsArena />} />
+          <Route path="/gaming-intelligence/real-estate" element={<RealEstate />} />
+          <Route path="/gaming-intelligence/car-builder" element={<CarBuilder />} />
+          <Route path="/gaming-intelligence/journal" element={<Journal />} />
+          <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
