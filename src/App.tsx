@@ -21,6 +21,7 @@ import RealEstate from "./pages/gaming/RealEstate";
 import CarBuilder from "./pages/gaming/CarBuilder";
 import Journal from "./pages/gaming/Journal";
 import ProjectManager from "./pages/gaming/ProjectManager";
+import AIBuilderHub from "./pages/AIBuilderHub";
 import SQLLab from "./pages/SQLLab";
 import Visualizer from "./pages/Visualizer";
 import Experiments from "./pages/Experiments";
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/gaming-intelligence/car-builder" element={<CarBuilder />} />
           <Route path="/gaming-intelligence/journal" element={<Journal />} />
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
+          <Route path="/ai-builder" element={<AIBuilderHub />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
