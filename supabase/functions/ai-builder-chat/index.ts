@@ -18,6 +18,16 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Enhanced system prompt that enforces code generation
+    const enhancedSystemPrompt = `${systemPrompt}
+
+REMINDER: You are a CODE GENERATOR. Your responses MUST include actual working code wrapped in the specified format tags (---HTML---, ---CSS---, ---JS---, ---TXT---). 
+NEVER apologize or say you cannot build something. 
+NEVER just describe what an app would do - BUILD IT.
+ALWAYS output complete, functional code that works when previewed in a browser.`;
+
+    console.log("Processing AI Builder request with module prompt");
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -27,7 +37,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: enhancedSystemPrompt },
           ...messages,
         ],
       }),
@@ -35,12 +45,14 @@ serve(async (req) => {
 
     if (!response.ok) {
       if (response.status === 429) {
+        console.error("Rate limit exceeded");
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (response.status === 402) {
+        console.error("AI credits exhausted");
         return new Response(
           JSON.stringify({ error: "AI credits exhausted. Please add credits." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -53,6 +65,8 @@ serve(async (req) => {
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "I couldn't generate a response. Please try again.";
+
+    console.log("AI response received, content length:", content.length);
 
     return new Response(
       JSON.stringify({ content }),
