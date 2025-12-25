@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Heart, Brain, Zap } from "lucide-react";
+import { Brain, Zap } from "lucide-react";
 
 const Mission = () => {
   return (
@@ -17,33 +17,7 @@ const Mission = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            <Card className="p-8 bg-card/50 backdrop-blur-sm border-border card-glow">
-              <div className="space-y-6">
-                <div className="w-12 h-12 rounded-lg bg-cyber-blue/10 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-cyber-blue" />
-                </div>
-                <h3 className="text-2xl font-bold">Why We Started</h3>
-                <div className="text-muted-foreground space-y-4 leading-relaxed">
-                  <p>
-                    My name is GP, and Zyquence started from a real place in my life. After graduating, 
-                    I got rejected from jobs over and over again. I never had internships. I didn't have 
-                    the experience companies wanted.
-                  </p>
-                  <p>
-                    I've dealt with ADHD my whole life — but I realized something important: 
-                    <span className="text-cyber-cyan font-semibold"> ADHD can be a superpower when you use it right</span>. 
-                    It lets you think creatively, make connections others can't see, and build things that feel new and different.
-                  </p>
-                  <p>
-                    I noticed my classmates were going through the same thing. Everyone was stuck waiting for opportunities. 
-                    That's when I thought: What if we could build a place where anyone can develop real skills — 
-                    even while dealing with ADHD, disabilities, or mental challenges?
-                  </p>
-                </div>
-              </div>
-            </Card>
-
+          <div className="max-w-2xl mx-auto mb-16">
             <Card className="p-8 bg-card/50 backdrop-blur-sm border-border card-glow">
               <div className="space-y-6">
                 <div className="w-12 h-12 rounded-lg bg-cyber-green/10 flex items-center justify-center">
