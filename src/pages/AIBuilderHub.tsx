@@ -65,7 +65,7 @@ const AIBuilderHub = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="h-screen flex w-full bg-background overflow-hidden">
         <AIBuilderSidebar 
           activeModule={activeModule} 
           onModuleChange={setActiveModule}
@@ -73,7 +73,7 @@ const AIBuilderHub = () => {
           showMyBuilds={showMyBuilds}
         />
         
-        <main className="flex-1 flex">
+        <main className="flex-1 flex overflow-hidden">
           {showMyBuilds ? (
             <AIBuilderMyBuilds 
               builds={myBuilds} 

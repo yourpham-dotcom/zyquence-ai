@@ -425,7 +425,7 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
   const module = moduleInfo[activeModule];
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background overflow-hidden">
       <header className="h-14 border-b border-border flex items-center justify-between px-6">
         <h1 className="font-semibold">{module.title}</h1>
         <Button 
