@@ -20,7 +20,7 @@ const FinancialLiteracy = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 gap-6 bg-background">
+    <div className="h-full flex flex-col p-6 gap-6 bg-background overflow-y-auto pb-24">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
