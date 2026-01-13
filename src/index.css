@@ -20,8 +20,8 @@ All colors MUST be HSL.
     --popover: 214 31% 91%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 130 70% 45%;
-    --primary-foreground: 140 80% 97%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 215 24% 26%;
     --secondary-foreground: 210 40% 98%;
@@ -37,23 +37,23 @@ All colors MUST be HSL.
 
     --border: 212 26% 83%;
     --input: 212 26% 83%;
-    --ring: 130 70% 45%;
+    --ring: 0 0% 10%;
 
     --radius: 0.5rem;
 
     /* Custom Zyquence tokens */
-    --cyber-blue: 130 70% 55%;
-    --cyber-cyan: 140 75% 60%;
-    --cyber-green: 145 68% 50%;
+    --cyber-blue: 0 0% 15%;
+    --cyber-cyan: 0 0% 20%;
+    --cyber-green: 0 0% 10%;
     --neon-accent: 280 100% 70%;
 
     /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(130 70% 55%) 0%, hsl(145 68% 50%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 15%) 0%, hsl(0 0% 10%) 100%);
     --gradient-card: linear-gradient(135deg, hsl(220 20% 12%) 0%, hsl(220 15% 18%) 100%);
-    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(130 70% 55% / 0.15), transparent 50%);
+    --gradient-glow: radial-gradient(circle at 50% 0%, hsl(0 0% 15% / 0.15), transparent 50%);
 
     /* Shadows */
-    --shadow-glow: 0 0 40px hsl(130 70% 55% / 0.3);
+    --shadow-glow: 0 0 40px hsl(0 0% 15% / 0.3);
     --shadow-card: 0 8px 32px hsl(220 25% 4% / 0.4);
 
     /* Transitions */
@@ -64,9 +64,9 @@ All colors MUST be HSL.
 
     --sidebar-foreground: 222 47% 11%;
 
-    --sidebar-primary: 130 70% 45%;
+    --sidebar-primary: 0 0% 10%;
 
-    --sidebar-primary-foreground: 140 80% 97%;
+    --sidebar-primary-foreground: 0 0% 98%;
 
     --sidebar-accent: 215 24% 26%;
 
@@ -74,11 +74,11 @@ All colors MUST be HSL.
 
     --sidebar-border: 212 26% 83%;
 
-    --sidebar-ring: 130 70% 45%;
+    --sidebar-ring: 0 0% 10%;
 
-    --chart-1: 130 75% 60%;
+    --chart-1: 0 0% 15%;
 
-    --chart-2: 140 80% 65%;
+    --chart-2: 0 0% 25%;
 
     --chart-3: 215 20% 65%;
 
@@ -123,8 +123,8 @@ All colors MUST be HSL.
     --card-foreground: 210 40% 98%;
     --popover: 215 24% 26%;
     --popover-foreground: 210 40% 98%;
-    --primary: 130 75% 60%;
-    --primary-foreground: 140 80% 15%;
+    --primary: 0 0% 85%;
+    --primary-foreground: 0 0% 10%;
     --secondary: 212 26% 83%;
     --secondary-foreground: 228 84% 4%;
     --muted: 215 16% 46%;
@@ -135,20 +135,20 @@ All colors MUST be HSL.
     --destructive-foreground: 0 85% 97%;
     --border: 215 19% 34%;
     --input: 215 19% 34%;
-    --ring: 130 75% 60%;
-    --chart-1: 130 80% 70%;
-    --chart-2: 140 85% 75%;
+    --ring: 0 0% 85%;
+    --chart-1: 0 0% 75%;
+    --chart-2: 0 0% 65%;
     --chart-3: 215 20% 65%;
     --chart-4: 215 16% 46%;
     --chart-5: 215 19% 34%;
     --sidebar: 217 32% 17%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 130 75% 60%;
-    --sidebar-primary-foreground: 140 80% 15%;
+    --sidebar-primary: 0 0% 85%;
+    --sidebar-primary-foreground: 0 0% 10%;
     --sidebar-accent: 215 20% 65%;
     --sidebar-accent-foreground: 228 84% 4%;
     --sidebar-border: 215 19% 34%;
-    --sidebar-ring: 130 75% 60%;
+    --sidebar-ring: 0 0% 85%;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
@@ -204,9 +204,6 @@ All colors MUST be HSL.
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
-
-/* ---break---
-*/
 
 @layer base {
   * {
