@@ -23,13 +23,13 @@ const Hero = () => {
 
           {/* Main heading */}
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
-            <span className="block text-gradient glow-text">
+            <span className="block text-foreground/70">
               Innovating the
             </span>
-            <span className="block mt-2">
+            <span className="block mt-2 text-foreground/70">
               Next Level of
             </span>
-            <span className="block text-gradient glow-text mt-2">
+            <span className="block mt-2 text-foreground/70">
               Creative Intelligence
             </span>
           </h1>
