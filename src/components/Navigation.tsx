@@ -15,8 +15,7 @@ const Navigation = () => {
     <nav className="fixed top-0 w-full z-50 backdrop-blur-lg bg-background/80 border-b border-border">
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-cyber-blue to-cyber-cyan rounded-lg" />
+          <div className="flex items-center">
             <span className="text-2xl font-bold text-gradient">Zyquence</span>
           </div>
 
