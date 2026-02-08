@@ -54,7 +54,7 @@ const ChatInterface = () => {
                 className={`rounded-lg px-4 py-3 max-w-[75%] ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-card border border-border"
+                    : "bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm"
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>

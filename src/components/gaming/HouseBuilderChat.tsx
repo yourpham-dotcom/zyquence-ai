@@ -112,7 +112,7 @@ export default function HouseBuilderChat({ onHouseGenerated }: HouseBuilderChatP
                 className={`rounded-lg px-3 py-2 max-w-[80%] text-sm ${
                   msg.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
+                    : "bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm text-foreground"
                 }`}
               >
                 {msg.content}
@@ -129,7 +129,7 @@ export default function HouseBuilderChat({ onHouseGenerated }: HouseBuilderChatP
               <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-3.5 h-3.5 text-primary" />
               </div>
-              <div className="rounded-lg px-3 py-2 bg-muted text-foreground text-sm flex items-center gap-2">
+              <div className="rounded-lg px-3 py-2 bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm text-foreground text-sm flex items-center gap-2">
                 <Loader2 className="w-3 h-3 animate-spin" />
                 Designing your house...
               </div>
