@@ -54,6 +54,7 @@ export const useSpotify = () => {
   const [isLoading, setIsLoading] = useState(false);
   const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const hasHandledCallback = useRef(false);
 
   // Check for stored tokens on mount
   useEffect(() => {
@@ -72,36 +73,34 @@ export const useSpotify = () => {
     }
   }, []);
 
-  // Poll for currently playing when connected
+  // Handle OAuth callback - check URL for code parameter
   useEffect(() => {
-    if (state.isConnected && state.accessToken) {
-      fetchCurrentlyPlaying();
-      pollInterval.current = setInterval(fetchCurrentlyPlaying, 5000);
-    }
-    return () => {
-      if (pollInterval.current) clearInterval(pollInterval.current);
-    };
-  }, [state.isConnected, state.accessToken]);
+    if (hasHandledCallback.current) return;
 
-  // Handle OAuth callback
-  useEffect(() => {
-    const handleCallback = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("spotify_code");
-      if (!code) return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    const spotifyState = params.get("state");
 
-      // Clean URL
-      const url = new URL(window.location.href);
-      url.searchParams.delete("spotify_code");
-      window.history.replaceState({}, "", url.toString());
+    // Only handle if we have a code and it looks like a Spotify callback
+    if (!code || spotifyState !== "spotify_auth") return;
 
+    hasHandledCallback.current = true;
+
+    // Clean URL immediately
+    const url = new URL(window.location.href);
+    url.searchParams.delete("code");
+    url.searchParams.delete("state");
+    window.history.replaceState({}, "", url.toString());
+
+    const exchangeCode = async () => {
       setIsLoading(true);
       try {
+        const redirectUri = `${window.location.origin}/studio`;
         const { data, error } = await supabase.functions.invoke("spotify-auth", {
           body: {
             action: "exchange",
             code,
-            redirect_uri: `${window.location.origin}/studio`,
+            redirect_uri: redirectUri,
           },
         });
 
@@ -128,8 +127,19 @@ export const useSpotify = () => {
       }
     };
 
-    handleCallback();
+    exchangeCode();
   }, []);
+
+  // Poll for currently playing when connected
+  useEffect(() => {
+    if (state.isConnected && state.accessToken) {
+      fetchCurrentlyPlaying();
+      pollInterval.current = setInterval(fetchCurrentlyPlaying, 5000);
+    }
+    return () => {
+      if (pollInterval.current) clearInterval(pollInterval.current);
+    };
+  }, [state.isConnected, state.accessToken]);
 
   const connect = useCallback(async () => {
     setIsLoading(true);
@@ -146,67 +156,11 @@ export const useSpotify = () => {
       authUrl.searchParams.set("response_type", "code");
       authUrl.searchParams.set("redirect_uri", redirectUri);
       authUrl.searchParams.set("scope", SPOTIFY_SCOPES);
+      authUrl.searchParams.set("state", "spotify_auth");
       authUrl.searchParams.set("show_dialog", "true");
 
-      // Open in popup
-      const width = 450;
-      const height = 700;
-      const left = window.screenX + (window.innerWidth - width) / 2;
-      const top = window.screenY + (window.innerHeight - height) / 2;
-
-      const popup = window.open(
-        authUrl.toString(),
-        "Spotify Login",
-        `width=${width},height=${height},left=${left},top=${top}`
-      );
-
-      // Listen for the callback
-      const checkPopup = setInterval(async () => {
-        try {
-          if (!popup || popup.closed) {
-            clearInterval(checkPopup);
-            setIsLoading(false);
-            return;
-          }
-          const popupUrl = popup.location.href;
-          if (popupUrl.includes("code=")) {
-            const url = new URL(popupUrl);
-            const code = url.searchParams.get("code");
-            popup.close();
-            clearInterval(checkPopup);
-
-            if (code) {
-              const { data: tokenData, error: tokenError } = await supabase.functions.invoke("spotify-auth", {
-                body: {
-                  action: "exchange",
-                  code,
-                  redirect_uri: redirectUri,
-                },
-              });
-
-              if (tokenError) throw tokenError;
-
-              const expiresAt = Date.now() + tokenData.expires_in * 1000;
-              localStorage.setItem("spotify_auth", JSON.stringify({
-                access_token: tokenData.access_token,
-                refresh_token: tokenData.refresh_token,
-                user: tokenData.user,
-                expires_at: expiresAt,
-              }));
-
-              setState(prev => ({
-                ...prev,
-                isConnected: true,
-                user: tokenData.user,
-                accessToken: tokenData.access_token,
-              }));
-            }
-            setIsLoading(false);
-          }
-        } catch {
-          // Cross-origin - popup still on Spotify's domain
-        }
-      }, 500);
+      // Redirect in same window
+      window.location.href = authUrl.toString();
     } catch (err) {
       console.error("Spotify connect error:", err);
       setIsLoading(false);
@@ -246,7 +200,7 @@ export const useSpotify = () => {
         expires_at: expiresAt,
       }));
 
-      setState(prev => ({ ...prev, accessToken: data.access_token, isConnected: true }));
+      setState(prev => ({ ...prev, accessToken: data.access_token, isConnected: true, user: stored.user }));
     } catch {
       disconnect();
     }
