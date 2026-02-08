@@ -3,14 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
   Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
-  Brain, UserPlus, Wand2, DollarSign, Star, ChevronRight
+  Brain, UserPlus, Wand2, DollarSign, Star
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import ChatInterface from "@/components/studio/ChatInterface";
@@ -180,29 +174,21 @@ const Studio = () => {
 
           {/* Tool Icons with Dropdowns */}
           {tools.map((tool) => (
-            <DropdownMenu key={tool.id}>
-              <DropdownMenuTrigger asChild>
+            <Tooltip key={tool.id}>
+              <TooltipTrigger asChild>
                 <Button
                   variant="ghost"
                   size={sidebarWidth > 64 ? "default" : "icon"}
+                  onClick={() => setActiveTool(tool.id)}
                   className={`${activeTool === tool.id ? "bg-primary text-primary-foreground" : "hover:bg-accent"} ${sidebarWidth > 64 ? "w-full justify-start px-4" : ""}`}
                   style={sidebarWidth > 64 ? { width: `${sidebarWidth - 16}px` } : {}}
                 >
                   <tool.icon className="h-5 w-5" />
                   {sidebarWidth > 100 && <span className="ml-2 text-sm">{tool.label}</span>}
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start" className="w-48 bg-background border-border">
-                <DropdownMenuItem 
-                  onClick={() => setActiveTool(tool.id)}
-                  className="cursor-pointer flex items-center gap-2"
-                >
-                  <tool.icon className="h-4 w-4" />
-                  <span>{tool.label}</span>
-                  <ChevronRight className="h-4 w-4 ml-auto" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </TooltipTrigger>
+              <TooltipContent side="right">{tool.label}</TooltipContent>
+            </Tooltip>
           ))}
 
           <div className="w-8 h-px bg-border my-2" />
