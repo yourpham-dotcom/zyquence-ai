@@ -68,21 +68,21 @@ const AthleteAppBuilder = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-6 gap-6 bg-background">
+    <div className="h-full flex flex-col p-4 md:p-6 gap-4 md:gap-6 bg-background overflow-y-auto">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
             <Wand2 className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-foreground">AI No-Code App Builder</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-foreground">AI No-Code App Builder</h2>
             <p className="text-sm text-muted-foreground">Build custom athlete apps with AI - no coding needed</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
-        <Card className="p-6 bg-card border-border flex flex-col min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0 lg:min-h-0">
+        <Card className="p-4 md:p-6 bg-card border-border flex flex-col min-h-[300px] lg:min-h-0">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">AI Copilot Chat</h3>
@@ -152,7 +152,7 @@ const AthleteAppBuilder = () => {
           </div>
         </Card>
 
-        <Card className="p-6 bg-card border-border flex flex-col min-h-0">
+        <Card className="p-4 md:p-6 bg-card border-border flex flex-col min-h-[250px] lg:min-h-0">
           <div className="flex items-center gap-3 mb-4">
             <Code className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">App Preview</h3>
