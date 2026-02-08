@@ -10,19 +10,24 @@ const SpotifyCallback = () => {
     const error = searchParams.get("error");
 
     if (code) {
-      // Store code in localStorage so the main window can pick it up
-      localStorage.setItem("spotify_callback_code", code);
+      // Primary: postMessage to opener (works across storage partitions)
+      if (window.opener) {
+        window.opener.postMessage({ type: "spotify_callback", code }, "*");
+      }
+      // Fallback: localStorage (works if same storage partition)
+      try { localStorage.setItem("spotify_callback_code", code); } catch {}
     }
 
     if (error) {
-      localStorage.setItem("spotify_callback_error", error);
+      if (window.opener) {
+        window.opener.postMessage({ type: "spotify_callback_error", error }, "*");
+      }
+      try { localStorage.setItem("spotify_callback_error", error); } catch {}
     }
 
-    // Close this tab/redirect back to studio
-    // Small delay to ensure localStorage is written
+    // Close this tab/redirect back
     setTimeout(() => {
       window.close();
-      // If window.close() doesn't work (e.g. not opened by script), redirect
       navigate("/studio");
     }, 500);
   }, [searchParams, navigate]);
