@@ -40,6 +40,8 @@ const SPOTIFY_SCOPES = [
   "user-read-private",
 ].join(" ");
 
+const REDIRECT_PATH = "/spotify-callback";
+
 export const useSpotify = () => {
   const [state, setState] = useState<SpotifyState>({
     isConnected: false,
@@ -54,7 +56,6 @@ export const useSpotify = () => {
   const [isLoading, setIsLoading] = useState(false);
   const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const hasHandledCallback = useRef(false);
 
   // Check for stored tokens on mount
   useEffect(() => {
@@ -73,61 +74,42 @@ export const useSpotify = () => {
     }
   }, []);
 
-  // Handle OAuth callback - check URL for code parameter
+  // Listen for OAuth callback via localStorage
   useEffect(() => {
-    if (hasHandledCallback.current) return;
-
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    const spotifyState = params.get("state");
-
-    // Only handle if we have a code and it looks like a Spotify callback
-    if (!code || spotifyState !== "spotify_auth") return;
-
-    hasHandledCallback.current = true;
-
-    // Clean URL immediately
-    const url = new URL(window.location.href);
-    url.searchParams.delete("code");
-    url.searchParams.delete("state");
-    window.history.replaceState({}, "", url.toString());
-
-    const exchangeCode = async () => {
-      setIsLoading(true);
-      try {
-        const redirectUri = `${window.location.origin}/studio`;
-        const { data, error } = await supabase.functions.invoke("spotify-auth", {
-          body: {
-            action: "exchange",
-            code,
-            redirect_uri: redirectUri,
-          },
-        });
-
-        if (error) throw error;
-
-        const expiresAt = Date.now() + data.expires_in * 1000;
-        localStorage.setItem("spotify_auth", JSON.stringify({
-          access_token: data.access_token,
-          refresh_token: data.refresh_token,
-          user: data.user,
-          expires_at: expiresAt,
-        }));
-
-        setState(prev => ({
-          ...prev,
-          isConnected: true,
-          user: data.user,
-          accessToken: data.access_token,
-        }));
-      } catch (err) {
-        console.error("Spotify auth error:", err);
-      } finally {
+    const handleStorageChange = async (e: StorageEvent) => {
+      if (e.key === "spotify_callback_code" && e.newValue) {
+        const code = e.newValue;
+        localStorage.removeItem("spotify_callback_code");
+        await exchangeCode(code);
+      }
+      if (e.key === "spotify_callback_error" && e.newValue) {
+        console.error("Spotify auth error:", e.newValue);
+        localStorage.removeItem("spotify_callback_error");
         setIsLoading(false);
       }
     };
 
-    exchangeCode();
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  // Also check on focus (in case storage event was missed)
+  useEffect(() => {
+    const handleFocus = async () => {
+      const code = localStorage.getItem("spotify_callback_code");
+      if (code) {
+        localStorage.removeItem("spotify_callback_code");
+        await exchangeCode(code);
+      }
+      const error = localStorage.getItem("spotify_callback_error");
+      if (error) {
+        localStorage.removeItem("spotify_callback_error");
+        setIsLoading(false);
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   // Poll for currently playing when connected
@@ -141,6 +123,41 @@ export const useSpotify = () => {
     };
   }, [state.isConnected, state.accessToken]);
 
+  const exchangeCode = async (code: string) => {
+    setIsLoading(true);
+    try {
+      const redirectUri = `${window.location.origin}${REDIRECT_PATH}`;
+      const { data, error } = await supabase.functions.invoke("spotify-auth", {
+        body: {
+          action: "exchange",
+          code,
+          redirect_uri: redirectUri,
+        },
+      });
+
+      if (error) throw error;
+
+      const expiresAt = Date.now() + data.expires_in * 1000;
+      localStorage.setItem("spotify_auth", JSON.stringify({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        user: data.user,
+        expires_at: expiresAt,
+      }));
+
+      setState(prev => ({
+        ...prev,
+        isConnected: true,
+        user: data.user,
+        accessToken: data.access_token,
+      }));
+    } catch (err) {
+      console.error("Spotify auth error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const connect = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -150,17 +167,16 @@ export const useSpotify = () => {
 
       if (error) throw error;
 
-      const redirectUri = `${window.location.origin}/studio`;
+      const redirectUri = `${window.location.origin}${REDIRECT_PATH}`;
       const authUrl = new URL("https://accounts.spotify.com/authorize");
       authUrl.searchParams.set("client_id", data.client_id);
       authUrl.searchParams.set("response_type", "code");
       authUrl.searchParams.set("redirect_uri", redirectUri);
       authUrl.searchParams.set("scope", SPOTIFY_SCOPES);
-      authUrl.searchParams.set("state", "spotify_auth");
       authUrl.searchParams.set("show_dialog", "true");
 
-      // Redirect in same window
-      window.location.href = authUrl.toString();
+      // Open in a new tab (avoids iframe restrictions)
+      window.open(authUrl.toString(), "_blank", "noopener,noreferrer");
     } catch (err) {
       console.error("Spotify connect error:", err);
       setIsLoading(false);
@@ -270,7 +286,6 @@ export const useSpotify = () => {
   const playTrack = useCallback(async (track: SpotifyTrack) => {
     if (!state.accessToken) return;
 
-    // Try Spotify Connect first (requires Premium)
     try {
       const res = await fetch("https://api.spotify.com/v1/me/player/play", {
         method: "PUT",
@@ -291,9 +306,7 @@ export const useSpotify = () => {
 
     // Fallback: play 30s preview
     if (track.previewUrl) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
+      if (audioRef.current) audioRef.current.pause();
       audioRef.current = new Audio(track.previewUrl);
       audioRef.current.volume = 0.7;
       audioRef.current.play();
@@ -307,7 +320,6 @@ export const useSpotify = () => {
   const togglePlay = useCallback(async () => {
     if (!state.accessToken) return;
 
-    // Try Spotify Connect
     try {
       const endpoint = state.isPlaying
         ? "https://api.spotify.com/v1/me/player/pause"
@@ -325,11 +337,8 @@ export const useSpotify = () => {
     }
 
     if (audioRef.current) {
-      if (state.isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
+      if (state.isPlaying) audioRef.current.pause();
+      else audioRef.current.play();
       setState(prev => ({ ...prev, isPlaying: !prev.isPlaying }));
     }
   }, [state.accessToken, state.isPlaying]);
