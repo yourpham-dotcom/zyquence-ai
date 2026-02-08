@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Save, Loader2, Download } from "lucide-react";
+import { Send, Bot, User, Save, Loader2, Download, Bookmark, BookmarkCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,6 +34,7 @@ interface AIBuilderChatProps {
   activeModule: ModuleType;
   onFilesGenerated: (files: GeneratedFile[]) => void;
   onSaveBuild: (title: string) => void;
+  savedBuildIds?: string[];
 }
 
 const moduleInfo = {
@@ -304,6 +305,7 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevModuleRef = useRef(activeModule);
 
@@ -311,6 +313,7 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
     if (prevModuleRef.current !== activeModule) {
       setMessages([]);
       onFilesGenerated([]);
+      setIsSaved(false);
       prevModuleRef.current = activeModule;
     }
   }, [activeModule, onFilesGenerated]);
@@ -446,6 +449,7 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
         
         if (files.length > 0) {
           onFilesGenerated(files);
+          setIsSaved(false);
           toast.success(`Generated ${files.length} file(s)!`);
         }
       }
@@ -470,20 +474,12 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
     <div className="flex-1 flex flex-col bg-background overflow-hidden">
       <header className="h-14 border-b border-border flex items-center justify-between px-6">
         <h1 className="font-semibold">{module.title}</h1>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={() => {
-            const title = prompt("Name your build:");
-            if (title) {
-              onSaveBuild(title);
-              toast.success("Build saved!");
-            }
-          }}
-        >
-          <Save className="w-4 h-4 mr-2" />
-          Save Build
-        </Button>
+        {isSaved && (
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <BookmarkCheck className="w-3 h-3 text-green-500" />
+            Saved
+          </span>
+        )}
       </header>
 
       <ScrollArea className="flex-1 p-6">
@@ -547,6 +543,30 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
                         </span>
                       ))}
                     </div>
+                    {!isSaved && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-3 w-full"
+                        onClick={() => {
+                          const title = prompt("Name your build:");
+                          if (title) {
+                            onSaveBuild(title);
+                            setIsSaved(true);
+                            toast.success("Build saved! View it in My Builds.");
+                          }
+                        }}
+                      >
+                        <Bookmark className="w-4 h-4 mr-2" />
+                        Save This Build
+                      </Button>
+                    )}
+                    {isSaved && (
+                      <div className="mt-3 flex items-center gap-2 text-sm text-green-500">
+                        <BookmarkCheck className="w-4 h-4" />
+                        Build saved
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

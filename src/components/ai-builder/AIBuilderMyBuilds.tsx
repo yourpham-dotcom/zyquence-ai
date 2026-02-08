@@ -6,17 +6,30 @@ import {
   ExternalLink,
   Rocket,
   Clock,
-  FileCode
+  FileCode,
+  Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Build, ModuleType } from "@/pages/AIBuilderHub";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface AIBuilderMyBuildsProps {
   builds: Build[];
   onLoadBuild: (build: Build) => void;
   onDeploy: (buildId: string) => string;
+  onDeleteBuild: (buildId: string) => void;
 }
 
 const moduleIcons = {
@@ -40,7 +53,7 @@ const moduleLabels = {
   "athlete-resources": "Athlete Resources"
 };
 
-const AIBuilderMyBuilds = ({ builds, onLoadBuild, onDeploy }: AIBuilderMyBuildsProps) => {
+const AIBuilderMyBuilds = ({ builds, onLoadBuild, onDeploy, onDeleteBuild }: AIBuilderMyBuildsProps) => {
   const handleDeploy = (build: Build) => {
     if (build.deployedUrl) {
       window.open(build.deployedUrl, "_blank");
@@ -48,6 +61,11 @@ const AIBuilderMyBuilds = ({ builds, onLoadBuild, onDeploy }: AIBuilderMyBuildsP
       const url = onDeploy(build.id);
       toast.success(`Deployed to ${url}`);
     }
+  };
+
+  const handleDelete = (build: Build) => {
+    onDeleteBuild(build.id);
+    toast.success(`"${build.title}" has been deleted.`);
   };
 
   return (
@@ -124,6 +142,34 @@ const AIBuilderMyBuilds = ({ builds, onLoadBuild, onDeploy }: AIBuilderMyBuildsP
                             <Rocket className="w-4 h-4" />
                           )}
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete build?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will permanently delete "{build.title}". This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => handleDelete(build)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </div>
