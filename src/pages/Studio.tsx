@@ -3,10 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
   Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
-  Brain, UserPlus, Wand2, DollarSign, Star
+  Brain, UserPlus, Wand2, DollarSign, Star, Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import ChatInterface from "@/components/studio/ChatInterface";
 import CodeEditor from "@/components/studio/CodeEditor";
 import Journal from "@/components/studio/Journal";
@@ -80,14 +86,17 @@ const Studio = () => {
     };
   }, [isResizing, isResizingPlayer]);
 
-  const tools = [
-    { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
+  const athleteTools = [
     { id: "mental" as ToolType, icon: Brain, label: "Mental Health" },
     { id: "recruiting" as ToolType, icon: UserPlus, label: "Recruiting Profile" },
     { id: "appbuilder" as ToolType, icon: Wand2, label: "App Builder" },
     { id: "cybersec" as ToolType, icon: Shield, label: "Sports Cybersecurity" },
     { id: "financial" as ToolType, icon: DollarSign, label: "Financial Literacy" },
     { id: "branding" as ToolType, icon: Star, label: "Image Engineer" },
+  ];
+
+  const tools = [
+    { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
     { id: "style" as ToolType, icon: Sparkles, label: "Style Intelligence" },
     { id: "music" as ToolType, icon: Music, label: "Music Studio" },
     { id: "video" as ToolType, icon: Video, label: "Video Editor" },
@@ -99,6 +108,8 @@ const Studio = () => {
     { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
     { id: "journal" as ToolType, icon: Book, label: "Journal" },
   ];
+
+  const isAthleteToolActive = athleteTools.some(t => t.id === activeTool);
 
   const games = [
     { id: "pingpong" as GameType, label: "Ping Pong" },
@@ -171,6 +182,38 @@ const Studio = () => {
           </Tooltip>
 
           <div className="w-8 h-px bg-border my-2" />
+
+          {/* Athlete Tools Dropdown */}
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size={sidebarWidth > 64 ? "default" : "icon"}
+                    className={`${isAthleteToolActive ? "bg-primary text-primary-foreground" : "hover:bg-accent"} ${sidebarWidth > 64 ? "w-full justify-start px-4" : ""}`}
+                    style={sidebarWidth > 64 ? { width: `${sidebarWidth - 16}px` } : {}}
+                  >
+                    <Users className="h-5 w-5" />
+                    {sidebarWidth > 100 && <span className="ml-2 text-sm">Athlete Tools</span>}
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="right">Athlete Tools</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent side="right" align="start" className="w-52 bg-popover border-border">
+              {athleteTools.map((tool) => (
+                <DropdownMenuItem
+                  key={tool.id}
+                  onClick={() => setActiveTool(tool.id)}
+                  className={`cursor-pointer flex items-center gap-2 ${activeTool === tool.id ? "bg-accent" : ""}`}
+                >
+                  <tool.icon className="h-4 w-4" />
+                  <span>{tool.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Tool Icons with Dropdowns */}
           {tools.map((tool) => (
