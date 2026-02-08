@@ -128,7 +128,7 @@ const RecruitingProfile = () => {
                   className={`max-w-[80%] p-3 rounded-lg ${
                     msg.role === "user"
                       ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
+                      : "bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm text-foreground"
                   }`}
                 >
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -137,7 +137,7 @@ const RecruitingProfile = () => {
             ))}
             {isProcessing && (
               <div className="flex justify-start">
-                <div className="bg-muted text-foreground p-3 rounded-lg">
+                <div className="bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm text-foreground p-3 rounded-lg">
                   <Loader2 className="w-4 h-4 animate-spin" />
                 </div>
               </div>
