@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
   Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
-  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3
+  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useIsMobile } from "@/hooks/use-mobile";
 import ChatInterface from "@/components/studio/ChatInterface";
 import CodeEditor from "@/components/studio/CodeEditor";
 import Journal from "@/components/studio/Journal";
@@ -38,6 +39,7 @@ export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [activeTool, setActiveTool] = useState<ToolType>("chat");
   const [activeGame, setActiveGame] = useState<GameType>(null);
   const [showGames, setShowGames] = useState(false);
@@ -45,6 +47,7 @@ const Studio = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [mediaPlayerHeight, setMediaPlayerHeight] = useState(80);
   const [isResizingPlayer, setIsResizingPlayer] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleMouseDown = () => {
     setIsResizing(true);
@@ -165,6 +168,151 @@ const Studio = () => {
         return <ChatInterface />;
     }
   };
+
+  if (isMobile) {
+    return (
+      <TooltipProvider>
+        <div className="h-screen flex flex-col bg-background select-none">
+          {/* Mobile Top Bar */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card shrink-0">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+              <Home className="h-5 w-5" />
+            </Button>
+            <h1 className="text-sm font-semibold text-foreground truncate">
+              {athleteTools.find(t => t.id === activeTool)?.label ||
+               creativeTools.find(t => t.id === activeTool)?.label ||
+               mediaTools.find(t => t.id === activeTool)?.label ||
+               tools.find(t => t.id === activeTool)?.label || "Studio"}
+            </h1>
+            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
+            <div className="absolute inset-0 top-[53px] z-50 bg-background/95 backdrop-blur-sm overflow-y-auto pb-20">
+              <div className="p-4 space-y-6">
+                {/* Main Tools */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Main</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {tools.map((tool) => (
+                      <Button
+                        key={tool.id}
+                        variant={activeTool === tool.id ? "default" : "outline"}
+                        className="h-14 flex flex-col items-center justify-center gap-1"
+                        onClick={() => { setActiveTool(tool.id); setMobileMenuOpen(false); }}
+                      >
+                        <tool.icon className="h-5 w-5" />
+                        <span className="text-xs">{tool.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Athlete Tools */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Athlete Tools</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {athleteTools.map((tool) => (
+                      <Button
+                        key={tool.id}
+                        variant={activeTool === tool.id ? "default" : "outline"}
+                        className="h-14 flex flex-col items-center justify-center gap-1"
+                        onClick={() => { setActiveTool(tool.id); setMobileMenuOpen(false); }}
+                      >
+                        <tool.icon className="h-5 w-5" />
+                        <span className="text-xs">{tool.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Creative & Code */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Creative & Code</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {creativeTools.map((tool) => (
+                      <Button
+                        key={tool.id}
+                        variant={activeTool === tool.id ? "default" : "outline"}
+                        className="h-14 flex flex-col items-center justify-center gap-1"
+                        onClick={() => { setActiveTool(tool.id); setMobileMenuOpen(false); }}
+                      >
+                        <tool.icon className="h-5 w-5" />
+                        <span className="text-xs">{tool.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Media & Arts */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Media & Arts</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {mediaTools.map((tool) => (
+                      <Button
+                        key={tool.id}
+                        variant={activeTool === tool.id ? "default" : "outline"}
+                        className="h-14 flex flex-col items-center justify-center gap-1"
+                        onClick={() => { setActiveTool(tool.id); setMobileMenuOpen(false); }}
+                      >
+                        <tool.icon className="h-5 w-5" />
+                        <span className="text-xs">{tool.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mini Games */}
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Mini Games</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    {games.map((game) => (
+                      <Button
+                        key={game.id}
+                        variant={activeGame === game.id ? "default" : "outline"}
+                        className="h-14 flex flex-col items-center justify-center gap-1"
+                        onClick={() => { setActiveGame(game.id); setShowGames(true); setMobileMenuOpen(false); }}
+                      >
+                        <Gamepad2 className="h-5 w-5" />
+                        <span className="text-xs">{game.label}</span>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Main Content */}
+          <div className="flex-1 overflow-y-auto min-h-0">
+            {showGames && activeGame ? (
+              <div className="h-full flex flex-col">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-border">
+                  <h3 className="text-sm font-semibold">Mini Games</h3>
+                  <Button variant="ghost" size="sm" onClick={() => { setActiveGame(null); setShowGames(false); }}>
+                    Back
+                  </Button>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                  <MiniGame game={activeGame} onClose={() => { setActiveGame(null); setShowGames(false); }} compact />
+                </div>
+              </div>
+            ) : (
+              renderTool()
+            )}
+          </div>
+
+          {/* Mobile Media Player */}
+          <div className="h-16 shrink-0">
+            <MediaPlayer />
+          </div>
+        </div>
+      </TooltipProvider>
+    );
+  }
 
   return (
     <TooltipProvider>
