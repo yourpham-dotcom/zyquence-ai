@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Music, Film, Play, Pause, SkipBack, SkipForward, Volume2, Search, LogIn, LogOut, X, ExternalLink } from "lucide-react";
+import { Music, Film, Play, Pause, SkipBack, SkipForward, Volume2, Search, LogIn, LogOut, X, ListMusic, ChevronLeft } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSpotify } from "@/hooks/useSpotify";
+import { useSpotify, SpotifyTrack } from "@/hooks/useSpotify";
 
 const MediaPlayer = () => {
   const [volume, setVolume] = useState([70]);
   const [mediaType, setMediaType] = useState<"spotify" | "soundcloud">("spotify");
   const [showSearch, setShowSearch] = useState(false);
+  const [showPlaylists, setShowPlaylists] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [scUrl, setScUrl] = useState("");
   const [scEmbedUrl, setScEmbedUrl] = useState<string | null>(null);
+  const [viewingPlaylistId, setViewingPlaylistId] = useState<string | null>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const spotify = useSpotify();
@@ -22,11 +24,20 @@ const MediaPlayer = () => {
   useEffect(() => {
     if (mediaType !== "spotify" || !spotify.isConnected) return;
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (!searchQuery.trim()) {
+      spotify.search("");
+      return;
+    }
     searchTimeout.current = setTimeout(() => {
       spotify.search(searchQuery);
     }, 400);
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [searchQuery, mediaType, spotify.isConnected]);
+
+  // Sync volume to SDK
+  useEffect(() => {
+    spotify.setVolume(volume[0]);
+  }, [volume]);
 
   const handleSoundCloudEmbed = () => {
     if (!scUrl.trim()) return;
@@ -41,6 +52,24 @@ const MediaPlayer = () => {
     const m = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  const handleTrackClick = (track: SpotifyTrack) => {
+    spotify.playTrack(track);
+    setShowSearch(false);
+    setShowPlaylists(false);
+  };
+
+  const handleSeek = (value: number[]) => {
+    if (spotify.duration > 0) {
+      const positionMs = Math.floor((value[0] / 100) * spotify.duration);
+      spotify.seek(positionMs);
+    }
+  };
+
+  const openPlaylistTracks = (playlistId: string) => {
+    setViewingPlaylistId(playlistId);
+    spotify.fetchPlaylistTracks(playlistId);
   };
 
   return (
@@ -82,28 +111,13 @@ const MediaPlayer = () => {
             <ScrollArea className="flex-1">
               <div className="p-2 space-y-1">
                 {spotify.searchResults.map((track) => (
-                  <button
-                    key={track.id}
-                    onClick={() => {
-                      spotify.playTrack(track);
-                      setShowSearch(false);
-                    }}
-                    className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left"
-                  >
-                    <img
-                      src={track.albumArt}
-                      alt={track.album}
-                      className="w-10 h-10 rounded object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{track.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-                    </div>
-                    <span className="text-xs text-muted-foreground">{formatMs(track.duration)}</span>
-                  </button>
+                  <TrackRow key={track.id} track={track} onClick={() => handleTrackClick(track)} formatMs={formatMs} />
                 ))}
                 {searchQuery && spotify.searchResults.length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-4">No results found</p>
+                )}
+                {!searchQuery && (
+                  <p className="text-sm text-muted-foreground text-center py-4">Type to search for tracks</p>
                 )}
               </div>
             </ScrollArea>
@@ -122,6 +136,68 @@ const MediaPlayer = () => {
               />
             </div>
           )}
+        </div>
+      )}
+
+      {/* Playlists Overlay */}
+      {showPlaylists && (
+        <div className="absolute inset-0 z-20 bg-card border-t border-border flex flex-col">
+          <div className="flex items-center gap-2 p-3 border-b border-border">
+            {viewingPlaylistId ? (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setViewingPlaylistId(null)}>
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            ) : (
+              <ListMusic className="w-4 h-4 text-muted-foreground" />
+            )}
+            <span className="text-sm font-medium flex-1">
+              {viewingPlaylistId
+                ? spotify.playlists.find(p => p.id === viewingPlaylistId)?.name || "Playlist"
+                : "Your Playlists"
+              }
+            </span>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setShowPlaylists(false); setViewingPlaylistId(null); }}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <ScrollArea className="flex-1">
+            {!viewingPlaylistId ? (
+              <div className="p-2 space-y-1">
+                {spotify.playlists.map((playlist) => (
+                  <button
+                    key={playlist.id}
+                    onClick={() => openPlaylistTracks(playlist.id)}
+                    className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left"
+                  >
+                    {playlist.image ? (
+                      <img src={playlist.image} alt={playlist.name} className="w-10 h-10 rounded object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+                        <ListMusic className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{playlist.name}</p>
+                      <p className="text-xs text-muted-foreground">{playlist.trackCount} tracks</p>
+                    </div>
+                  </button>
+                ))}
+                {spotify.playlists.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">No playlists found</p>
+                )}
+              </div>
+            ) : (
+              <div className="p-2 space-y-1">
+                {spotify.playlistTracks.map((track) => (
+                  <TrackRow key={track.id} track={track} onClick={() => handleTrackClick(track)} formatMs={formatMs} />
+                ))}
+                {spotify.playlistTracks.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">Loading tracks...</p>
+                )}
+              </div>
+            )}
+          </ScrollArea>
         </div>
       )}
 
@@ -226,20 +302,48 @@ const MediaPlayer = () => {
                 ) : (
                   <p className="text-xs md:text-sm text-muted-foreground">
                     {mediaType === "spotify" 
-                      ? (spotify.isConnected ? "Search for a track" : "Login to Spotify")
+                      ? (spotify.isConnected 
+                          ? (spotify.sdkReady ? "Search or pick a playlist" : "Initializing player...")
+                          : "Login to Spotify")
                       : "Paste a SoundCloud URL"
                     }
                   </p>
                 )}
-                <Slider value={[spotify.progress / Math.max(spotify.duration, 1) * 100]} max={100} step={1} className="w-full mt-1" />
+                <div className="flex items-center gap-2">
+                  {spotify.currentTrack && (
+                    <span className="text-[10px] text-muted-foreground hidden md:inline">{formatMs(spotify.progress)}</span>
+                  )}
+                  <Slider
+                    value={[spotify.duration > 0 ? (spotify.progress / spotify.duration) * 100 : 0]}
+                    max={100}
+                    step={0.1}
+                    className="flex-1 mt-1"
+                    onValueChange={handleSeek}
+                  />
+                  {spotify.currentTrack && (
+                    <span className="text-[10px] text-muted-foreground hidden md:inline">{formatMs(spotify.duration)}</span>
+                  )}
+                </div>
               </div>
+
+              {/* Playlist Button */}
+              {mediaType === "spotify" && spotify.isConnected && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 md:h-8 md:w-8 hover:bg-accent"
+                  onClick={() => { setShowPlaylists(!showPlaylists); setShowSearch(false); }}
+                >
+                  <ListMusic className="w-3 h-3 md:w-4 md:h-4" />
+                </Button>
+              )}
 
               {/* Search Button */}
               <Button
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 md:h-8 md:w-8 hover:bg-accent"
-                onClick={() => setShowSearch(!showSearch)}
+                onClick={() => { setShowSearch(!showSearch); setShowPlaylists(false); }}
               >
                 <Search className="w-3 h-3 md:w-4 md:h-4" />
               </Button>
@@ -256,5 +360,24 @@ const MediaPlayer = () => {
     </div>
   );
 };
+
+// Extracted reusable track row component
+const TrackRow = ({ track, onClick, formatMs }: { track: SpotifyTrack; onClick: () => void; formatMs: (ms: number) => string }) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center gap-3 p-2 rounded-md hover:bg-accent transition-colors text-left"
+  >
+    <img
+      src={track.albumArt}
+      alt={track.album}
+      className="w-10 h-10 rounded object-cover"
+    />
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-medium truncate">{track.name}</p>
+      <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+    </div>
+    <span className="text-xs text-muted-foreground">{formatMs(track.duration)}</span>
+  </button>
+);
 
 export default MediaPlayer;
