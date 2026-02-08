@@ -1,1 +1,16 @@
 project_id = "fimlnnhdphffuzgzpwab"
+
+[functions.spotify-auth]
+verify_jwt = false
+
+[functions.ai-builder-chat]
+verify_jwt = false
+
+[functions.athlete-mental-coach]
+verify_jwt = false
+
+[functions.house-builder]
+verify_jwt = false
+
+[functions.style-transfer]
+verify_jwt = false
