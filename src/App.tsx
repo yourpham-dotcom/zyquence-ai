@@ -27,6 +27,7 @@ import Visualizer from "./pages/Visualizer";
 import Experiments from "./pages/Experiments";
 import Missions from "./pages/Missions";
 import Portfolio from "./pages/Portfolio";
+import SpotifyCallback from "./pages/SpotifyCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +63,7 @@ const App = () => (
           <Route path="/gaming-intelligence/journal" element={<Journal />} />
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           <Route path="/ai-builder" element={<AIBuilderHub />} />
+          <Route path="/spotify-callback" element={<SpotifyCallback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
