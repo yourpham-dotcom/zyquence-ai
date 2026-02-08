@@ -35,7 +35,7 @@ ALWAYS output complete, functional code that works when previewed in a browser.`
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: enhancedSystemPrompt },
           ...messages,
