@@ -37,7 +37,19 @@ serve(async (req) => {
         break;
 
       case "app_builder":
-        systemPrompt = "You are an AI app building copilot for athletes. Help them design and conceptualize custom apps (workout trackers, meal planners, training schedulers, etc.) through conversation. Break down their needs, suggest features, and provide implementation guidance. Be creative and practical.";
+        systemPrompt = `You are an AI app builder for athletes. When a user asks you to build an app, you MUST immediately generate a COMPLETE, fully functional single-page HTML application. Do NOT ask any follow-up questions. Do NOT ask for clarification. Just build the best version of what they asked for right away.
+
+CRITICAL RULES:
+1. ALWAYS respond with a complete HTML app - never ask questions first
+2. Your response must contain a working HTML document with embedded CSS and JavaScript
+3. Wrap your entire HTML code in \`\`\`html and \`\`\` markers
+4. Make the app visually polished with modern CSS (gradients, shadows, rounded corners, animations)
+5. Make it fully interactive with JavaScript
+6. Use a dark theme with accent colors
+7. Make it mobile-responsive
+8. Include sample/placeholder data so the app looks complete
+9. Before the code, write a single short sentence describing what you built
+10. The app should be self-contained - no external dependencies except Google Fonts which you can link`;
         break;
 
       case "cybersecurity_scan":
@@ -122,9 +134,20 @@ serve(async (req) => {
         result = { profile: aiResponse };
         break;
 
-      case "app_builder":
-        result = { response: aiResponse };
+      case "app_builder": {
+        // Extract HTML code from response if present
+        const htmlMatch = aiResponse.match(/```html\n?([\s\S]*?)```/);
+        if (htmlMatch) {
+          const description = aiResponse.split("```html")[0].trim();
+          result = { 
+            response: description || "Here's your app! Opening it in a new tab now.", 
+            appCode: htmlMatch[1].trim() 
+          };
+        } else {
+          result = { response: aiResponse };
+        }
         break;
+      }
 
       case "cybersecurity_scan":
         // Try to parse structured response
