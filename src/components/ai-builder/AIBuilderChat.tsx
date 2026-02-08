@@ -472,7 +472,7 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
                 className={`rounded-2xl px-4 py-3 max-w-[80%] ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm"
+                    : "glass-bubble text-foreground"
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -502,7 +502,7 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                 <Bot className="w-5 h-5 text-primary" />
               </div>
-              <div className="bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm rounded-2xl px-4 py-3">
+              <div className="glass-bubble text-foreground rounded-2xl px-4 py-3">
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   <span className="text-sm text-muted-foreground">Generating...</span>

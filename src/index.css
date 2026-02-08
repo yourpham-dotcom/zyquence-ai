@@ -187,6 +187,14 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-card), 0 0 0 1px hsl(var(--cyber-blue) / 0.1);
   }
 
+  .glass-bubble {
+    background: hsl(var(--background) / 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--foreground) / 0.08);
+    box-shadow: 0 1px 3px hsl(var(--foreground) / 0.04);
+  }
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }

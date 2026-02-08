@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Bot, User } from "lucide-react";
+import { Send, Bot, User, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Message {
   role: "user" | "assistant";
@@ -14,23 +16,40 @@ const ChatInterface = () => {
     { role: "assistant", content: "Hello! I'm your Zyquence AI assistant. I can help you with coding, Python practice, journaling, or answer any questions you have. What would you like to work on today?" }
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input };
     setMessages(prev => [...prev, userMessage]);
-    
-    // Simulate AI response
-    setTimeout(() => {
+    setInput("");
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("athlete-mental-coach", {
+        body: {
+          input: input,
+          type: "general",
+          conversationHistory: messages
+        },
+      });
+
+      if (error) throw error;
+
       const aiResponse: Message = {
         role: "assistant",
-        content: "I'm here to help! While this is a demo, in the full version I'll assist with Python coding, debugging, journaling prompts, and much more. Try switching tools using the dropdown above!"
+        content: data.response || data.analysis || "I'm sorry, I couldn't generate a response. Please try again."
       };
       setMessages(prev => [...prev, aiResponse]);
-    }, 500);
-
-    setInput("");
+    } catch (error: any) {
+      console.error("Chat error:", error);
+      toast.error("Failed to get a response. Please try again.");
+      setIsLoading(false);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,7 +73,7 @@ const ChatInterface = () => {
                 className={`rounded-lg px-4 py-3 max-w-[75%] ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-foreground/[0.04] backdrop-blur-xl border border-foreground/[0.08] shadow-sm"
+                    : "glass-bubble text-foreground"
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -66,6 +85,19 @@ const ChatInterface = () => {
               )}
             </div>
           ))}
+          {isLoading && (
+            <div className="flex gap-3 justify-start">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-5 h-5 text-primary" />
+              </div>
+              <div className="glass-bubble text-foreground rounded-lg px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm text-muted-foreground">Thinking...</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -92,9 +124,9 @@ const ChatInterface = () => {
               onClick={handleSend} 
               size="icon" 
               className="h-[52px] w-[52px] bg-primary hover:bg-primary/90 rounded-xl"
-              disabled={!input.trim()}
+              disabled={!input.trim() || isLoading}
             >
-              <Send className="w-5 h-5" />
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
             </Button>
           </div>
         </div>
