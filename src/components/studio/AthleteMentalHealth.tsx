@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ const AthleteMentalHealth = () => {
   const [mood, setMood] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
 
   const handleAnalyze = async () => {
@@ -115,7 +116,13 @@ const AthleteMentalHealth = () => {
           <p className="text-sm text-muted-foreground mb-3">
             How are you feeling today? Share your thoughts for personalized insights.
           </p>
-          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button 
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            onClick={() => {
+              textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+              setTimeout(() => textareaRef.current?.focus(), 300);
+            }}
+          >
             Start Check-in
           </Button>
         </Card>
@@ -128,6 +135,7 @@ const AthleteMentalHealth = () => {
         </div>
 
         <Textarea
+          ref={textareaRef}
           placeholder="Describe how you're feeling mentally, physically, or emotionally. Share your thoughts about training, competition, or life balance..."
           value={mood}
           onChange={(e) => setMood(e.target.value)}
