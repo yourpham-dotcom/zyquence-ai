@@ -6,6 +6,16 @@ import { Star, TrendingUp, Users, Target, Loader2, Sparkles } from "lucide-react
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+const stripMarkdown = (text: string): string => {
+  return text
+    .replace(/#{1,6}\s?/g, '')        // Remove headings
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold
+    .replace(/\*([^*]+)\*/g, '$1')     // Remove italic
+    .replace(/\*\s/g, '- ')           // Replace * bullets with -
+    .replace(/\*$/gm, '')             // Remove trailing *
+    .trim();
+};
+
 const AthleteImageEngineer = () => {
   const [profile, setProfile] = useState("");
   const [analysis, setAnalysis] = useState<any>(null);
@@ -161,7 +171,7 @@ const AthleteImageEngineer = () => {
           <div className="space-y-4">
             <Card className="p-4 bg-primary/5 border-primary/20">
               <h4 className="font-semibold text-foreground mb-2">Your Brand Analysis</h4>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{analysis.overview}</p>
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{stripMarkdown(analysis.overview)}</p>
             </Card>
 
             {analysis.strengths && (
@@ -172,7 +182,7 @@ const AthleteImageEngineer = () => {
                 </h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   {analysis.strengths.map((strength: string, idx: number) => (
-                    <li key={idx}>• {strength}</li>
+                    <li key={idx}>• {stripMarkdown(strength)}</li>
                   ))}
                 </ul>
               </Card>
@@ -186,7 +196,7 @@ const AthleteImageEngineer = () => {
                 </h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   {analysis.recommendations.map((rec: string, idx: number) => (
-                    <li key={idx}>• {rec}</li>
+                    <li key={idx}>• {stripMarkdown(rec)}</li>
                   ))}
                 </ul>
               </Card>
