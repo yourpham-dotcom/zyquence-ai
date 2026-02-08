@@ -74,8 +74,30 @@ export const useSpotify = () => {
     }
   }, []);
 
-  // Listen for OAuth callback via localStorage
+  // Poll for OAuth callback code in localStorage (storage events unreliable in iframes)
   useEffect(() => {
+    let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+    const checkForCallback = async () => {
+      const code = localStorage.getItem("spotify_callback_code");
+      if (code) {
+        localStorage.removeItem("spotify_callback_code");
+        if (pollTimer) clearInterval(pollTimer);
+        await exchangeCode(code);
+      }
+      const error = localStorage.getItem("spotify_callback_error");
+      if (error) {
+        console.error("Spotify auth error:", error);
+        localStorage.removeItem("spotify_callback_error");
+        if (pollTimer) clearInterval(pollTimer);
+        setIsLoading(false);
+      }
+    };
+
+    // Poll every 500ms for the callback code
+    pollTimer = setInterval(checkForCallback, 500);
+
+    // Also listen for storage events as a backup
     const handleStorageChange = async (e: StorageEvent) => {
       if (e.key === "spotify_callback_code" && e.newValue) {
         const code = e.newValue;
@@ -88,28 +110,12 @@ export const useSpotify = () => {
         setIsLoading(false);
       }
     };
-
     window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
 
-  // Also check on focus (in case storage event was missed)
-  useEffect(() => {
-    const handleFocus = async () => {
-      const code = localStorage.getItem("spotify_callback_code");
-      if (code) {
-        localStorage.removeItem("spotify_callback_code");
-        await exchangeCode(code);
-      }
-      const error = localStorage.getItem("spotify_callback_error");
-      if (error) {
-        localStorage.removeItem("spotify_callback_error");
-        setIsLoading(false);
-      }
+    return () => {
+      if (pollTimer) clearInterval(pollTimer);
+      window.removeEventListener("storage", handleStorageChange);
     };
-
-    window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
   // Poll for currently playing when connected
@@ -177,8 +183,8 @@ export const useSpotify = () => {
       authUrl.searchParams.set("scope", SPOTIFY_SCOPES);
       authUrl.searchParams.set("show_dialog", "true");
 
-      // Open in a new tab (avoids iframe restrictions)
-      window.open(authUrl.toString(), "_blank", "noopener,noreferrer");
+      // Open in a new tab (avoid noopener so window.close works in callback)
+      window.open(authUrl.toString(), "_blank");
     } catch (err) {
       console.error("Spotify connect error:", err);
       setIsLoading(false);
