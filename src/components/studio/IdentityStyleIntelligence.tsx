@@ -2,9 +2,10 @@ import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Upload, Copy, Download, Loader2, User } from "lucide-react";
+import { Sparkles, Upload, Copy, Download, Loader2, User, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import CameraCapture from "./CameraCapture";
 
 const IdentityStyleIntelligence = () => {
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
@@ -12,9 +13,29 @@ const IdentityStyleIntelligence = () => {
   const [styledResult, setStyledResult] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [styleUrl, setStyleUrl] = useState("");
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraTarget, setCameraTarget] = useState<"user" | "style">("user");
   const userFileRef = useRef<HTMLInputElement>(null);
   const styleFileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  const handleCameraCapture = (dataUrl: string) => {
+    if (cameraTarget === "user") {
+      setUserPhoto(dataUrl);
+      setStyledResult(null);
+    } else {
+      setStylePhoto(dataUrl);
+    }
+    toast({
+      title: "Photo Captured",
+      description: "Your camera photo has been loaded",
+    });
+  };
+
+  const openCamera = (target: "user" | "style") => {
+    setCameraTarget(target);
+    setShowCamera(true);
+  };
 
   const handleUserPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -181,6 +202,14 @@ const IdentityStyleIntelligence = () => {
             <Upload className="w-4 h-4 mr-2" />
             Upload Photo
           </Button>
+          <Button 
+            onClick={() => openCamera("user")}
+            variant="outline"
+            className="w-full"
+          >
+            <Camera className="w-4 h-4 mr-2" />
+            Take Photo
+          </Button>
         </Card>
 
         {/* Style Reference */}
@@ -220,6 +249,14 @@ const IdentityStyleIntelligence = () => {
             >
               <Upload className="w-4 h-4 mr-2" />
               Upload Style Image
+            </Button>
+            <Button 
+              onClick={() => openCamera("style")}
+              variant="outline"
+              className="w-full"
+            >
+              <Camera className="w-4 h-4 mr-2" />
+              Take Photo of Style
             </Button>
             
             <div className="flex gap-2">
@@ -303,9 +340,9 @@ const IdentityStyleIntelligence = () => {
           <div className="space-y-1">
             <h4 className="font-semibold text-foreground">How it works</h4>
             <p className="text-sm text-muted-foreground">
-              1. Upload a clear photo of yourself
+              1. Upload or take a photo of yourself using your camera
               <br />
-              2. Upload a style reference or paste an image URL from fashion sites
+              2. Upload a style reference, take a photo, or paste an image URL from fashion sites
               <br />
               3. Click "Apply Style with AI" to see yourself in that outfit and hairstyle
               <br />
@@ -314,6 +351,12 @@ const IdentityStyleIntelligence = () => {
           </div>
         </div>
       </Card>
+
+      <CameraCapture
+        open={showCamera}
+        onOpenChange={setShowCamera}
+        onCapture={handleCameraCapture}
+      />
     </div>
   );
 };
