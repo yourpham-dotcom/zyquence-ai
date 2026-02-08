@@ -57,6 +57,10 @@ const AIBuilderHub = () => {
     return fakeUrl;
   };
 
+  const handleDeleteBuild = (buildId: string) => {
+    setMyBuilds(prev => prev.filter(b => b.id !== buildId));
+  };
+
   const handleLoadBuild = (build: Build) => {
     setActiveModule(build.module);
     setGeneratedFiles(build.files);
@@ -79,6 +83,7 @@ const AIBuilderHub = () => {
               builds={myBuilds} 
               onLoadBuild={handleLoadBuild}
               onDeploy={handleDeploy}
+              onDeleteBuild={handleDeleteBuild}
             />
           ) : (
             <>
