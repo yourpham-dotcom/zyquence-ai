@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Save, Loader2 } from "lucide-react";
+import { Send, Bot, User, Save, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -7,11 +7,27 @@ import { ModuleType, GeneratedFile } from "@/pages/AIBuilderHub";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+const IMAGE_KEYWORDS = [
+  "generate an image", "generate image", "create an image", "create image",
+  "make an image", "make image", "draw", "design an image", "design image",
+  "picture of", "photo of", "illustration of", "artwork of",
+  "generate a picture", "create a picture", "make a picture",
+  "generate a photo", "create a photo", "make a photo",
+  "show me an image", "show me a picture",
+  "image of", "visualize", "render",
+];
+
+function isImageRequest(text: string): boolean {
+  const lower = text.toLowerCase();
+  return IMAGE_KEYWORDS.some(kw => lower.includes(kw));
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   files?: GeneratedFile[];
+  imageUrl?: string;
 }
 
 interface AIBuilderChatProps {
@@ -381,38 +397,57 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const userInput = input;
     setInput("");
     setIsLoading(true);
 
     try {
-      const response = await supabase.functions.invoke("ai-builder-chat", {
-        body: {
-          messages: [...messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content
-          })),
-          systemPrompt: moduleInfo[activeModule].systemPrompt
+      // Check if this is an image generation request
+      if (isImageRequest(userInput)) {
+        const { data, error } = await supabase.functions.invoke("generate-image", {
+          body: { prompt: userInput, quality: "high" },
+        });
+
+        if (error) throw error;
+        if (data.error) throw new Error(data.error);
+
+        const assistantMessage: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: data.caption || "Here's your generated image!",
+          imageUrl: data.imageUrl,
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        const response = await supabase.functions.invoke("ai-builder-chat", {
+          body: {
+            messages: [...messages, userMessage].map(m => ({
+              role: m.role,
+              content: m.content
+            })),
+            systemPrompt: moduleInfo[activeModule].systemPrompt
+          }
+        });
+
+        if (response.error) throw response.error;
+
+        const aiContent = response.data.content;
+        const files = parseFilesFromResponse(aiContent);
+        const displayContent = cleanContentForDisplay(aiContent);
+
+        const assistantMessage: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: displayContent,
+          files: files.length > 0 ? files : undefined
+        };
+
+        setMessages(prev => [...prev, assistantMessage]);
+        
+        if (files.length > 0) {
+          onFilesGenerated(files);
+          toast.success(`Generated ${files.length} file(s)!`);
         }
-      });
-
-      if (response.error) throw response.error;
-
-      const aiContent = response.data.content;
-      const files = parseFilesFromResponse(aiContent);
-      const displayContent = cleanContentForDisplay(aiContent);
-
-      const assistantMessage: Message = {
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: displayContent,
-        files: files.length > 0 ? files : undefined
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-      
-      if (files.length > 0) {
-        onFilesGenerated(files);
-        toast.success(`Generated ${files.length} file(s)!`);
       }
     } catch (error) {
       console.error("AI Error:", error);
@@ -420,6 +455,13 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDownloadImage = (imageUrl: string) => {
+    const link = document.createElement("a");
+    link.href = imageUrl;
+    link.download = `zyquence-image-${Date.now()}.png`;
+    link.click();
   };
 
   const module = moduleInfo[activeModule];
@@ -476,6 +518,25 @@ const AIBuilderChat = ({ activeModule, onFilesGenerated, onSaveBuild }: AIBuilde
                 }`}
               >
                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                {message.imageUrl && (
+                  <div className="mt-2 relative group">
+                    <img
+                      src={message.imageUrl}
+                      alt="AI generated"
+                      className="rounded-lg max-w-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => handleDownloadImage(message.imageUrl!)}
+                    >
+                      <Download className="w-3 h-3 mr-1" />
+                      Save
+                    </Button>
+                  </div>
+                )}
                 {message.files && message.files.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-border/50">
                     <p className="text-xs font-medium mb-2 opacity-70">Generated Files:</p>
