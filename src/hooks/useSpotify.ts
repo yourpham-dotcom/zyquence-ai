@@ -74,15 +74,31 @@ export const useSpotify = () => {
     }
   }, []);
 
-  // Poll for OAuth callback code in localStorage (storage events unreliable in iframes)
+  // Listen for OAuth callback via postMessage (primary) and localStorage polling (fallback)
   useEffect(() => {
     let pollTimer: ReturnType<typeof setInterval> | null = null;
 
+    const handleMessage = async (e: MessageEvent) => {
+      if (e.data?.type === "spotify_callback" && e.data.code) {
+        console.log("Spotify: received code via postMessage");
+        if (pollTimer) clearInterval(pollTimer);
+        await exchangeCode(e.data.code);
+      }
+      if (e.data?.type === "spotify_callback_error") {
+        console.error("Spotify auth error via postMessage:", e.data.error);
+        if (pollTimer) clearInterval(pollTimer);
+        setIsLoading(false);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+
+    // Fallback: poll localStorage (in case postMessage doesn't work)
     const checkForCallback = async () => {
       const code = localStorage.getItem("spotify_callback_code");
       if (code) {
         localStorage.removeItem("spotify_callback_code");
         if (pollTimer) clearInterval(pollTimer);
+        console.log("Spotify: received code via localStorage poll");
         await exchangeCode(code);
       }
       const error = localStorage.getItem("spotify_callback_error");
@@ -93,28 +109,11 @@ export const useSpotify = () => {
         setIsLoading(false);
       }
     };
-
-    // Poll every 500ms for the callback code
     pollTimer = setInterval(checkForCallback, 500);
-
-    // Also listen for storage events as a backup
-    const handleStorageChange = async (e: StorageEvent) => {
-      if (e.key === "spotify_callback_code" && e.newValue) {
-        const code = e.newValue;
-        localStorage.removeItem("spotify_callback_code");
-        await exchangeCode(code);
-      }
-      if (e.key === "spotify_callback_error" && e.newValue) {
-        console.error("Spotify auth error:", e.newValue);
-        localStorage.removeItem("spotify_callback_error");
-        setIsLoading(false);
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
 
     return () => {
       if (pollTimer) clearInterval(pollTimer);
-      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("message", handleMessage);
     };
   }, []);
 
