@@ -168,6 +168,8 @@ export const useSpotify = () => {
       if (error) throw error;
 
       const redirectUri = `${window.location.origin}${REDIRECT_PATH}`;
+      console.log("Spotify redirect_uri:", redirectUri);
+      
       const authUrl = new URL("https://accounts.spotify.com/authorize");
       authUrl.searchParams.set("client_id", data.client_id);
       authUrl.searchParams.set("response_type", "code");
