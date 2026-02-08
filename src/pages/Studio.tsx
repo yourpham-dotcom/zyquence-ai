@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
   Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
-  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench
+  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -99,21 +99,25 @@ const Studio = () => {
     { id: "photo" as ToolType, icon: Image, label: "Photo Studio" },
     { id: "code" as ToolType, icon: Code, label: "Code Editor" },
     { id: "python" as ToolType, icon: BookOpen, label: "Python Practice" },
-    { id: "journal" as ToolType, icon: Book, label: "Journal" },
     { id: "sql" as ToolType, icon: Database, label: "SQL Practice" },
     { id: "security" as ToolType, icon: Shield, label: "Cybersecurity Lab" },
+  ];
+
+  const mediaTools = [
+    { id: "music" as ToolType, icon: Music, label: "Music Studio" },
+    { id: "video" as ToolType, icon: Video, label: "Video Editor" },
+    { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
+    { id: "journal" as ToolType, icon: Book, label: "Journal" },
   ];
 
   const tools = [
     { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
     { id: "style" as ToolType, icon: Sparkles, label: "Style Intelligence" },
-    { id: "music" as ToolType, icon: Music, label: "Music Studio" },
-    { id: "video" as ToolType, icon: Video, label: "Video Editor" },
-    { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
   ];
 
   const isAthleteToolActive = athleteTools.some(t => t.id === activeTool);
   const isCreativeToolActive = creativeTools.some(t => t.id === activeTool);
+  const isMediaToolActive = mediaTools.some(t => t.id === activeTool);
 
   const games = [
     { id: "pingpong" as GameType, label: "Ping Pong" },
@@ -258,6 +262,38 @@ const Studio = () => {
             </Tooltip>
             <DropdownMenuContent side="right" align="start" className="w-52 bg-popover border-border">
               {creativeTools.map((tool) => (
+                <DropdownMenuItem
+                  key={tool.id}
+                  onClick={() => setActiveTool(tool.id)}
+                  className={`cursor-pointer flex items-center gap-2 ${activeTool === tool.id ? "bg-accent" : ""}`}
+                >
+                  <tool.icon className="h-4 w-4" />
+                  <span>{tool.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {/* Media & Arts Tools Dropdown */}
+          <DropdownMenu>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size={sidebarWidth > 64 ? "default" : "icon"}
+                    className={`${isMediaToolActive ? "bg-primary text-primary-foreground" : "hover:bg-accent"} ${sidebarWidth > 64 ? "w-full justify-start px-4" : ""}`}
+                    style={sidebarWidth > 64 ? { width: `${sidebarWidth - 16}px` } : {}}
+                  >
+                    <Disc3 className="h-5 w-5" />
+                    {sidebarWidth > 100 && <span className="ml-2 text-sm">Media & Arts</span>}
+                  </Button>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="right">Media & Arts</TooltipContent>
+            </Tooltip>
+            <DropdownMenuContent side="right" align="start" className="w-52 bg-popover border-border">
+              {mediaTools.map((tool) => (
                 <DropdownMenuItem
                   key={tool.id}
                   onClick={() => setActiveTool(tool.id)}
