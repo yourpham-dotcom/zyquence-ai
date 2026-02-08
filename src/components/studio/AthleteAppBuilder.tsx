@@ -68,27 +68,27 @@ const AthleteAppBuilder = () => {
   };
 
   return (
-    <div className="h-full flex flex-col p-4 md:p-6 gap-4 md:gap-6 bg-background overflow-y-auto">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+    <div className="h-full flex flex-col bg-background overflow-y-auto">
+      <div className="p-4 md:p-6 space-y-5 md:space-y-6">
+        {/* Header */}
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
             <Wand2 className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h2 className="text-xl md:text-2xl font-bold text-foreground">AI No-Code App Builder</h2>
-            <p className="text-sm text-muted-foreground">Build custom athlete apps with AI - no coding needed</p>
+            <h2 className="text-lg md:text-2xl font-bold text-foreground leading-tight">AI No-Code App Builder</h2>
+            <p className="text-xs md:text-sm text-muted-foreground mt-1">Build custom athlete apps with AI - no coding needed</p>
           </div>
         </div>
-      </div>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0 lg:min-h-0">
-        <Card className="p-4 md:p-6 bg-card border-border flex flex-col min-h-[300px] lg:min-h-0">
+        {/* Chat Card */}
+        <Card className="p-4 md:p-6 bg-card border-border flex flex-col">
           <div className="flex items-center gap-3 mb-4">
             <MessageSquare className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">AI Copilot Chat</h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+          <div className="space-y-3 mb-4 max-h-[40vh] overflow-y-auto">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -126,7 +126,7 @@ const AthleteAppBuilder = () => {
               onClick={handleSend}
               disabled={isProcessing || !input.trim()}
               size="icon"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 shrink-0"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -152,21 +152,22 @@ const AthleteAppBuilder = () => {
           </div>
         </Card>
 
-        <Card className="p-4 md:p-6 bg-card border-border flex flex-col min-h-[250px] lg:min-h-0">
+        {/* App Preview Card */}
+        <Card className="p-4 md:p-6 bg-card border-border flex flex-col">
           <div className="flex items-center gap-3 mb-4">
             <Code className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">App Preview</h3>
           </div>
 
           {appPreview ? (
-            <div className="flex-1 border-2 border-dashed border-border rounded-lg p-4 bg-muted/5 overflow-auto">
+            <div className="border-2 border-dashed border-border rounded-lg p-4 bg-muted/5 overflow-auto max-h-[50vh]">
               <pre className="text-xs text-foreground whitespace-pre-wrap">{appPreview}</pre>
             </div>
           ) : (
-            <div className="flex-1 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center bg-muted/5">
-              <Wand2 className="w-12 h-12 text-muted-foreground mb-3" />
+            <div className="border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center bg-muted/5 py-10 md:py-16">
+              <Wand2 className="w-10 h-10 md:w-12 md:h-12 text-muted-foreground mb-3" />
               <p className="text-muted-foreground text-sm">Your app will appear here</p>
-              <p className="text-muted-foreground text-xs mt-2">
+              <p className="text-muted-foreground text-xs mt-2 text-center px-4">
                 Tell the AI what you need and watch it build your app
               </p>
             </div>
@@ -179,19 +180,23 @@ const AthleteAppBuilder = () => {
             </Button>
           )}
         </Card>
-      </div>
 
-      <Card className="p-4 bg-primary/5 border-primary/20">
-        <div className="flex gap-3">
-          <Wand2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-          <div>
-            <h4 className="font-semibold text-foreground mb-1">Example Apps You Can Build</h4>
-            <p className="text-sm text-muted-foreground">
-              Training schedulers • Nutrition trackers • Performance analyzers • Goal setters • Team communication tools • Injury recovery planners • Mental wellness journals • Competition calendars
-            </p>
+        {/* Example Apps Card */}
+        <Card className="p-4 bg-primary/5 border-primary/20">
+          <div className="flex gap-3">
+            <Wand2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <h4 className="font-semibold text-foreground mb-1 text-sm">Example Apps You Can Build</h4>
+              <p className="text-xs md:text-sm text-muted-foreground leading-relaxed">
+                Training schedulers • Nutrition trackers • Performance analyzers • Goal setters • Team communication tools • Injury recovery planners • Mental wellness journals • Competition calendars
+              </p>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+
+        {/* Bottom spacer for mobile */}
+        <div className="h-4 md:h-0" />
+      </div>
     </div>
   );
 };
