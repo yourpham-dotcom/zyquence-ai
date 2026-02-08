@@ -259,8 +259,8 @@ const MediaPlayer = () => {
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 md:h-8 md:w-8 hover:bg-accent"
-                  onClick={spotify.skipPrev}
-                  disabled={!spotify.isConnected && mediaType === "spotify"}
+                  onClick={() => { if (mediaType === "spotify") spotify.skipPrev(); }}
+                  disabled={mediaType === "spotify" && (!spotify.isConnected || !spotify.currentTrack)}
                 >
                   <SkipBack className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
@@ -270,7 +270,7 @@ const MediaPlayer = () => {
                   onClick={() => {
                     if (mediaType === "spotify") spotify.togglePlay();
                   }}
-                  disabled={!spotify.isConnected && mediaType === "spotify"}
+                  disabled={mediaType === "spotify" && !spotify.isConnected}
                 >
                   {spotify.isPlaying ? <Pause className="w-4 h-4 md:w-5 md:h-5" /> : <Play className="w-4 h-4 md:w-5 md:h-5" />}
                 </Button>
@@ -278,8 +278,8 @@ const MediaPlayer = () => {
                   variant="ghost"
                   size="icon"
                   className="h-7 w-7 md:h-8 md:w-8 hover:bg-accent"
-                  onClick={spotify.skipNext}
-                  disabled={!spotify.isConnected && mediaType === "spotify"}
+                  onClick={() => { if (mediaType === "spotify") spotify.skipNext(); }}
+                  disabled={mediaType === "spotify" && (!spotify.isConnected || !spotify.currentTrack)}
                 >
                   <SkipForward className="w-3 h-3 md:w-4 md:h-4" />
                 </Button>
