@@ -48,8 +48,6 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
-    const { intake, replan } = await req.json();
-
     let userMessage = "";
 
     if (replan) {
