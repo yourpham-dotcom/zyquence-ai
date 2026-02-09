@@ -14,16 +14,6 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Products</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Music</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Sports</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Gaming</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Cybersecurity</a></li>
-            </ul>
-          </div>
-
-          <div>
             <h4 className="font-semibold mb-4">Company</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="#mission" className="hover:text-foreground transition-colors">Mission</a></li>
