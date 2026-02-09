@@ -2,10 +2,13 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Database, BarChart3, FlaskConical, Trophy, Briefcase, Upload, Code } from "lucide-react";
+import { Database, BarChart3, FlaskConical, Trophy, Briefcase, Upload, Code, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
+import ProGate from "@/components/ProGate";
 
 const DataIntelligence = () => {
+  const { isPro, loading: subLoading } = useSubscription();
   const [stats, setStats] = useState({
     datasetsCount: 0,
     queriesCount: 0,
@@ -17,8 +20,22 @@ const DataIntelligence = () => {
   });
 
   useEffect(() => {
-    loadStats();
-  }, []);
+    if (isPro) {
+      loadStats();
+    }
+  }, [isPro]);
+
+  if (subLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isPro) {
+    return <ProGate />;
+  }
 
   const loadStats = async () => {
     const { data: { user } } = await supabase.auth.getUser();
