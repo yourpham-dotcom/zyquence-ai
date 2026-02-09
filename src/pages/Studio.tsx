@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
   Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
-  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3, Menu, X
+  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3, Menu, X, Flame
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -33,8 +33,9 @@ import AthleteAppBuilder from "@/components/studio/AthleteAppBuilder";
 import SportsCybersecurity from "@/components/studio/SportsCybersecurity";
 import FinancialLiteracy from "@/components/studio/FinancialLiteracy";
 import AthleteImageEngineer from "@/components/studio/AthleteImageEngineer";
+import ClutchMode from "@/components/studio/ClutchMode";
 
-export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding";
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -116,6 +117,7 @@ const Studio = () => {
   const tools = [
     { id: "chat" as ToolType, icon: MessageSquare, label: "AI Chat" },
     { id: "style" as ToolType, icon: Sparkles, label: "Style Intelligence" },
+    { id: "clutch" as ToolType, icon: Flame, label: "Clutch Mode" },
   ];
 
   const isAthleteToolActive = athleteTools.some(t => t.id === activeTool);
@@ -164,6 +166,8 @@ const Studio = () => {
         return <ArtistStudio />;
       case "journal":
         return <Journal />;
+      case "clutch":
+        return <ClutchMode />;
       default:
         return <ChatInterface />;
     }
