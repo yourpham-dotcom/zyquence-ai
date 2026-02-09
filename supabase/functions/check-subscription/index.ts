@@ -40,6 +40,39 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { email: user.email });
 
+    // Check for manual pro access override first
+    const { data: override } = await supabaseClient
+      .from("pro_access_overrides")
+      .select("*")
+      .eq("email", user.email)
+      .is("expires_at", null)
+      .maybeSingle();
+
+    // Also check for overrides with future expiry
+    const { data: overrideWithExpiry } = await supabaseClient
+      .from("pro_access_overrides")
+      .select("*")
+      .eq("email", user.email)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+
+    const hasOverride = !!override || !!overrideWithExpiry;
+
+    if (hasOverride) {
+      logStep("Pro access override found", { email: user.email });
+      return new Response(
+        JSON.stringify({
+          subscribed: true,
+          product_id: "prod_Twj36mQhOR4juQ",
+          subscription_end: overrideWithExpiry?.expires_at || null,
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        }
+      );
+    }
+
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
 
