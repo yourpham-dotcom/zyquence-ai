@@ -2,7 +2,7 @@ const Footer = () => {
   return (
     <footer className="py-12 border-t border-border relative">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-cyber-blue to-cyber-cyan rounded-lg" />
@@ -11,16 +11,6 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground">
               Innovating the next level of creative intelligence and tech
             </p>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4">Products</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Music</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Sports</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Gaming</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Zyquence Cybersecurity</a></li>
-            </ul>
           </div>
 
           <div>
