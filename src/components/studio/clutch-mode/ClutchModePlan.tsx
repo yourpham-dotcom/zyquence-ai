@@ -10,7 +10,7 @@ import {
   RotateCcw, Play, Clock, CheckCircle2, Coffee,
   Settings, Shield, ArrowRight, Sparkles, AlertCircle
 } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, differenceInMinutes } from "date-fns";
 import type { ClutchPlan, ReplanData } from "./types";
 
 interface ClutchModePlanProps {
@@ -20,11 +20,11 @@ interface ClutchModePlanProps {
   isReplanning: boolean;
 }
 
-const blockTypeConfig: Record<string, { icon: typeof Play; className: string; label: string }> = {
-  work: { icon: Play, className: "bg-primary/10 border-primary/30 text-foreground", label: "Work" },
-  break: { icon: Coffee, className: "bg-accent/50 border-border text-muted-foreground", label: "Break" },
-  admin: { icon: Settings, className: "bg-secondary/10 border-secondary/30 text-foreground", label: "Setup" },
-  buffer: { icon: Shield, className: "bg-muted/30 border-border text-muted-foreground", label: "Buffer" },
+const blockTypeConfig: Record<string, { icon: typeof Play; bgClass: string; barClass: string; label: string }> = {
+  work: { icon: Play, bgClass: "bg-primary/10 border-primary/30 text-foreground", barClass: "bg-primary", label: "Work" },
+  break: { icon: Coffee, bgClass: "bg-accent/50 border-border text-muted-foreground", barClass: "bg-muted", label: "Break" },
+  admin: { icon: Settings, bgClass: "bg-secondary/10 border-secondary/30 text-foreground", barClass: "bg-secondary", label: "Setup" },
+  buffer: { icon: Shield, bgClass: "bg-muted/30 border-border text-muted-foreground", barClass: "bg-muted-foreground/30", label: "Buffer" },
 };
 
 const ClutchModePlan = ({ plan, onReplan, onReset, isReplanning }: ClutchModePlanProps) => {
@@ -47,9 +47,17 @@ const ClutchModePlan = ({ plan, onReplan, onReset, isReplanning }: ClutchModePla
 
   const formatDate = (iso: string) => {
     try {
-      return format(parseISO(iso), "EEE, MMM d");
+      return format(parseISO(iso), "EEEE, MMMM d");
     } catch {
       return "";
+    }
+  };
+
+  const getDuration = (start: string, end: string) => {
+    try {
+      return differenceInMinutes(parseISO(end), parseISO(start));
+    } catch {
+      return 0;
     }
   };
 
@@ -121,30 +129,61 @@ const ClutchModePlan = ({ plan, onReplan, onReset, isReplanning }: ClutchModePla
             </Card>
           </div>
 
-          {/* Schedule */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Full Schedule</h3>
+          {/* Day-by-Day Timeline Schedule */}
+          <div className="space-y-5">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Full Day Schedule</h3>
             {Object.entries(groupedBlocks).map(([date, blocks]) => (
-              <div key={date} className="space-y-2">
-                <p className="text-xs font-medium text-muted-foreground">{date}</p>
-                {blocks.map((block, i) => {
-                  const config = blockTypeConfig[block.type] || blockTypeConfig.work;
-                  const Icon = config.icon;
-                  return (
-                    <Card key={i} className={`p-3 border ${config.className}`}>
-                      <div className="flex items-center gap-3">
-                        <Icon className="h-4 w-4 shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{block.label}</p>
+              <div key={date} className="space-y-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-px flex-1 bg-border" />
+                  <span className="text-xs font-semibold text-foreground px-2">{date}</span>
+                  <div className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-[52px] top-0 bottom-0 w-px bg-border" />
+
+                  {blocks.map((block, i) => {
+                    const config = blockTypeConfig[block.type] || blockTypeConfig.work;
+                    const Icon = config.icon;
+                    const duration = getDuration(block.startTime, block.endTime);
+
+                    return (
+                      <div key={i} className="relative flex items-stretch gap-3 group">
+                        {/* Time column */}
+                        <div className="w-[52px] shrink-0 text-right pr-3 py-2">
+                          <p className="text-xs font-mono text-foreground leading-tight">{formatTime(block.startTime)}</p>
                         </div>
-                        <div className="flex items-center gap-1 text-xs font-mono shrink-0">
-                          <Clock className="h-3 w-3" />
-                          {formatTime(block.startTime)} – {formatTime(block.endTime)}
+
+                        {/* Dot on timeline */}
+                        <div className="absolute left-[52px] top-3 -translate-x-1/2 z-10">
+                          <div className={`w-2.5 h-2.5 rounded-full border-2 border-background ${config.barClass}`} />
+                        </div>
+
+                        {/* Block card */}
+                        <div className="flex-1 pb-2 pl-3">
+                          <Card className={`p-3 border ${config.bgClass} transition-all`}>
+                            <div className="flex items-center gap-2.5">
+                              <Icon className="h-4 w-4 shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{block.label}</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <Badge variant="outline" className="text-xs font-mono px-1.5 py-0">
+                                  {duration}m
+                                </Badge>
+                                <span className="text-xs text-muted-foreground font-mono">
+                                  → {formatTime(block.endTime)}
+                                </span>
+                              </div>
+                            </div>
+                          </Card>
                         </div>
                       </div>
-                    </Card>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </div>
