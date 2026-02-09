@@ -4,10 +4,26 @@ import { Button } from "@/components/ui/button";
 import { 
   Gamepad2, Brain, Palette, Code, Shield, Home, Car, 
   Music, Utensils, Trophy, Sparkles, BookOpen, Dumbbell,
-  FileCode, Camera, Building
+  FileCode, Camera, Building, Loader2
 } from "lucide-react";
+import { useSubscription } from "@/hooks/useSubscription";
+import ProGate from "@/components/ProGate";
 
 const GamingIntelligence = () => {
+  const { isPro, loading: subLoading } = useSubscription();
+
+  if (subLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isPro) {
+    return <ProGate />;
+  }
+
   const features = [
     {
       icon: Gamepad2,
