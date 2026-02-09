@@ -9,10 +9,12 @@ import {
 import { Menu, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
+  const { isPro } = useSubscription();
 
   const handleSignOut = async () => {
     await signOut();
@@ -36,12 +38,16 @@ const Navigation = () => {
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
-            <a href="/data-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
-              Data Intelligence
-            </a>
-            <a href="/gaming-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
-              Gaming Engine
-            </a>
+            {isPro && (
+              <>
+                <a href="/data-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Data Intelligence
+                </a>
+                <a href="/gaming-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Gaming Engine
+                </a>
+              </>
+            )}
             <a href="/ai-builder" className="text-muted-foreground hover:text-foreground transition-colors">
               AI Builder
             </a>
@@ -97,12 +103,16 @@ const Navigation = () => {
             <a href="#features" className="block text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
-            <a href="/data-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
-              Data Intelligence
-            </a>
-            <a href="/gaming-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
-              Gaming Engine
-            </a>
+            {isPro && (
+              <>
+                <a href="/data-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
+                  Data Intelligence
+                </a>
+                <a href="/gaming-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
+                  Gaming Engine
+                </a>
+              </>
+            )}
             <a href="/ai-builder" className="block text-muted-foreground hover:text-foreground transition-colors">
               AI Builder
             </a>
