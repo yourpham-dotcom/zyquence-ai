@@ -38,13 +38,6 @@ const Hero = () => {
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-border hover:bg-muted text-lg px-8 h-14 rounded-xl"
-            >
-              Explore Products
-            </Button>
           </div>
         </div>
       </div>
