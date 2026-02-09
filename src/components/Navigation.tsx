@@ -29,9 +29,6 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#products" className="text-muted-foreground hover:text-foreground transition-colors">
-              Products
-            </a>
             <a href="#mission" className="text-muted-foreground hover:text-foreground transition-colors">
               Mission
             </a>
@@ -94,9 +91,6 @@ const Navigation = () => {
 
         {isOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-4">
-            <a href="#products" className="block text-muted-foreground hover:text-foreground transition-colors">
-              Products
-            </a>
             <a href="#mission" className="block text-muted-foreground hover:text-foreground transition-colors">
               Mission
             </a>
