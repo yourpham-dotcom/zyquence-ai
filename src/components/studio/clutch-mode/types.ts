@@ -53,3 +53,10 @@ export interface ReplanData {
   remainingTime: string;
   currentEnergy: number;
 }
+
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  updatedPlan?: ClutchPlan;
+}
