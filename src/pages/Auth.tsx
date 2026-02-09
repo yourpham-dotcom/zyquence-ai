@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,17 +7,71 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { lovable } from "@/integrations/lovable/index";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Loader2 } from "lucide-react";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Auth submission:", { email, password, isSignUp });
+    setIsSubmitting(true);
+
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success("Check your email to confirm your account!");
+          setEmail("");
+          setPassword("");
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success("Welcome back!");
+          navigate("/");
+        }
+      }
+    } catch (err) {
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -134,8 +189,13 @@ const Auth = () => {
             <Button
               type="submit"
               className="w-full bg-cyber-blue hover:bg-cyber-blue/90 text-primary-foreground"
+              disabled={isSubmitting}
             >
-              {isSignUp ? "Sign up" : "Sign in"}
+              {isSubmitting ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{isSignUp ? "Signing up..." : "Signing in..."}</>
+              ) : (
+                isSignUp ? "Sign up" : "Sign in"
+              )}
             </Button>
             
             <div className="text-center text-sm text-muted-foreground">
