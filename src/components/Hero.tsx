@@ -47,7 +47,7 @@ const Hero = () => {
               className="bg-cyber-blue hover:bg-cyber-blue/90 text-lg px-8 h-14 group"
               asChild
             >
-              <a href="/studio">
+              <a href="/pricing">
                 Start Your Journey
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
