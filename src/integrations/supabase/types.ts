@@ -442,6 +442,33 @@ export type Database = {
           },
         ]
       }
+      pro_access_overrides: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string | null
+          granted_by: string | null
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       project_collaborators: {
         Row: {
           created_at: string
