@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.clutch-mode]
 verify_jwt = false
+
+[functions.atlas-chat]
+verify_jwt = false
