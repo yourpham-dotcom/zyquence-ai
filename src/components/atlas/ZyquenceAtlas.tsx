@@ -7,6 +7,7 @@ import AtlasExplore from "./AtlasExplore";
 import AtlasCurfew from "./AtlasCurfew";
 import AtlasReset from "./AtlasReset";
 import AtlasTransition from "./AtlasTransition";
+import AtlasChat from "./AtlasChat";
 
 type AtlasTab = "home" | "explore" | "curfew" | "reset" | "transition";
 
@@ -107,6 +108,9 @@ const ZyquenceAtlas = () => {
           {renderContent()}
         </div>
       </ScrollArea>
+
+      {/* Chat Support */}
+      <AtlasChat />
     </div>
   );
 };
