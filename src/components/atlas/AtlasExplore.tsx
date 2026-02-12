@@ -1,34 +1,29 @@
 import { useState } from "react";
-import { Search, MapPin, Coffee, ShoppingBag, Utensils, Landmark, Filter, Zap, Eye, Clock, Heart, Camera } from "lucide-react";
+import { Search, MapPin, Filter } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
-const AtlasExplore = () => {
+interface AtlasExploreProps {
+  mode: string;
+}
+
+const AtlasExplore = ({ mode }: AtlasExploreProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("food");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
-  const [tasteProfile, setTasteProfile] = useState({
-    foodVibe: "clean",
-    energy: "low",
-    style: "streetwear",
-    intent: "chill",
-  });
-  const [showProfile, setShowProfile] = useState(false);
 
   const categories = [
-    { id: "food", label: "Food", icon: Utensils },
-    { id: "shopping", label: "Shopping", icon: ShoppingBag },
-    { id: "coffee", label: "Coffee & Chill", icon: Coffee },
-    { id: "culture", label: "Culture", icon: Landmark },
+    { id: "food", label: "Food" },
+    { id: "shopping", label: "Shopping" },
+    { id: "coffee", label: "Coffee" },
+    { id: "walkable", label: "Walkable" },
   ];
 
-  const athleteFilters = [
-    { id: "safe", label: "Safe & Discreet", icon: Eye },
-    { id: "quick", label: "Quick In-and-Out", icon: Clock },
-    { id: "low-distraction", label: "Low Distraction", icon: Zap },
-    { id: "recovery", label: "Recovery-Aligned", icon: Heart },
-    { id: "content", label: "Content-Friendly", icon: Camera },
+  const filters = [
+    { id: "time-efficient", label: "Time Efficient" },
+    { id: "low-disruption", label: "Low Disruption" },
+    { id: "recovery-aware", label: "Recovery Aware" },
+    { id: "athlete-pacing", label: "Athlete Pacing" },
   ];
 
   const toggleFilter = (id: string) => {
@@ -37,172 +32,133 @@ const AtlasExplore = () => {
     );
   };
 
-  const foodPlaces = [
-    { name: "Green Kitchen", type: "Game-Day Approved", tags: ["clean eating", "quick"], rating: "Recovery-friendly", distance: "0.8 mi" },
-    { name: "Midnight Fuel", type: "Late-Night Safe", tags: ["protein-heavy", "discreet"], rating: "Athlete favorite", distance: "1.2 mi" },
-    { name: "The Harvest Table", type: "Recovery-Friendly", tags: ["organic", "low-key"], rating: "Low distraction", distance: "2.1 mi" },
-    { name: "Sakura Bowl", type: "Game-Day Approved", tags: ["lean", "quick in-and-out"], rating: "Pre-game ready", distance: "0.5 mi" },
-  ];
+  const getModeLabel = () => {
+    switch (mode) {
+      case "recovery": return "Recovery priority — lighter options shown first";
+      case "exploration": return "Exploration mode — wider range, flexible pacing";
+      case "low-energy": return "Low-energy — minimal movement, close proximity";
+      case "travel": return "Travel day — airport and hotel area only";
+      default: return "";
+    }
+  };
 
-  const shoppingPlaces = [
-    { name: "Tier Zero", type: "Sneakers", tags: ["exclusive drops", "discreet"], rating: "VIP access", distance: "1.5 mi" },
-    { name: "Local Thread", type: "Local Designers", tags: ["streetwear", "unique"], rating: "Low-key", distance: "0.9 mi" },
-    { name: "Luxe District", type: "Luxury", tags: ["high-end", "private shopping"], rating: "Appointment only", distance: "3.2 mi" },
-  ];
+  const places: Record<string, { name: string; type: string; time: string; distance: string; tags: string[] }[]> = {
+    food: [
+      { name: "Clean Kitchen Co", type: "Pre/post-game approved", time: "25 min", distance: "0.6 mi", tags: ["lean", "quick"] },
+      { name: "Night Fuel Bar", type: "Late-night available", time: "15 min", distance: "1.1 mi", tags: ["protein", "discreet"] },
+      { name: "Harvest Bowl", type: "Recovery-aligned", time: "30 min", distance: "1.8 mi", tags: ["organic", "low-key"] },
+      { name: "Sakura Grill", type: "Quick turnaround", time: "20 min", distance: "0.4 mi", tags: ["light", "efficient"] },
+    ],
+    shopping: [
+      { name: "Sole Supply", type: "Footwear", time: "30 min", distance: "1.3 mi", tags: ["drops", "appointment"] },
+      { name: "Thread Local", type: "Streetwear", time: "25 min", distance: "0.8 mi", tags: ["local", "unique"] },
+      { name: "District Luxe", type: "High-end", time: "45 min", distance: "2.9 mi", tags: ["private", "scheduled"] },
+    ],
+    coffee: [
+      { name: "Analog", type: "Low-traffic", time: "20 min", distance: "0.3 mi", tags: ["quiet", "wifi"] },
+      { name: "The Reading Room", type: "Bookstore cafe", time: "30 min", distance: "0.9 mi", tags: ["no crowds"] },
+    ],
+    walkable: [
+      { name: "Riverfront Path", type: "Light walk", time: "30 min", distance: "0.5 mi", tags: ["flat", "low traffic"] },
+      { name: "Old Quarter", type: "Neighborhood", time: "45 min", distance: "1.2 mi", tags: ["cultural", "walkable"] },
+      { name: "Botanical Grounds", type: "Green space", time: "40 min", distance: "1.6 mi", tags: ["quiet", "open"] },
+    ],
+  };
 
-  const coffeePlaces = [
-    { name: "Analog Coffee", type: "Chill Spot", tags: ["quiet", "good wifi"], rating: "Low energy", distance: "0.4 mi" },
-    { name: "The Reading Room", type: "Coffee & Books", tags: ["no crowds", "relaxing"], rating: "Recovery vibe", distance: "1.1 mi" },
-  ];
-
-  const culturePlaces = [
-    { name: "City Art Museum", type: "Art", tags: ["low energy", "inspiring"], rating: "Walkable", distance: "2.0 mi" },
-    { name: "Historic Quarter", type: "Exploration", tags: ["cultural", "photo-worthy"], rating: "Content-friendly", distance: "1.8 mi" },
-  ];
-
-  const getPlaces = () => {
-    const map: Record<string, typeof foodPlaces> = {
-      food: foodPlaces,
-      shopping: shoppingPlaces,
-      coffee: coffeePlaces,
-      culture: culturePlaces,
-    };
-    let places = map[activeCategory] || foodPlaces;
+  const getFilteredPlaces = () => {
+    let list = places[activeCategory] || [];
     if (searchQuery) {
-      places = places.filter((p) =>
+      list = list.filter((p) =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
-    return places;
-  };
-
-  const profileOptions = {
-    foodVibe: ["Clean", "Comfort", "Adventurous", "Quick"],
-    energy: ["Low", "Medium", "High"],
-    style: ["Streetwear", "Luxury", "Casual", "Local"],
-    intent: ["Chill", "Explore", "Fuel Up", "Content"],
+    return list;
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">City Planner</p>
+
+      {/* Mode Indicator */}
+      <div className="px-3 py-2 border border-border bg-muted/20 text-xs text-muted-foreground">
+        {getModeLabel()}
+      </div>
+
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input
-          placeholder="Search places..."
+          placeholder="Search locations..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
+          className="pl-9 h-8 text-sm"
         />
       </div>
 
       {/* Categories */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
+      <div className="flex gap-1">
         {categories.map((cat) => (
           <button
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-all ${
+            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${
               activeCategory === cat.id
                 ? "bg-foreground text-background border-foreground"
                 : "border-border text-muted-foreground hover:border-foreground/30"
             }`}
           >
-            <cat.icon className="h-3.5 w-3.5" />
             {cat.label}
           </button>
         ))}
       </div>
 
-      {/* Athlete Filters */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Filter className="h-3.5 w-3.5" />
-            Athlete Filters
-          </div>
-          <button
-            onClick={() => setShowProfile(!showProfile)}
-            className="text-xs text-foreground/70 hover:text-foreground transition-colors"
-          >
-            {showProfile ? "Hide" : "Taste"} Profile
-          </button>
+      {/* Filters */}
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <Filter className="h-3 w-3" />
+          Filters
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {athleteFilters.map((filter) => (
+        <div className="flex gap-1.5 flex-wrap">
+          {filters.map((f) => (
             <button
-              key={filter.id}
-              onClick={() => toggleFilter(filter.id)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs border transition-all ${
-                activeFilters.includes(filter.id)
+              key={f.id}
+              onClick={() => toggleFilter(f.id)}
+              className={`px-2 py-1 text-[11px] font-medium border transition-colors ${
+                activeFilters.includes(f.id)
                   ? "bg-foreground/10 border-foreground/30 text-foreground"
                   : "border-border/50 text-muted-foreground hover:border-border"
               }`}
             >
-              <filter.icon className="h-3 w-3" />
-              {filter.label}
+              {f.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Taste Profile */}
-      {showProfile && (
-        <Card className="border-border/50">
-          <CardContent className="p-4 space-y-3">
-            <p className="text-sm font-medium">Your Taste Profile</p>
-            {Object.entries(profileOptions).map(([key, options]) => (
-              <div key={key} className="space-y-1.5">
-                <p className="text-xs text-muted-foreground capitalize">{key === "foodVibe" ? "Food Vibe" : key}</p>
-                <div className="flex gap-1.5 flex-wrap">
-                  {options.map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => setTasteProfile((prev) => ({ ...prev, [key]: opt.toLowerCase() }))}
-                      className={`px-2.5 py-1 rounded-full text-xs border transition-all ${
-                        tasteProfile[key as keyof typeof tasteProfile] === opt.toLowerCase()
-                          ? "bg-foreground text-background border-foreground"
-                          : "border-border text-muted-foreground hover:border-foreground/30"
-                      }`}
-                    >
-                      {opt}
-                    </button>
-                  ))}
-                </div>
+      {/* Results */}
+      <div className="space-y-2">
+        {getFilteredPlaces().map((place, i) => (
+          <div key={i} className="flex items-center justify-between p-3 border border-border hover:border-foreground/15 transition-colors">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium">{place.name}</p>
+              <p className="text-[11px] text-muted-foreground">{place.type}</p>
+              <div className="flex gap-1.5 mt-1">
+                {place.tags.map((tag) => (
+                  <span key={tag} className="text-[10px] text-muted-foreground border border-border/50 px-1.5 py-0.5">
+                    {tag}
+                  </span>
+                ))}
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Places List */}
-      <div className="space-y-3">
-        {getPlaces().map((place, i) => (
-          <Card key={i} className="border-border/50 hover:border-foreground/15 transition-all">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1.5">
-                  <p className="text-sm font-medium">{place.name}</p>
-                  <p className="text-xs text-muted-foreground">{place.type}</p>
-                  <div className="flex gap-1.5 flex-wrap">
-                    {place.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-[10px] px-1.5 py-0">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-right space-y-1">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    {place.distance}
-                  </div>
-                  <p className="text-[10px] text-foreground/60">{place.rating}</p>
-                </div>
+            </div>
+            <div className="text-right space-y-0.5 shrink-0 ml-3">
+              <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <MapPin className="h-3 w-3" />
+                {place.distance}
               </div>
-            </CardContent>
-          </Card>
+              <p className="text-[11px] text-muted-foreground">{place.time}</p>
+            </div>
+          </div>
         ))}
       </div>
     </div>

@@ -1,119 +1,151 @@
 import { useState } from "react";
-import { MapPin, Calendar, Clock, Moon, Compass, RotateCcw, Plane, Shield } from "lucide-react";
+import { MapPin, Clock, AlertTriangle, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
-type AtlasTab = "home" | "explore" | "curfew" | "reset" | "transition";
+type AtlasTab = "dashboard" | "planner" | "city" | "reset" | "adjust";
 
 interface AtlasHomeProps {
   onNavigate: (tab: AtlasTab) => void;
+  mode: string;
 }
 
-const AtlasHome = ({ onNavigate }: AtlasHomeProps) => {
+const AtlasHome = ({ onNavigate, mode }: AtlasHomeProps) => {
   const [city, setCity] = useState("Los Angeles");
   const [country, setCountry] = useState("USA");
   const [dayStatus, setDayStatus] = useState<"game" | "travel" | "off">("off");
-  const [curfewTime, setCurfewTime] = useState("11:00 PM");
+  const [curfewTime, setCurfewTime] = useState("23:00");
 
-  const statusConfig = {
-    game: { label: "Game Day", color: "bg-destructive/10 text-destructive border-destructive/20" },
-    travel: { label: "Travel Day", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
-    off: { label: "Off Day", color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+  const statusLabels = {
+    game: "Game Day",
+    travel: "Travel Day",
+    off: "Off Day",
   };
 
-  const currentStatus = statusConfig[dayStatus];
+  const getAvailableWindow = () => {
+    const hour = parseInt(curfewTime.split(":")[0]);
+    if (dayStatus === "game") return "Post-game to " + formatTime(curfewTime);
+    if (dayStatus === "travel") return "After arrival to " + formatTime(curfewTime);
+    return "06:00 AM to " + formatTime(curfewTime);
+  };
 
-  const quickActions = [
-    { icon: Compass, label: "Explore", tab: "explore" as AtlasTab, desc: "Discover your city" },
-    { icon: Clock, label: "Curfew", tab: "curfew" as AtlasTab, desc: "Manage your windows" },
-    { icon: RotateCcw, label: "Reset", tab: "reset" as AtlasTab, desc: "Mental check-in" },
-    { icon: Plane, label: "Transition", tab: "transition" as AtlasTab, desc: "Moving abroad" },
+  const formatTime = (time: string) => {
+    const [h, m] = time.split(":").map(Number);
+    const period = h >= 12 ? "PM" : "AM";
+    const hour12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+    return `${hour12}:${m.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const getConstraints = () => {
+    const constraints: string[] = [];
+    if (dayStatus === "game") constraints.push("Limited window post-game");
+    if (dayStatus === "travel") constraints.push("Arrival time unknown");
+    if (mode === "recovery") constraints.push("Recovery priority active");
+    if (mode === "travel") constraints.push("Travel day pacing");
+    return constraints;
+  };
+
+  const actions = [
+    { label: "Plan Scenario", tab: "planner" as AtlasTab, desc: "Calculate time windows" },
+    { label: "City Planner", tab: "city" as AtlasTab, desc: "Find locations by category" },
+    { label: "Reset", tab: "reset" as AtlasTab, desc: "Check-in and refocus" },
+    { label: "Adjust", tab: "adjust" as AtlasTab, desc: "International adjustment" },
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Location & Status Header */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <MapPin className="h-4 w-4" />
-          <span className="text-sm">{city}, {country}</span>
-        </div>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          {(["game", "travel", "off"] as const).map((status) => (
-            <button
-              key={status}
-              onClick={() => setDayStatus(status)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                dayStatus === status ? statusConfig[status].color : "border-border text-muted-foreground hover:border-foreground/20"
-              }`}
-            >
-              {statusConfig[status].label}
-            </button>
-          ))}
-        </div>
+    <div className="space-y-5">
+      {/* Location */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <MapPin className="h-3.5 w-3.5" />
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="bg-transparent outline-none text-foreground font-medium w-28"
+        />
+        <span>,</span>
+        <input
+          type="text"
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          className="bg-transparent outline-none text-foreground font-medium w-16"
+        />
       </div>
 
-      {/* Lifestyle Window Card */}
-      <Card className="border-border/50">
-        <CardContent className="p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Moon className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Lifestyle Window</span>
-            </div>
-            <Badge variant="outline" className="text-xs">
-              {dayStatus === "game" ? "Limited" : dayStatus === "travel" ? "Flexible" : "Open"}
-            </Badge>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground">Available</p>
-              <p className="text-lg font-semibold">
-                {dayStatus === "game" ? "Post-game — " + curfewTime : dayStatus === "travel" ? "Varies" : "All day — " + curfewTime}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Curfew</p>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={curfewTime}
-                  onChange={(e) => setCurfewTime(e.target.value)}
-                  className="text-lg font-semibold bg-transparent border-none outline-none w-24"
-                  placeholder="--:-- --"
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Access Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        {quickActions.map((action) => (
+      {/* Day Status */}
+      <div className="flex gap-1.5">
+        {(["game", "travel", "off"] as const).map((s) => (
           <button
-            key={action.tab}
-            onClick={() => onNavigate(action.tab)}
-            className="p-4 rounded-xl border border-border/50 hover:border-foreground/20 transition-all text-left space-y-2 bg-card/50"
+            key={s}
+            onClick={() => setDayStatus(s)}
+            className={`px-3 py-1.5 text-xs font-medium border transition-colors ${
+              dayStatus === s
+                ? "bg-foreground text-background border-foreground"
+                : "border-border text-muted-foreground hover:border-foreground/30"
+            }`}
           >
-            <action.icon className="h-5 w-5 text-foreground/70" />
-            <div>
-              <p className="text-sm font-medium">{action.label}</p>
-              <p className="text-xs text-muted-foreground">{action.desc}</p>
-            </div>
+            {statusLabels[s]}
           </button>
         ))}
       </div>
 
-      {/* Privacy Notice */}
-      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/30 border border-border/30">
-        <Shield className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Zyquence Atlas is a lifestyle and productivity platform for athletes and is not affiliated with any team, league, or agency. All data remains private and controlled by you.
-        </p>
+      {/* Constraints Panel */}
+      <Card className="border-border">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Constraints</span>
+            <span className="text-xs text-muted-foreground">{statusLabels[dayStatus]}</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-[11px] text-muted-foreground">Cutoff</p>
+              <input
+                type="time"
+                value={curfewTime}
+                onChange={(e) => setCurfewTime(e.target.value)}
+                className="text-sm font-medium bg-transparent outline-none border-b border-border/50 pb-0.5"
+              />
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground">Available Window</p>
+              <p className="text-sm font-medium">{getAvailableWindow()}</p>
+            </div>
+          </div>
+
+          {getConstraints().length > 0 && (
+            <div className="space-y-1 pt-1 border-t border-border/50">
+              {getConstraints().map((c, i) => (
+                <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <AlertTriangle className="h-3 w-3 shrink-0" />
+                  {c}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 gap-2">
+        {actions.map((action) => (
+          <button
+            key={action.tab}
+            onClick={() => onNavigate(action.tab)}
+            className="p-3 border border-border hover:border-foreground/20 transition-colors text-left space-y-1"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium">{action.label}</p>
+              <ArrowRight className="h-3 w-3 text-muted-foreground" />
+            </div>
+            <p className="text-[11px] text-muted-foreground">{action.desc}</p>
+          </button>
+        ))}
       </div>
+
+      {/* Positioning */}
+      <p className="text-[10px] text-muted-foreground border-t border-border/50 pt-3">
+        Zyquence Atlas is a personal planning and lifestyle utility. It does not provide booking, representation, or advisory services.
+      </p>
     </div>
   );
 };

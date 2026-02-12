@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Globe, Compass, Clock, RotateCcw, Plane, Home, ArrowLeft, ToggleLeft, ToggleRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { LayoutGrid, Map, Clock, RotateCcw, Plane, Activity } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import AtlasHome from "./AtlasHome";
 import AtlasExplore from "./AtlasExplore";
@@ -9,90 +8,82 @@ import AtlasReset from "./AtlasReset";
 import AtlasTransition from "./AtlasTransition";
 import AtlasChat from "./AtlasChat";
 
-type AtlasTab = "home" | "explore" | "curfew" | "reset" | "transition";
+type AtlasTab = "dashboard" | "planner" | "city" | "reset" | "adjust";
 
 const ZyquenceAtlas = () => {
-  const [activeTab, setActiveTab] = useState<AtlasTab>("home");
-  const [mode, setMode] = useState<"domestic" | "international">("domestic");
+  const [activeTab, setActiveTab] = useState<AtlasTab>("dashboard");
+  const [mode, setMode] = useState<"recovery" | "exploration" | "low-energy" | "travel">("recovery");
 
   const tabs = [
-    { id: "home" as AtlasTab, label: "Home", icon: Home },
-    { id: "explore" as AtlasTab, label: "Explore", icon: Compass },
-    { id: "curfew" as AtlasTab, label: "Curfew", icon: Clock },
+    { id: "dashboard" as AtlasTab, label: "Dashboard", icon: LayoutGrid },
+    { id: "planner" as AtlasTab, label: "Scenario", icon: Clock },
+    { id: "city" as AtlasTab, label: "City", icon: Map },
     { id: "reset" as AtlasTab, label: "Reset", icon: RotateCcw },
-    { id: "transition" as AtlasTab, label: "Transition", icon: Plane },
+    { id: "adjust" as AtlasTab, label: "Adjust", icon: Plane },
   ];
 
-  const modeInfo = {
-    domestic: {
-      label: "Domestic",
-      tips: ["Arena-centric suggestions", "Traffic-aware timing", "Crowd & media awareness", "Recovery-first recs"],
-    },
-    international: {
-      label: "International",
-      tips: ["Language-friendly spots", "Athlete-safe areas", "Cultural etiquette", "Common mistakes abroad"],
-    },
-  };
+  const modes = [
+    { id: "recovery" as const, label: "Recovery" },
+    { id: "exploration" as const, label: "Exploration" },
+    { id: "low-energy" as const, label: "Low-Energy" },
+    { id: "travel" as const, label: "Travel Day" },
+  ];
 
   const renderContent = () => {
     switch (activeTab) {
-      case "home":
-        return <AtlasHome onNavigate={setActiveTab} />;
-      case "explore":
-        return <AtlasExplore />;
-      case "curfew":
-        return <AtlasCurfew />;
+      case "dashboard":
+        return <AtlasHome onNavigate={setActiveTab} mode={mode} />;
+      case "planner":
+        return <AtlasCurfew mode={mode} />;
+      case "city":
+        return <AtlasExplore mode={mode} />;
       case "reset":
         return <AtlasReset />;
-      case "transition":
+      case "adjust":
         return <AtlasTransition />;
       default:
-        return <AtlasHome onNavigate={setActiveTab} />;
+        return <AtlasHome onNavigate={setActiveTab} mode={mode} />;
     }
   };
 
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Header */}
-      <div className="shrink-0 px-5 pt-5 pb-3 space-y-3 border-b border-border/50">
+      <div className="shrink-0 px-5 pt-5 pb-3 space-y-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-foreground/70" />
-            <h1 className="text-lg font-semibold">Zyquence Atlas</h1>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+            <h1 className="text-sm font-semibold tracking-tight uppercase">Atlas</h1>
           </div>
-          {/* Mode Toggle */}
-          <button
-            onClick={() => setMode(mode === "domestic" ? "international" : "domestic")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-border hover:border-foreground/20 transition-all"
-          >
-            {mode === "domestic" ? (
-              <ToggleLeft className="h-3.5 w-3.5" />
-            ) : (
-              <ToggleRight className="h-3.5 w-3.5" />
-            )}
-            {modeInfo[mode].label}
-          </button>
         </div>
 
-        {/* Mode Tips Banner */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {modeInfo[mode].tips.map((tip, i) => (
-            <Badge key={i} variant="outline" className="text-[10px] whitespace-nowrap shrink-0 px-2 py-0.5">
-              {tip}
-            </Badge>
+        {/* Mode Selector */}
+        <div className="flex gap-1.5">
+          {modes.map((m) => (
+            <button
+              key={m.id}
+              onClick={() => setMode(m.id)}
+              className={`px-2.5 py-1 text-[11px] font-medium border transition-colors ${
+                mode === m.id
+                  ? "bg-foreground text-background border-foreground"
+                  : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
+              }`}
+            >
+              {m.label}
+            </button>
           ))}
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-1">
+        <div className="flex gap-0.5">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors border-b-2 ${
                 activeTab === tab.id
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/30"
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               <tab.icon className="h-3.5 w-3.5" />
