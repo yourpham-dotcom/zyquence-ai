@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Home, MessageSquare, Code, BookOpen, Book, Video, 
   Image, Shield, Database, Palette, Gamepad2, Music, Sparkles,
-  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3, Menu, X, Flame
+  Brain, UserPlus, Wand2, DollarSign, Star, Users, Wrench, Disc3, Menu, X, Flame, Compass
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -34,8 +34,9 @@ import SportsCybersecurity from "@/components/studio/SportsCybersecurity";
 import FinancialLiteracy from "@/components/studio/FinancialLiteracy";
 import AthleteImageEngineer from "@/components/studio/AthleteImageEngineer";
 import ClutchMode from "@/components/studio/ClutchMode";
+import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
 
-export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch";
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch" | "atlas";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -97,6 +98,7 @@ const Studio = () => {
     { id: "cybersec" as ToolType, icon: Shield, label: "Sports Cybersecurity" },
     { id: "financial" as ToolType, icon: DollarSign, label: "Financial Literacy" },
     { id: "branding" as ToolType, icon: Star, label: "Image Engineer" },
+    { id: "atlas" as ToolType, icon: Compass, label: "Zyquence Atlas" },
   ];
 
   const creativeTools = [
@@ -168,6 +170,8 @@ const Studio = () => {
         return <Journal />;
       case "clutch":
         return <ClutchMode />;
+      case "atlas":
+        return <ZyquenceAtlas />;
       default:
         return <ChatInterface />;
     }
