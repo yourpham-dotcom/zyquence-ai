@@ -1,32 +1,22 @@
-import { useState } from "react";
-import { Clock, Moon, Sun, Calendar, Bell, MapPin, AlertCircle } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Clock, AlertTriangle, CheckCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 
-const AtlasCurfew = () => {
-  const [curfew, setCurfew] = useState("23:00");
+interface AtlasCurfewProps {
+  mode: string;
+}
+
+const AtlasCurfew = ({ mode }: AtlasCurfewProps) => {
+  const [city, setCity] = useState("Los Angeles");
+  const [country, setCountry] = useState("USA");
+  const [stayLength, setStayLength] = useState("7");
+  const [arrivalDate, setArrivalDate] = useState(() => {
+    const d = new Date();
+    return d.toISOString().split("T")[0];
+  });
+  const [cutoffTime, setCutoffTime] = useState("23:00");
   const [dayType, setDayType] = useState<"game" | "off" | "travel">("off");
-  const [remindersOn, setRemindersOn] = useState(true);
-  const [reminderMinutes, setReminderMinutes] = useState(30);
-
-  const dayTypes = [
-    { id: "game" as const, label: "Game Day", icon: Sun, curfewDefault: "22:00" },
-    { id: "off" as const, label: "Off Day", icon: Moon, curfewDefault: "23:30" },
-    { id: "travel" as const, label: "Travel Day", icon: Calendar, curfewDefault: "22:00" },
-  ];
-
-  const getLifestyleWindow = () => {
-    const hour = parseInt(curfew.split(":")[0]);
-    if (dayType === "game") {
-      return { start: "Post-game (~2hrs after)", end: curfew, duration: "~2-3 hrs" };
-    }
-    if (dayType === "travel") {
-      return { start: "After arrival", end: curfew, duration: "Varies" };
-    }
-    return { start: "Morning", end: curfew, duration: `All day until ${formatTime(curfew)}` };
-  };
 
   const formatTime = (time: string) => {
     const [h, m] = time.split(":").map(Number);
@@ -35,148 +25,178 @@ const AtlasCurfew = () => {
     return `${hour12}:${m.toString().padStart(2, "0")} ${period}`;
   };
 
-  const window = getLifestyleWindow();
+  const scenario = useMemo(() => {
+    const cutoffHour = parseInt(cutoffTime.split(":")[0]);
+    const cutoffMin = parseInt(cutoffTime.split(":")[1]);
 
-  const suggestedSpots = [
-    { name: "Quick dinner spot", fits: true, time: "45 min", type: "Food" },
-    { name: "Recovery smoothie bar", fits: true, time: "15 min", type: "Recovery" },
-    { name: "Shopping district", fits: dayType !== "game", time: "1-2 hrs", type: "Shopping" },
-    { name: "Cultural museum visit", fits: dayType === "off", time: "2-3 hrs", type: "Culture" },
-  ];
+    let startHour: number;
+    let startLabel: string;
+
+    if (dayType === "game") {
+      startHour = 21;
+      startLabel = "~9:00 PM (post-game estimate)";
+    } else if (dayType === "travel") {
+      startHour = 14;
+      startLabel = "~2:00 PM (post-arrival estimate)";
+    } else {
+      startHour = 8;
+      startLabel = "8:00 AM";
+    }
+
+    const totalMinutes = (cutoffHour * 60 + cutoffMin) - (startHour * 60);
+    const hours = Math.floor(Math.max(0, totalMinutes) / 60);
+    const mins = Math.max(0, totalMinutes) % 60;
+
+    const categories: { name: string; duration: string; fits: boolean; priority: string }[] = [];
+
+    if (mode === "recovery") {
+      categories.push(
+        { name: "Recovery meal", duration: "45 min", fits: totalMinutes >= 45, priority: "High" },
+        { name: "Light walk", duration: "30 min", fits: totalMinutes >= 75, priority: "Medium" },
+        { name: "Shopping", duration: "90 min", fits: totalMinutes >= 165, priority: "Low" },
+      );
+    } else if (mode === "exploration") {
+      categories.push(
+        { name: "Neighborhood walk", duration: "60 min", fits: totalMinutes >= 60, priority: "High" },
+        { name: "Local food spot", duration: "45 min", fits: totalMinutes >= 105, priority: "High" },
+        { name: "Cultural site", duration: "120 min", fits: totalMinutes >= 225, priority: "Medium" },
+        { name: "Shopping district", duration: "90 min", fits: totalMinutes >= 315, priority: "Low" },
+      );
+    } else if (mode === "low-energy") {
+      categories.push(
+        { name: "Coffee spot", duration: "30 min", fits: totalMinutes >= 30, priority: "High" },
+        { name: "Light meal", duration: "40 min", fits: totalMinutes >= 70, priority: "Medium" },
+        { name: "Bookstore / quiet area", duration: "45 min", fits: totalMinutes >= 115, priority: "Low" },
+      );
+    } else {
+      categories.push(
+        { name: "Airport food", duration: "30 min", fits: totalMinutes >= 30, priority: "High" },
+        { name: "Hotel check-in area", duration: "20 min", fits: totalMinutes >= 50, priority: "Medium" },
+        { name: "Nearby walk", duration: "30 min", fits: totalMinutes >= 80, priority: "Low" },
+      );
+    }
+
+    const warnings: string[] = [];
+    if (totalMinutes < 60) warnings.push("Very limited window. Prioritize essentials only.");
+    if (dayType === "game" && totalMinutes > 180) warnings.push("Extended post-game window. Monitor energy.");
+    if (dayType === "travel") warnings.push("Arrival time is estimated. Adjust after landing.");
+    if (parseInt(stayLength) <= 2) warnings.push("Short stay. Minimize exploration scope.");
+
+    return { startLabel, totalMinutes, hours, mins, categories, warnings };
+  }, [cutoffTime, dayType, mode, stayLength]);
 
   return (
     <div className="space-y-5">
-      {/* Day Type Selector */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium">What kind of day is it?</p>
-        <div className="flex gap-2">
-          {dayTypes.map((dt) => (
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Scenario View</p>
+
+      {/* Inputs Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-[11px] text-muted-foreground">City</label>
+          <Input value={city} onChange={(e) => setCity(e.target.value)} className="h-8 text-sm" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[11px] text-muted-foreground">Country / Region</label>
+          <Input value={country} onChange={(e) => setCountry(e.target.value)} className="h-8 text-sm" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[11px] text-muted-foreground">Stay (days)</label>
+          <Input type="number" value={stayLength} onChange={(e) => setStayLength(e.target.value)} className="h-8 text-sm" min="1" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[11px] text-muted-foreground">Arrival Date</label>
+          <Input type="date" value={arrivalDate} onChange={(e) => setArrivalDate(e.target.value)} className="h-8 text-sm" />
+        </div>
+      </div>
+
+      {/* Day Type + Cutoff */}
+      <div className="flex items-end gap-3">
+        <div className="flex gap-1.5">
+          {(["game", "off", "travel"] as const).map((dt) => (
             <button
-              key={dt.id}
-              onClick={() => {
-                setDayType(dt.id);
-                setCurfew(dt.curfewDefault);
-              }}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-medium border transition-all ${
-                dayType === dt.id
+              key={dt}
+              onClick={() => setDayType(dt)}
+              className={`px-2.5 py-1.5 text-xs font-medium border transition-colors ${
+                dayType === dt
                   ? "bg-foreground text-background border-foreground"
                   : "border-border text-muted-foreground hover:border-foreground/30"
               }`}
             >
-              <dt.icon className="h-4 w-4" />
-              {dt.label}
+              {dt === "game" ? "Game" : dt === "off" ? "Off" : "Travel"}
             </button>
           ))}
         </div>
+        <div className="space-y-1">
+          <label className="text-[11px] text-muted-foreground">Cutoff</label>
+          <Input type="time" value={cutoffTime} onChange={(e) => setCutoffTime(e.target.value)} className="h-8 text-sm w-28" />
+        </div>
       </div>
 
-      {/* Curfew Input */}
-      <Card className="border-border/50">
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Your Curfew</span>
-            </div>
-            <Badge variant="outline" className="text-xs">Optional</Badge>
+      {/* Time Breakdown */}
+      <Card className="border-border">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Time Breakdown</span>
           </div>
-          <div className="flex items-center gap-4">
-            <Input
-              type="time"
-              value={curfew}
-              onChange={(e) => setCurfew(e.target.value)}
-              className="w-40 text-center text-lg font-semibold"
-            />
-            <p className="text-2xl font-semibold text-foreground/80">{formatTime(curfew)}</p>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            This can be your personal preference or a team guideline. You control this.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Lifestyle Window */}
-      <Card className="border-border/50">
-        <CardContent className="p-5 space-y-3">
-          <p className="text-sm font-medium">Your Lifestyle Window</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <p className="text-xs text-muted-foreground">Start</p>
-              <p className="text-sm font-medium">{window.start}</p>
+              <p className="text-[11px] text-muted-foreground">Start</p>
+              <p className="text-sm font-medium">{scenario.startLabel}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">End</p>
-              <p className="text-sm font-medium">{formatTime(curfew)}</p>
+              <p className="text-[11px] text-muted-foreground">End</p>
+              <p className="text-sm font-medium">{formatTime(cutoffTime)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Duration</p>
-              <p className="text-sm font-medium">{window.duration}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Reminders */}
-      <Card className="border-border/50">
-        <CardContent className="p-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Gentle Reminders</span>
-            </div>
-            <Switch checked={remindersOn} onCheckedChange={setRemindersOn} />
-          </div>
-          {remindersOn && (
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Remind me before curfew</p>
-              <div className="flex gap-2">
-                {[15, 30, 45, 60].map((min) => (
-                  <button
-                    key={min}
-                    onClick={() => setReminderMinutes(min)}
-                    className={`px-3 py-1.5 rounded-full text-xs border transition-all ${
-                      reminderMinutes === min
-                        ? "bg-foreground text-background border-foreground"
-                        : "border-border text-muted-foreground hover:border-foreground/30"
-                    }`}
-                  >
-                    {min} min
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground italic">
-                A friendly heads-up, not an alarm. Just helping you stay on track.
+              <p className="text-[11px] text-muted-foreground">Usable Time</p>
+              <p className="text-sm font-medium">
+                {scenario.totalMinutes > 0 ? `${scenario.hours}h ${scenario.mins}m` : "None"}
               </p>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Suggested Spots That Fit */}
-      <div className="space-y-3">
-        <p className="text-sm font-medium">Fits Your Window</p>
-        {suggestedSpots.map((spot, i) => (
+      {/* Activity Categories */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Activities That Fit</p>
+        {scenario.categories.map((cat, i) => (
           <div
             key={i}
-            className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
-              spot.fits ? "border-border/50 bg-card/50" : "border-border/20 opacity-50"
+            className={`flex items-center justify-between p-3 border transition-colors ${
+              cat.fits ? "border-border" : "border-border/30 opacity-40"
             }`}
           >
             <div className="flex items-center gap-3">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
+              {cat.fits ? (
+                <CheckCircle className="h-3.5 w-3.5 text-foreground/50" />
+              ) : (
+                <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" />
+              )}
               <div>
-                <p className="text-sm">{spot.name}</p>
-                <p className="text-xs text-muted-foreground">{spot.type} · {spot.time}</p>
+                <p className="text-sm">{cat.name}</p>
+                <p className="text-[11px] text-muted-foreground">{cat.duration} · Priority: {cat.priority}</p>
               </div>
             </div>
-            {spot.fits ? (
-              <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-500/30">Fits</Badge>
-            ) : (
-              <Badge variant="outline" className="text-[10px] text-muted-foreground">Too long</Badge>
-            )}
+            <span className={`text-[11px] font-medium ${cat.fits ? "text-foreground/70" : "text-muted-foreground"}`}>
+              {cat.fits ? "Fits" : "Exceeds"}
+            </span>
           </div>
         ))}
       </div>
+
+      {/* Warnings */}
+      {scenario.warnings.length > 0 && (
+        <div className="space-y-1.5 pt-2 border-t border-border/50">
+          {scenario.warnings.map((w, i) => (
+            <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+              <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+              {w}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
