@@ -29,6 +29,7 @@ import Missions from "./pages/Missions";
 import Portfolio from "./pages/Portfolio";
 import SpotifyCallback from "./pages/SpotifyCallback";
 import Pricing from "./pages/Pricing";
+import ProDashboard from "./pages/ProDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ const App = () => (
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/pro-dashboard" element={<ProDashboard />} />
           <Route path="/spotify-callback" element={<SpotifyCallback />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
