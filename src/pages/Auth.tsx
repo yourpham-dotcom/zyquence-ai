@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -20,12 +21,13 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { isPro, loading: subLoading } = useSubscription();
 
   useEffect(() => {
-    if (user) {
-      navigate("/");
+    if (user && !subLoading) {
+      navigate(isPro ? "/pro-dashboard" : "/");
     }
-  }, [user, navigate]);
+  }, [user, isPro, subLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +58,7 @@ const Auth = () => {
           toast.error(error.message);
         } else {
           toast.success("Welcome back!");
-          navigate("/");
+          // Redirect handled by useEffect after subscription check
         }
       }
     } catch (err) {
