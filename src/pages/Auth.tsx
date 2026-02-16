@@ -9,9 +9,10 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const PRO_PRODUCT_ID = "prod_Twj36mQhOR4juQ";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -21,13 +22,25 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
-  const { isPro, loading: subLoading } = useSubscription();
 
   useEffect(() => {
-    if (user && !subLoading) {
-      navigate(isPro ? "/pro-dashboard" : "/");
-    }
-  }, [user, isPro, subLoading, navigate]);
+    if (!user) return;
+
+    const redirectUser = async () => {
+      try {
+        const { data } = await supabase.functions.invoke("check-subscription");
+        if (data?.subscribed && data?.product_id === PRO_PRODUCT_ID) {
+          navigate("/pro-dashboard", { replace: true });
+        } else {
+          navigate("/", { replace: true });
+        }
+      } catch {
+        navigate("/", { replace: true });
+      }
+    };
+
+    redirectUser();
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
