@@ -48,12 +48,6 @@ const Navigation = () => {
                 </a>
               </>
             )}
-            <a href="/ai-builder" className="text-muted-foreground hover:text-foreground transition-colors">
-              AI Builder
-            </a>
-            <Button variant="default" className="bg-cyber-blue hover:bg-cyber-blue/90" asChild>
-              <a href="/studio">Launch Studio</a>
-            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
@@ -113,12 +107,6 @@ const Navigation = () => {
                 </a>
               </>
             )}
-            <a href="/ai-builder" className="block text-muted-foreground hover:text-foreground transition-colors">
-              AI Builder
-            </a>
-            <Button variant="default" className="w-full bg-cyber-blue hover:bg-cyber-blue/90" asChild>
-              <a href="/studio">Launch Studio</a>
-            </Button>
             {user ? (
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
