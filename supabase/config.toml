@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.lyrics-studio]
 verify_jwt = false
+
+[functions.artist-intelligence]
+verify_jwt = false
