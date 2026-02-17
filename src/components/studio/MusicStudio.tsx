@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Music2, Save, Upload, Download, Users, Play, Pause } from "lucide-react";
+import { Music2, Save, Upload, Download, Users, Play, Pause, Mic2, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -44,6 +44,7 @@ const MusicStudio = () => {
   const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
   const [showExport, setShowExport] = useState(false);
   const [userTier, setUserTier] = useState<"free" | "pro" | "premium">("free");
+  const [showLyricsSidebar, setShowLyricsSidebar] = useState(false);
 
   useEffect(() => {
     initializeProject();
@@ -190,6 +191,15 @@ const MusicStudio = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            variant={showLyricsSidebar ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowLyricsSidebar(!showLyricsSidebar)}
+          >
+            {showLyricsSidebar ? <PanelRightClose className="w-4 h-4 mr-2" /> : <PanelRightOpen className="w-4 h-4 mr-2" />}
+            <Mic2 className="w-4 h-4 mr-1" />
+            Lyrics
+          </Button>
           <Button variant="outline" size="sm" onClick={handlePlayPause}>
             {isPlaying ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
             {isPlaying ? "Pause" : "Play"}
@@ -207,12 +217,12 @@ const MusicStudio = () => {
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex">
-        <Tabs defaultValue="editor" className="flex-1 flex flex-col">
+        {/* Left: Tabs area */}
+        <Tabs defaultValue="editor" className="flex-1 flex flex-col min-w-0">
           <TabsList className="mx-6 mt-4 w-fit">
             <TabsTrigger value="editor">Editor</TabsTrigger>
             <TabsTrigger value="record">Record</TabsTrigger>
             <TabsTrigger value="effects">Effects</TabsTrigger>
-            <TabsTrigger value="lyrics">Lyrics Studio</TabsTrigger>
             <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
           </TabsList>
 
@@ -253,14 +263,28 @@ const MusicStudio = () => {
             />
           </TabsContent>
 
-          <TabsContent value="lyrics" className="flex-1 overflow-hidden">
-            <LyricsStudio />
-          </TabsContent>
-
           <TabsContent value="collaborate" className="flex-1 overflow-hidden">
             <CollaborationPanel projectId={project?.id} />
           </TabsContent>
         </Tabs>
+
+        {/* Right: Lyrics Sidebar */}
+        {showLyricsSidebar && (
+          <div className="w-[480px] border-l border-border bg-card flex flex-col overflow-hidden animate-in slide-in-from-right-5 duration-300">
+            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Mic2 className="w-4 h-4 text-primary" />
+                <span className="font-semibold text-sm">Lyrics Studio</span>
+              </div>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowLyricsSidebar(false)}>
+                <PanelRightClose className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <LyricsStudio />
+            </div>
+          </div>
+        )}
       </div>
 
       {showExport && project && (
