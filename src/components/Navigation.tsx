@@ -43,6 +43,9 @@ const Navigation = () => {
                 <a href="/gaming-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
                   Gaming Engine
                 </a>
+                <a href="/artist-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Artist Intelligence
+                </a>
               </>
             )}
             <a href="/ai-builder" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -104,6 +107,9 @@ const Navigation = () => {
                 </a>
                 <a href="/gaming-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Gaming Engine
+                </a>
+                <a href="/artist-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
+                  Artist Intelligence
                 </a>
               </>
             )}
