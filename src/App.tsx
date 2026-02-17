@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Studio from "./pages/Studio";
 import Auth from "./pages/Auth";
@@ -30,7 +30,7 @@ import Portfolio from "./pages/Portfolio";
 import SpotifyCallback from "./pages/SpotifyCallback";
 import Pricing from "./pages/Pricing";
 import ProDashboard from "./pages/ProDashboard";
-import FreeDashboard from "./pages/FreeDashboard";
+
 import ArtistIntelligence from "./pages/ArtistIntelligence";
 import NotFound from "./pages/NotFound";
 
@@ -69,7 +69,7 @@ const App = () => (
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/pro-dashboard" element={<ProDashboard />} />
-          <Route path="/free-dashboard" element={<FreeDashboard />} />
+          <Route path="/free-dashboard" element={<Navigate to="/pro-dashboard" replace />} />
           <Route path="/spotify-callback" element={<SpotifyCallback />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
