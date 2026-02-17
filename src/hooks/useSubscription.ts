@@ -15,7 +15,7 @@ interface SubscriptionState {
 // Simple module-level cache
 let cachedState: SubscriptionState | null = null;
 let cachedUserId: string | null = null;
-let pendingPromise: Promise<SubscriptionState> | null = null;
+let fetchInFlight = false;
 
 async function fetchSubscription(): Promise<SubscriptionState> {
   try {
@@ -46,49 +46,53 @@ export const useSubscription = () => {
   const { user } = useAuth();
   const userId = user?.id ?? null;
 
-  const initial = (cachedState && cachedUserId === userId)
-    ? cachedState
-    : { subscribed: false, productId: null, subscriptionEnd: null, loading: !!userId, isPro: false };
-  const [state, setState] = useState<SubscriptionState>(initial);
+  const [state, setState] = useState<SubscriptionState>(
+    cachedState && cachedUserId === userId
+      ? cachedState
+      : { subscribed: false, productId: null, subscriptionEnd: null, loading: !!userId, isPro: false }
+  );
 
   useEffect(() => {
     if (!userId) {
       cachedUserId = null;
       cachedState = null;
-      pendingPromise = null;
+      fetchInFlight = false;
       setState({ subscribed: false, productId: null, subscriptionEnd: null, loading: false, isPro: false });
       return;
     }
 
-    // Already cached for this user
+    // Already cached for this user — apply immediately
     if (cachedUserId === userId && cachedState) {
       setState(cachedState);
       return;
     }
 
-    // Deduplicate concurrent requests
-    if (!pendingPromise || cachedUserId !== userId) {
-      cachedUserId = userId;
-      setState(prev => ({ ...prev, loading: true }));
-      pendingPromise = fetchSubscription();
-    }
+    // Prevent duplicate fetches
+    if (fetchInFlight && cachedUserId === userId) return;
 
-    let cancelled = false;
-    pendingPromise.then((result) => {
-      if (!cancelled) {
-        cachedState = result;
-        pendingPromise = null;
-        setState(result);
-      }
+    cachedUserId = userId;
+    fetchInFlight = true;
+    setState(prev => ({ ...prev, loading: true }));
+
+    fetchSubscription().then((result) => {
+      cachedState = result;
+      fetchInFlight = false;
+      // Always update — don't use cancelled flag so navigated-to pages get the result
+      setState(result);
     });
-
-    return () => { cancelled = true; };
   }, [userId]);
+
+  // Sync from cache on mount if another instance already fetched
+  useEffect(() => {
+    if (cachedState && cachedUserId === userId && state.loading) {
+      setState(cachedState);
+    }
+  });
 
   const refresh = useCallback(async () => {
     cachedState = null;
     cachedUserId = null;
-    pendingPromise = null;
+    fetchInFlight = false;
     if (!userId) return;
     setState(prev => ({ ...prev, loading: true }));
     const result = await fetchSubscription();
