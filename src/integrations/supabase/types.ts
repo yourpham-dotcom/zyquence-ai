@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      artist_profiles: {
+        Row: {
+          background: string | null
+          created_at: string
+          experience_level: string | null
+          id: string
+          inspirations: string[] | null
+          lifestyle: string | null
+          music_goals: string | null
+          personality_traits: Json | null
+          preferred_genres: string[] | null
+          stage_name: string | null
+          updated_at: string
+          user_id: string
+          voice_type: string | null
+        }
+        Insert: {
+          background?: string | null
+          created_at?: string
+          experience_level?: string | null
+          id?: string
+          inspirations?: string[] | null
+          lifestyle?: string | null
+          music_goals?: string | null
+          personality_traits?: Json | null
+          preferred_genres?: string[] | null
+          stage_name?: string | null
+          updated_at?: string
+          user_id: string
+          voice_type?: string | null
+        }
+        Update: {
+          background?: string | null
+          created_at?: string
+          experience_level?: string | null
+          id?: string
+          inspirations?: string[] | null
+          lifestyle?: string | null
+          music_goals?: string | null
+          personality_traits?: Json | null
+          preferred_genres?: string[] | null
+          stage_name?: string | null
+          updated_at?: string
+          user_id?: string
+          voice_type?: string | null
+        }
+        Relationships: []
+      }
       di_dashboards: {
         Row: {
           charts: Json
@@ -359,6 +407,112 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback_sessions: {
+        Row: {
+          authenticity_score: number | null
+          commercial_appeal_score: number | null
+          created_at: string
+          energy_score: number | null
+          feedback_type: string | null
+          flow_score: number | null
+          full_feedback: Json | null
+          id: string
+          improvement_suggestions: Json | null
+          lyrics_input: string | null
+          profile_id: string | null
+          user_id: string
+        }
+        Insert: {
+          authenticity_score?: number | null
+          commercial_appeal_score?: number | null
+          created_at?: string
+          energy_score?: number | null
+          feedback_type?: string | null
+          flow_score?: number | null
+          full_feedback?: Json | null
+          id?: string
+          improvement_suggestions?: Json | null
+          lyrics_input?: string | null
+          profile_id?: string | null
+          user_id: string
+        }
+        Update: {
+          authenticity_score?: number | null
+          commercial_appeal_score?: number | null
+          created_at?: string
+          energy_score?: number | null
+          feedback_type?: string | null
+          flow_score?: number | null
+          full_feedback?: Json | null
+          id?: string
+          improvement_suggestions?: Json | null
+          lyrics_input?: string | null
+          profile_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_sessions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      identity_results: {
+        Row: {
+          archetype: string | null
+          audience_profile: string | null
+          brand_personality: string | null
+          created_at: string
+          full_analysis: Json | null
+          id: string
+          messaging_tone: string | null
+          profile_id: string | null
+          stage_name_suggestions: string[] | null
+          updated_at: string
+          user_id: string
+          visual_aesthetic: string | null
+        }
+        Insert: {
+          archetype?: string | null
+          audience_profile?: string | null
+          brand_personality?: string | null
+          created_at?: string
+          full_analysis?: Json | null
+          id?: string
+          messaging_tone?: string | null
+          profile_id?: string | null
+          stage_name_suggestions?: string[] | null
+          updated_at?: string
+          user_id: string
+          visual_aesthetic?: string | null
+        }
+        Update: {
+          archetype?: string | null
+          audience_profile?: string | null
+          brand_personality?: string | null
+          created_at?: string
+          full_analysis?: Json | null
+          id?: string
+          messaging_tone?: string | null
+          profile_id?: string | null
+          stage_name_suggestions?: string[] | null
+          updated_at?: string
+          user_id?: string
+          visual_aesthetic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "identity_results_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_projects: {
         Row: {
           bpm: number | null
@@ -497,6 +651,174 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "music_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      readiness_scores: {
+        Row: {
+          ai_explanation: string | null
+          brand_clarity: number | null
+          consistency: number | null
+          created_at: string
+          id: string
+          market_positioning: number | null
+          overall_score: number | null
+          profile_id: string | null
+          recommendations: Json | null
+          story_authenticity: number | null
+          updated_at: string
+          user_id: string
+          voice_potential: number | null
+        }
+        Insert: {
+          ai_explanation?: string | null
+          brand_clarity?: number | null
+          consistency?: number | null
+          created_at?: string
+          id?: string
+          market_positioning?: number | null
+          overall_score?: number | null
+          profile_id?: string | null
+          recommendations?: Json | null
+          story_authenticity?: number | null
+          updated_at?: string
+          user_id: string
+          voice_potential?: number | null
+        }
+        Update: {
+          ai_explanation?: string | null
+          brand_clarity?: number | null
+          consistency?: number | null
+          created_at?: string
+          id?: string
+          market_positioning?: number | null
+          overall_score?: number | null
+          profile_id?: string | null
+          recommendations?: Json | null
+          story_authenticity?: number | null
+          updated_at?: string
+          user_id?: string
+          voice_potential?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "readiness_scores_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sound_recommendations: {
+        Row: {
+          beat_styles: string[] | null
+          bpm_range: Json | null
+          comparable_artists: string[] | null
+          created_at: string
+          flow_ideas: string[] | null
+          full_analysis: Json | null
+          genre_scores: Json | null
+          id: string
+          music_lane_summary: string | null
+          profile_id: string | null
+          updated_at: string
+          user_id: string
+          vocal_guidance: string | null
+        }
+        Insert: {
+          beat_styles?: string[] | null
+          bpm_range?: Json | null
+          comparable_artists?: string[] | null
+          created_at?: string
+          flow_ideas?: string[] | null
+          full_analysis?: Json | null
+          genre_scores?: Json | null
+          id?: string
+          music_lane_summary?: string | null
+          profile_id?: string | null
+          updated_at?: string
+          user_id: string
+          vocal_guidance?: string | null
+        }
+        Update: {
+          beat_styles?: string[] | null
+          bpm_range?: Json | null
+          comparable_artists?: string[] | null
+          created_at?: string
+          flow_ideas?: string[] | null
+          full_analysis?: Json | null
+          genre_scores?: Json | null
+          id?: string
+          music_lane_summary?: string | null
+          profile_id?: string | null
+          updated_at?: string
+          user_id?: string
+          vocal_guidance?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sound_recommendations_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strategy_plans: {
+        Row: {
+          audience_conversion: Json | null
+          brand_positioning: string | null
+          content_strategy: Json | null
+          created_at: string
+          growth_recommendations: Json | null
+          id: string
+          long_term_strategy: string | null
+          next_steps: Json | null
+          priority_actions: Json | null
+          profile_id: string | null
+          release_roadmap: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audience_conversion?: Json | null
+          brand_positioning?: string | null
+          content_strategy?: Json | null
+          created_at?: string
+          growth_recommendations?: Json | null
+          id?: string
+          long_term_strategy?: string | null
+          next_steps?: Json | null
+          priority_actions?: Json | null
+          profile_id?: string | null
+          release_roadmap?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audience_conversion?: Json | null
+          brand_positioning?: string | null
+          content_strategy?: Json | null
+          created_at?: string
+          growth_recommendations?: Json | null
+          id?: string
+          long_term_strategy?: string | null
+          next_steps?: Json | null
+          priority_actions?: Json | null
+          profile_id?: string | null
+          release_roadmap?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_plans_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "artist_profiles"
             referencedColumns: ["id"]
           },
         ]
