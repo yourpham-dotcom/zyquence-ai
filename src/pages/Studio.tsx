@@ -35,9 +35,9 @@ import FinancialLiteracy from "@/components/studio/FinancialLiteracy";
 import AthleteImageEngineer from "@/components/studio/AthleteImageEngineer";
 import ClutchMode from "@/components/studio/ClutchMode";
 import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
-import LyricsStudio from "@/components/studio/LyricsStudio";
 
-export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch" | "atlas" | "lyrics";
+
+export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch" | "atlas";
 export type GameType = "pingpong" | "basketball" | "racing" | null;
 
 const Studio = () => {
@@ -112,7 +112,7 @@ const Studio = () => {
 
   const mediaTools = [
     { id: "music" as ToolType, icon: Music, label: "Music Studio" },
-    { id: "lyrics" as ToolType, icon: Mic2, label: "Lyrics Studio" },
+    
     { id: "video" as ToolType, icon: Video, label: "Video Editor" },
     { id: "art" as ToolType, icon: Palette, label: "Artist Studio" },
     { id: "journal" as ToolType, icon: Book, label: "Journal" },
@@ -174,8 +174,6 @@ const Studio = () => {
         return <ClutchMode />;
       case "atlas":
         return <ZyquenceAtlas />;
-      case "lyrics":
-        return <LyricsStudio />;
       default:
         return <ChatInterface />;
     }
