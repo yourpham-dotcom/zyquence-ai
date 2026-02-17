@@ -11,6 +11,7 @@ import EffectsPanel from "./music/EffectsPanel";
 import ExportDialog from "./music/ExportDialog";
 import ProjectManager from "./music/ProjectManager";
 import CollaborationPanel from "./music/CollaborationPanel";
+import LyricsStudio from "./LyricsStudio";
 import * as Tone from "tone";
 
 export interface Track {
@@ -211,6 +212,7 @@ const MusicStudio = () => {
             <TabsTrigger value="editor">Editor</TabsTrigger>
             <TabsTrigger value="record">Record</TabsTrigger>
             <TabsTrigger value="effects">Effects</TabsTrigger>
+            <TabsTrigger value="lyrics">Lyrics Studio</TabsTrigger>
             <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
           </TabsList>
 
@@ -249,6 +251,10 @@ const MusicStudio = () => {
                 }
               }}
             />
+          </TabsContent>
+
+          <TabsContent value="lyrics" className="flex-1 overflow-hidden">
+            <LyricsStudio />
           </TabsContent>
 
           <TabsContent value="collaborate" className="flex-1 overflow-hidden">
