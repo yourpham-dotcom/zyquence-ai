@@ -46,19 +46,10 @@ export const useSubscription = () => {
   const { user } = useAuth();
   const userId = user?.id ?? null;
 
-  const [state, setState] = useState<SubscriptionState>(() => {
-    // Use cache if available for this user
-    if (cachedState && cachedUserId === userId) {
-      return cachedState;
-    }
-    return {
-      subscribed: false,
-      productId: null,
-      subscriptionEnd: null,
-      loading: !!userId,
-      isPro: false,
-    };
-  });
+  const initial = (cachedState && cachedUserId === userId)
+    ? cachedState
+    : { subscribed: false, productId: null, subscriptionEnd: null, loading: !!userId, isPro: false };
+  const [state, setState] = useState<SubscriptionState>(initial);
 
   useEffect(() => {
     if (!userId) {
