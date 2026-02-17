@@ -75,8 +75,9 @@ Rules:
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          { role: "user", content: userPrompt + `\n\n[Variation seed: ${Date.now()}-${Math.random().toString(36).slice(2)}]` },
         ],
+        temperature: 1.2,
         stream: true,
       }),
     });
