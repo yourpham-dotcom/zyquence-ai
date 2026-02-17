@@ -3,6 +3,7 @@ import { Music2, Save, Upload, Download, Users, Play, Pause, Mic2, PanelRightOpe
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import MultitrackEditor from "./music/MultitrackEditor";
@@ -215,76 +216,82 @@ const MusicStudio = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-hidden flex">
-        {/* Left: Tabs area */}
-        <Tabs defaultValue="editor" className="flex-1 flex flex-col min-w-0">
-          <TabsList className="mx-6 mt-4 w-fit">
-            <TabsTrigger value="editor">Editor</TabsTrigger>
-            <TabsTrigger value="record">Record</TabsTrigger>
-            <TabsTrigger value="effects">Effects</TabsTrigger>
-            <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
-          </TabsList>
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+          <ResizablePanel defaultSize={showLyricsSidebar ? 60 : 100} minSize={30}>
+            <Tabs defaultValue="editor" className="h-full flex flex-col">
+              <TabsList className="mx-6 mt-4 w-fit">
+                <TabsTrigger value="editor">Editor</TabsTrigger>
+                <TabsTrigger value="record">Record</TabsTrigger>
+                <TabsTrigger value="effects">Effects</TabsTrigger>
+                <TabsTrigger value="collaborate">Collaborate</TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="editor" className="flex-1 overflow-hidden mt-0">
-            <MultitrackEditor
-              tracks={tracks}
-              setTracks={setTracks}
-              selectedTrack={selectedTrack}
-              setSelectedTrack={setSelectedTrack}
-              onAddTrack={addTrack}
-              isPlaying={isPlaying}
-              bpm={project?.bpm || 120}
-            />
-          </TabsContent>
+              <TabsContent value="editor" className="flex-1 overflow-hidden mt-0">
+                <MultitrackEditor
+                  tracks={tracks}
+                  setTracks={setTracks}
+                  selectedTrack={selectedTrack}
+                  setSelectedTrack={setSelectedTrack}
+                  onAddTrack={addTrack}
+                  isPlaying={isPlaying}
+                  bpm={project?.bpm || 120}
+                />
+              </TabsContent>
 
-          <TabsContent value="record" className="flex-1 overflow-hidden">
-            <RecordingPanel
-              onRecordingComplete={(audioUrl) => {
-                if (selectedTrack) {
-                  setTracks(tracks.map(t =>
-                    t.id === selectedTrack ? { ...t, audioUrl } : t
-                  ));
-                }
-              }}
-            />
-          </TabsContent>
+              <TabsContent value="record" className="flex-1 overflow-hidden">
+                <RecordingPanel
+                  onRecordingComplete={(audioUrl) => {
+                    if (selectedTrack) {
+                      setTracks(tracks.map(t =>
+                        t.id === selectedTrack ? { ...t, audioUrl } : t
+                      ));
+                    }
+                  }}
+                />
+              </TabsContent>
 
-          <TabsContent value="effects" className="flex-1 overflow-hidden">
-            <EffectsPanel
-              selectedTrack={tracks.find(t => t.id === selectedTrack)}
-              onEffectsChange={(effects) => {
-                if (selectedTrack) {
-                  setTracks(tracks.map(t =>
-                    t.id === selectedTrack ? { ...t, effects } : t
-                  ));
-                }
-              }}
-            />
-          </TabsContent>
+              <TabsContent value="effects" className="flex-1 overflow-hidden">
+                <EffectsPanel
+                  selectedTrack={tracks.find(t => t.id === selectedTrack)}
+                  onEffectsChange={(effects) => {
+                    if (selectedTrack) {
+                      setTracks(tracks.map(t =>
+                        t.id === selectedTrack ? { ...t, effects } : t
+                      ));
+                    }
+                  }}
+                />
+              </TabsContent>
 
-          <TabsContent value="collaborate" className="flex-1 overflow-hidden">
-            <CollaborationPanel projectId={project?.id} />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="collaborate" className="flex-1 overflow-hidden">
+                <CollaborationPanel projectId={project?.id} />
+              </TabsContent>
+            </Tabs>
+          </ResizablePanel>
 
-        {/* Right: Lyrics Sidebar */}
-        {showLyricsSidebar && (
-          <div className="w-[480px] border-l border-border bg-card flex flex-col overflow-hidden animate-in slide-in-from-right-5 duration-300">
-            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Mic2 className="w-4 h-4 text-primary" />
-                <span className="font-semibold text-sm">Lyrics Studio</span>
-              </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowLyricsSidebar(false)}>
-                <PanelRightClose className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex-1 overflow-y-auto min-h-0">
-              <LyricsStudio />
-            </div>
-          </div>
-        )}
+          {showLyricsSidebar && (
+            <>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={40} minSize={25} maxSize={70}>
+                <div className="h-full flex flex-col bg-card overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-2">
+                      <Mic2 className="w-4 h-4 text-primary" />
+                      <span className="font-semibold text-sm">Lyrics Studio</span>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowLyricsSidebar(false)}>
+                      <PanelRightClose className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto min-h-0">
+                    <LyricsStudio />
+                  </div>
+                </div>
+              </ResizablePanel>
+            </>
+          )}
+        </ResizablePanelGroup>
       </div>
 
       {showExport && project && (
