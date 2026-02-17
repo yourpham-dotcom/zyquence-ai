@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import {
   Palette,
   Cpu,
@@ -15,15 +16,19 @@ import { useEffect } from "react";
 
 const FreeDashboard = () => {
   const { user, loading: authLoading, signOut } = useAuth();
+  const { isPro, loading: subLoading } = useSubscription();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/auth");
     }
-  }, [authLoading, user, navigate]);
+    if (!authLoading && !subLoading && isPro) {
+      navigate("/pro-dashboard", { replace: true });
+    }
+  }, [authLoading, subLoading, user, isPro, navigate]);
 
-  if (authLoading) {
+  if (authLoading || subLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
