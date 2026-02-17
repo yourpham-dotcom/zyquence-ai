@@ -9,6 +9,7 @@ import {
   Palette,
   Globe,
   Cpu,
+  Music,
   ArrowRight,
   LogOut,
   Loader2,
@@ -72,6 +73,13 @@ const ProDashboard = () => {
       description: "Build and export custom AI-powered tools and workflows",
       path: "/ai-builder",
       color: "from-indigo-500 to-violet-500",
+    },
+    {
+      icon: Music,
+      title: "Artist Intelligence",
+      description: "AI-powered music identity, branding, and career direction",
+      path: "/artist-intelligence",
+      color: "from-fuchsia-500 to-rose-500",
     },
   ];
 
