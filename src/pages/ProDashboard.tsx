@@ -26,9 +26,6 @@ const ProDashboard = () => {
     if (!authLoading && !user) {
       navigate("/auth");
     }
-    if (!authLoading && !subLoading && !isPro) {
-      navigate("/free-dashboard", { replace: true });
-    }
   }, [authLoading, subLoading, user, isPro, navigate]);
 
   if (authLoading || subLoading) {
