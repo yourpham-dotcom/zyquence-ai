@@ -35,6 +35,9 @@ export const useSubscription = () => {
     if (checkedRef.current === userId) return;
     checkedRef.current = userId;
 
+    // Reset loading to true before async check
+    setState((prev) => ({ ...prev, loading: true }));
+
     const check = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("check-subscription");
