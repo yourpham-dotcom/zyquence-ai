@@ -9,23 +9,18 @@ const Hero = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/50 backdrop-blur-sm border border-border/50">
-            <Sparkles className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              Multi-Industry Creative Intelligence Engine
-            </span>
+          <div className="inline-flex flex-col items-center gap-4 px-8 py-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 max-w-3xl">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground tracking-wide uppercase">
+                Multi-Industry Creative Intelligence Engine
+              </span>
+            </div>
+            <p className="text-lg md:text-xl text-foreground/80 leading-relaxed text-center">
+              A digital growth engine blending AI, performance coaching, creative tools, and intelligent pathways
+              for artists, athletes, creators, and students.
+            </p>
           </div>
-
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight">
-            <span className="block text-foreground/70">Innovating the</span>
-            <span className="block mt-2 text-foreground/70">Next Level of</span>
-            <span className="block mt-2 text-foreground/70">Creative Intelligence</span>
-          </h1>
-
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            A digital growth engine blending AI, performance coaching, creative tools, and intelligent pathways
-            for artists, athletes, creators, and students.
-          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Button
