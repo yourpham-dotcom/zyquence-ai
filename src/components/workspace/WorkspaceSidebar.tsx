@@ -19,6 +19,9 @@ import {
   Crown,
   ChevronLeft,
   ChevronRight,
+  Share2,
+  Megaphone,
+  MessageCircle,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +53,12 @@ const mainNav = [
 const toolsNav = [
   { title: "Studio", path: "/studio", icon: Palette },
   { title: "Zyquence Atlas", path: "/studio", icon: Globe },
+];
+
+const socialNav = [
+  { title: "Social Media", path: "/dashboard/social", icon: Share2 },
+  { title: "Public Relations", path: "/dashboard/pr", icon: Megaphone },
+  { title: "Feedback", path: "/dashboard/feedback", icon: MessageCircle },
 ];
 
 const proNav = [
@@ -168,7 +177,35 @@ export function WorkspaceSidebar() {
 
         <Separator className="mx-4 bg-sidebar-border" />
 
-        {/* Pro Features */}
+        {/* Social & PR */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {socialNav.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                        )
+                      }
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
