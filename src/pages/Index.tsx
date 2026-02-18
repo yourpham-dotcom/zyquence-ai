@@ -20,12 +20,9 @@ const Index = () => {
     );
   }
 
-  // Redirect logged-in users to their dashboard
+  // Redirect logged-in users to unified workspace
   if (user) {
-    if (isPro) {
-      return <Navigate to="/pro-dashboard" replace />;
-    }
-    return <Navigate to="/free-dashboard" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

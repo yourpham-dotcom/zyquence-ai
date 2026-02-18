@@ -3,9 +3,25 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
-import Studio from "./pages/Studio";
 import Auth from "./pages/Auth";
+import NotFound from "./pages/NotFound";
+import Pricing from "./pages/Pricing";
+import SpotifyCallback from "./pages/SpotifyCallback";
+
+// Workspace layout & pages
+import WorkspaceLayout from "./components/workspace/WorkspaceLayout";
+import WorkspaceDashboard from "./pages/workspace/WorkspaceDashboard";
+import CalendarPage from "./pages/workspace/CalendarPage";
+import FinancePage from "./pages/workspace/FinancePage";
+import WorkspacePage from "./pages/workspace/WorkspacePage";
+import GoalsPage from "./pages/workspace/GoalsPage";
+import AssistantPage from "./pages/workspace/AssistantPage";
+
+// Existing pages
+import Studio from "./pages/Studio";
 import DataIntelligence from "./pages/DataIntelligence";
 import DataUpload from "./pages/DataUpload";
 import GamingIntelligence from "./pages/GamingIntelligence";
@@ -27,14 +43,17 @@ import Visualizer from "./pages/Visualizer";
 import Experiments from "./pages/Experiments";
 import Missions from "./pages/Missions";
 import Portfolio from "./pages/Portfolio";
-import SpotifyCallback from "./pages/SpotifyCallback";
-import Pricing from "./pages/Pricing";
-import ProDashboard from "./pages/ProDashboard";
 import FreeDashboard from "./pages/FreeDashboard";
+import ProDashboard from "./pages/ProDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
-import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+const Loading = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -45,6 +64,24 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/spotify-callback" element={<SpotifyCallback />} />
+
+          {/* Workspace layout with sidebar */}
+          <Route path="/dashboard" element={<WorkspaceLayout />}>
+            <Route index element={<WorkspaceDashboard />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="finance" element={<FinancePage />} />
+            <Route path="workspace" element={<WorkspacePage />} />
+            <Route path="goals" element={<GoalsPage />} />
+            <Route path="assistant" element={<AssistantPage />} />
+          </Route>
+
+          {/* Legacy dashboards (redirect to new workspace) */}
+          <Route path="/pro-dashboard" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/free-dashboard" element={<Navigate to="/dashboard" replace />} />
+
+          {/* Existing tool routes */}
           <Route path="/studio" element={<Studio />} />
           <Route path="/data-intelligence" element={<DataIntelligence />} />
           <Route path="/data-intelligence/upload" element={<DataUpload />} />
@@ -67,11 +104,8 @@ const App = () => (
           <Route path="/gaming-intelligence/journal" element={<Journal />} />
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           <Route path="/ai-builder" element={<AIBuilderHub />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/pro-dashboard" element={<ProDashboard />} />
-          <Route path="/free-dashboard" element={<FreeDashboard />} />
-          <Route path="/spotify-callback" element={<SpotifyCallback />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
+
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
