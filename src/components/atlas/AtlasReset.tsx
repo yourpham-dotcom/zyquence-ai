@@ -1,13 +1,27 @@
 import { useState } from "react";
-import { Check, RotateCcw } from "lucide-react";
+import { Check, RotateCcw, Plus, X, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+
+interface ScheduleBlock {
+  id: string;
+  label: string;
+  startTime: string;
+  endTime: string;
+  type: "recovery" | "training" | "lifestyle" | "rest";
+}
 
 const AtlasReset = () => {
   const [checkInScore, setCheckInScore] = useState<number | null>(null);
   const [journalEntry, setJournalEntry] = useState("");
   const [activeReset, setActiveReset] = useState<string | null>(null);
   const [resetComplete, setResetComplete] = useState(false);
+  const [scheduleBlocks, setScheduleBlocks] = useState<ScheduleBlock[]>([
+    { id: "1", label: "Morning Recovery", startTime: "07:00", endTime: "08:00", type: "recovery" },
+    { id: "2", label: "Training", startTime: "09:00", endTime: "11:00", type: "training" },
+    { id: "3", label: "Free Time", startTime: "12:00", endTime: "14:00", type: "lifestyle" },
+  ]);
+  const [newBlock, setNewBlock] = useState({ label: "", startTime: "", endTime: "", type: "lifestyle" as ScheduleBlock["type"] });
 
   const levels = [
     { score: 1, label: "Low" },
@@ -159,6 +173,95 @@ const AtlasReset = () => {
         {journalEntry.length > 0 && (
           <p className="text-[10px] text-muted-foreground">{journalEntry.length} chars · Private</p>
         )}
+      </div>
+
+      {/* Schedule Builder */}
+      <div className="space-y-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Schedule Builder</p>
+        <div className="space-y-1.5">
+          {scheduleBlocks
+            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+            .map((block) => (
+              <div
+                key={block.id}
+                className="flex items-center gap-2 p-2.5 border border-border hover:border-foreground/15 transition-colors"
+              >
+                <div className={`w-1.5 h-8 shrink-0 ${
+                  block.type === "recovery" ? "bg-blue-500" :
+                  block.type === "training" ? "bg-orange-500" :
+                  block.type === "rest" ? "bg-green-500" : "bg-foreground/30"
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{block.label}</p>
+                  <p className="text-[11px] text-muted-foreground">
+                    {block.startTime} – {block.endTime}
+                  </p>
+                </div>
+                <span className="text-[10px] text-muted-foreground uppercase shrink-0">{block.type}</span>
+                <button
+                  onClick={() => setScheduleBlocks(prev => prev.filter(b => b.id !== block.id))}
+                  className="p-1 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            ))}
+        </div>
+
+        {/* Add Block */}
+        <Card className="border-border">
+          <CardContent className="p-3 space-y-2">
+            <p className="text-[11px] text-muted-foreground">Add block</p>
+            <input
+              type="text"
+              value={newBlock.label}
+              onChange={(e) => setNewBlock(prev => ({ ...prev, label: e.target.value }))}
+              placeholder="Label"
+              className="w-full text-sm bg-transparent border border-border px-2 py-1.5 outline-none focus:border-foreground/30 transition-colors"
+            />
+            <div className="flex gap-2">
+              <input
+                type="time"
+                value={newBlock.startTime}
+                onChange={(e) => setNewBlock(prev => ({ ...prev, startTime: e.target.value }))}
+                className="flex-1 text-sm bg-transparent border border-border px-2 py-1.5 outline-none focus:border-foreground/30"
+              />
+              <input
+                type="time"
+                value={newBlock.endTime}
+                onChange={(e) => setNewBlock(prev => ({ ...prev, endTime: e.target.value }))}
+                className="flex-1 text-sm bg-transparent border border-border px-2 py-1.5 outline-none focus:border-foreground/30"
+              />
+            </div>
+            <div className="flex gap-1">
+              {(["recovery", "training", "lifestyle", "rest"] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setNewBlock(prev => ({ ...prev, type: t }))}
+                  className={`flex-1 py-1.5 text-[11px] font-medium border transition-colors ${
+                    newBlock.type === t
+                      ? "bg-foreground text-background border-foreground"
+                      : "border-border text-muted-foreground hover:border-foreground/30"
+                  }`}
+                >
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                if (newBlock.label && newBlock.startTime && newBlock.endTime) {
+                  setScheduleBlocks(prev => [...prev, { ...newBlock, id: Date.now().toString() }]);
+                  setNewBlock({ label: "", startTime: "", endTime: "", type: "lifestyle" });
+                }
+              }}
+              className="w-full py-2 text-xs font-medium bg-foreground text-background border border-foreground transition-colors hover:bg-foreground/90"
+            >
+              <Plus className="h-3 w-3 inline mr-1" />
+              Add Block
+            </button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
