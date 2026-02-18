@@ -22,7 +22,10 @@ const Index = () => {
 
   // Redirect logged-in users to their dashboard
   if (user) {
-    return <Navigate to="/pro-dashboard" replace />;
+    if (isPro) {
+      return <Navigate to="/pro-dashboard" replace />;
+    }
+    return <Navigate to="/free-dashboard" replace />;
   }
 
   return (

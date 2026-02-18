@@ -34,10 +34,10 @@ const Auth = () => {
         if (data?.subscribed && data?.product_id === PRO_PRODUCT_ID) {
           navigate("/pro-dashboard", { replace: true });
         } else {
-          navigate("/", { replace: true });
+          navigate("/free-dashboard", { replace: true });
         }
       } catch {
-        navigate("/", { replace: true });
+        navigate("/free-dashboard", { replace: true });
       }
     };
 
