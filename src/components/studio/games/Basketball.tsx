@@ -33,42 +33,25 @@ const Basketball = ({ compact = false }: BasketballProps) => {
 
     gameRef.current = game;
 
-    // Mouse controls
-    const handleMouseDown = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      
-      const dist = Math.sqrt((mouseX - game.ball.x) ** 2 + (mouseY - game.ball.y) ** 2);
-      if (dist < game.ball.radius && !game.shooting) {
-        game.ball.grabbed = true;
-      }
+    // Click to shoot
+    const handleClick = (e: MouseEvent) => {
+      if (game.shooting) return;
+
+      const hoopCenterX = game.hoop.x + game.hoop.width / 2;
+      const hoopY = game.hoop.y + 12;
+      const dx = hoopCenterX - game.ball.x;
+      const dy = hoopY - game.ball.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      const spread = (Math.random() - 0.5) * 2;
+      const power = 0.85 + Math.random() * 0.15;
+
+      game.velocity.x = (dx / dist) * 8 * power + spread;
+      game.velocity.y = (dy / dist) * 8 * power - 3;
+      game.shooting = true;
     };
 
-    const handleMouseUp = (e: MouseEvent) => {
-      if (game.ball.grabbed) {
-        game.ball.grabbed = false;
-        game.shooting = true;
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        game.velocity.x = (mouseX - game.ball.x) * 0.1;
-        game.velocity.y = (mouseY - game.ball.y) * 0.1;
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (game.ball.grabbed) {
-        const rect = canvas.getBoundingClientRect();
-        game.ball.x = e.clientX - rect.left;
-        game.ball.y = e.clientY - rect.top;
-      }
-    };
-
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mouseup", handleMouseUp);
-    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("click", handleClick);
 
     // Timer
     const timer = setInterval(() => {
@@ -136,15 +119,54 @@ const Basketball = ({ compact = false }: BasketballProps) => {
         ctx.stroke();
       }
 
-      // Draw ball
+      // Draw basketball
+      const bx = game.ball.x;
+      const by = game.ball.y;
+      const br = game.ball.radius;
+
+      // Ball base
       ctx.beginPath();
-      ctx.arc(game.ball.x, game.ball.y, game.ball.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "hsl(25, 95%, 53%)";
+      ctx.arc(bx, by, br, 0, Math.PI * 2);
+      const ballGrad = ctx.createRadialGradient(bx - 4, by - 4, 2, bx, by, br);
+      ballGrad.addColorStop(0, "#f5903a");
+      ballGrad.addColorStop(0.7, "#e86a17");
+      ballGrad.addColorStop(1, "#b84d0a");
+      ctx.fillStyle = ballGrad;
       ctx.fill();
-      ctx.strokeStyle = "hsl(0, 0%, 0%)";
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#6b3005";
+      ctx.lineWidth = 1.5;
       ctx.stroke();
       ctx.closePath();
+
+      // Horizontal seam
+      ctx.beginPath();
+      ctx.moveTo(bx - br, by);
+      ctx.lineTo(bx + br, by);
+      ctx.strokeStyle = "#6b3005";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Vertical seam
+      ctx.beginPath();
+      ctx.moveTo(bx, by - br);
+      ctx.lineTo(bx, by + br);
+      ctx.stroke();
+
+      // Curved seams
+      ctx.beginPath();
+      ctx.arc(bx, by, br * 0.7, -0.5, 0.5);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(bx, by, br * 0.7, Math.PI - 0.5, Math.PI + 0.5);
+      ctx.stroke();
+
+      // Bounce indicator when ready
+      if (!game.shooting) {
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.font = "11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("TAP!", bx, by - br - 8);
+      }
 
       // Ball physics
       if (game.shooting) {
@@ -184,9 +206,7 @@ const Basketball = ({ compact = false }: BasketballProps) => {
     return () => {
       game.running = false;
       clearInterval(timer);
-      canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("mouseup", handleMouseUp);
-      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("click", handleClick);
     };
   }, [gameStarted]);
 
@@ -214,7 +234,7 @@ const Basketball = ({ compact = false }: BasketballProps) => {
         className="border-2 border-border rounded-lg"
       />
       <p className="text-xs text-muted-foreground text-center">
-        Click and drag the ball to shoot
+        Tap anywhere to shoot the ball
       </p>
     </div>
   );
