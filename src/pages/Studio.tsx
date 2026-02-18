@@ -50,6 +50,8 @@ const Studio = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [mediaPlayerHeight, setMediaPlayerHeight] = useState(80);
   const [isResizingPlayer, setIsResizingPlayer] = useState(false);
+  const [gameSidebarWidth, setGameSidebarWidth] = useState(280);
+  const [isResizingGames, setIsResizingGames] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleMouseDown = () => {
@@ -74,14 +76,21 @@ const Studio = () => {
           setMediaPlayerHeight(newHeight);
         }
       }
+      if (isResizingGames) {
+        const newWidth = window.innerWidth - e.clientX;
+        if (newWidth >= 200 && newWidth <= 500) {
+          setGameSidebarWidth(newWidth);
+        }
+      }
     };
 
     const handleGlobalMouseUp = () => {
       setIsResizing(false);
       setIsResizingPlayer(false);
+      setIsResizingGames(false);
     };
 
-    if (isResizing || isResizingPlayer) {
+    if (isResizing || isResizingPlayer || isResizingGames) {
       document.addEventListener('mousemove', handleGlobalMouseMove);
       document.addEventListener('mouseup', handleGlobalMouseUp);
     }
@@ -90,7 +99,7 @@ const Studio = () => {
       document.removeEventListener('mousemove', handleGlobalMouseMove);
       document.removeEventListener('mouseup', handleGlobalMouseUp);
     };
-  }, [isResizing, isResizingPlayer]);
+  }, [isResizing, isResizingPlayer, isResizingGames]);
 
   const athleteTools = [
     { id: "mental" as ToolType, icon: Brain, label: "Mental Health" },
@@ -506,9 +515,46 @@ const Studio = () => {
           </div>
         </div>
 
-        {/* Games Sidebar (collapsible) */}
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          <div className="flex-1 overflow-hidden">
+            {renderTool()}
+          </div>
+
+          {/* Media Player Resizer Handle */}
+          <div 
+            className="h-1 bg-border hover:bg-primary cursor-row-resize relative group transition-colors"
+            onMouseDown={handlePlayerMouseDown}
+          >
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 flex items-center justify-center">
+              <div className="h-1 w-12 rounded-full bg-muted-foreground/20 group-hover:bg-primary/50 transition-colors" />
+            </div>
+          </div>
+
+          {/* Bottom Media Player */}
+          <div style={{ height: `${mediaPlayerHeight}px` }}>
+            <MediaPlayer />
+          </div>
+        </div>
+
+        {/* Games Sidebar Resizer */}
         {showGames && (
-          <div className="w-64 border-r border-border bg-card p-4 flex flex-col">
+          <div 
+            className="w-1 bg-border hover:bg-primary cursor-col-resize relative group transition-colors"
+            onMouseDown={() => setIsResizingGames(true)}
+          >
+            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-3 flex items-center justify-center">
+              <div className="w-1 h-12 rounded-full bg-muted-foreground/20 group-hover:bg-primary/50 transition-colors" />
+            </div>
+          </div>
+        )}
+
+        {/* Games Sidebar (collapsible & resizable) */}
+        {showGames && (
+          <div 
+            className="border-l border-border bg-card p-4 flex flex-col"
+            style={{ width: `${gameSidebarWidth}px` }}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Mini Games</h3>
               {activeGame && (
@@ -542,28 +588,6 @@ const Studio = () => {
             )}
           </div>
         )}
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-hidden">
-            {renderTool()}
-          </div>
-
-          {/* Media Player Resizer Handle */}
-          <div 
-            className="h-1 bg-border hover:bg-primary cursor-row-resize relative group transition-colors"
-            onMouseDown={handlePlayerMouseDown}
-          >
-            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 flex items-center justify-center">
-              <div className="h-1 w-12 rounded-full bg-muted-foreground/20 group-hover:bg-primary/50 transition-colors" />
-            </div>
-          </div>
-
-          {/* Bottom Media Player */}
-          <div style={{ height: `${mediaPlayerHeight}px` }}>
-            <MediaPlayer />
-          </div>
-        </div>
       </div>
     </TooltipProvider>
   );
