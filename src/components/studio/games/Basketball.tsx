@@ -71,8 +71,8 @@ const Basketball = ({ compact = false }: BasketballProps) => {
         const dist = Math.sqrt(dx * dx + dy * dy);
         const spread = (Math.random() - 0.5) * 1.5;
         const power = 0.9 + Math.random() * 0.1;
-        game.velocity.x = (dx / dist) * 8 * power + spread;
-        game.velocity.y = (dy / dist) * 8 * power - 3;
+        game.velocity.x = (dx / dist) * 12 * power + spread;
+        game.velocity.y = (dy / dist) * 12 * power - 5;
         game.shooting = true;
       }
     };
