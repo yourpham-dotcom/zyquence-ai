@@ -30,7 +30,7 @@ import Portfolio from "./pages/Portfolio";
 import SpotifyCallback from "./pages/SpotifyCallback";
 import Pricing from "./pages/Pricing";
 import ProDashboard from "./pages/ProDashboard";
-
+import FreeDashboard from "./pages/FreeDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
 import NotFound from "./pages/NotFound";
 
@@ -69,7 +69,7 @@ const App = () => (
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/pro-dashboard" element={<ProDashboard />} />
-          <Route path="/free-dashboard" element={<Navigate to="/pro-dashboard" replace />} />
+          <Route path="/free-dashboard" element={<FreeDashboard />} />
           <Route path="/spotify-callback" element={<SpotifyCallback />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
