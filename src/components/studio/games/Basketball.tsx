@@ -89,14 +89,52 @@ const Basketball = ({ compact = false }: BasketballProps) => {
       ctx.fillStyle = "hsl(var(--muted))";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw hoop
-      ctx.fillStyle = "hsl(var(--primary))";
-      ctx.fillRect(game.hoop.x, game.hoop.y, game.hoop.width, game.hoop.height);
-      ctx.strokeStyle = "hsl(var(--primary))";
+      // Draw backboard
+      const hoopCenterX = game.hoop.x + game.hoop.width / 2;
+      const hoopY = game.hoop.y;
+      const backboardWidth = 90;
+      const backboardHeight = 60;
+      
+      // Backboard glow
+      ctx.shadowColor = "rgba(255, 120, 30, 0.5)";
+      ctx.shadowBlur = 15;
+      ctx.strokeStyle = "#ff7830";
       ctx.lineWidth = 3;
+      ctx.strokeRect(hoopCenterX - backboardWidth / 2, hoopY - backboardHeight + 10, backboardWidth, backboardHeight);
+      ctx.shadowBlur = 0;
+      
+      // Backboard fill
+      ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+      ctx.fillRect(hoopCenterX - backboardWidth / 2, hoopY - backboardHeight + 10, backboardWidth, backboardHeight);
+      
+      // Inner backboard square
+      ctx.strokeStyle = "#ff7830";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(hoopCenterX - 18, hoopY - 26, 36, 28);
+      
+      // Pole
+      ctx.fillStyle = "#4a7ab5";
+      ctx.fillRect(hoopCenterX - 4, hoopY + 10, 8, 30);
+      
+      // Rim
+      ctx.strokeStyle = "#ff5500";
+      ctx.lineWidth = 4;
       ctx.beginPath();
-      ctx.arc(game.hoop.x + game.hoop.width / 2, game.hoop.y, 30, 0, Math.PI, true);
+      ctx.arc(hoopCenterX, hoopY + 12, 20, 0, Math.PI * 2);
       ctx.stroke();
+      
+      // Net strings
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const rx = Math.cos(angle) * 20;
+        const ry = Math.sin(angle) * 20;
+        ctx.beginPath();
+        ctx.moveTo(hoopCenterX + rx, hoopY + 12 + ry);
+        ctx.lineTo(hoopCenterX + rx * 0.3, hoopY + 45);
+        ctx.stroke();
+      }
 
       // Draw ball
       ctx.beginPath();
