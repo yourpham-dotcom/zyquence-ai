@@ -7,6 +7,9 @@ import { DollarSign, TrendingUp, PiggyBank, BookOpen, Calculator, Target } from 
 const FinancialLiteracy = () => {
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [budget, setBudget] = useState<any>(null);
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  const toggleSection = (id: string) => setOpenSection(prev => prev === id ? null : id);
 
   const calculateBudget = () => {
     const income = parseFloat(monthlyIncome);
@@ -42,10 +45,22 @@ const FinancialLiteracy = () => {
           <p className="text-sm text-muted-foreground mb-4">
             Learn strategies to save for your future, build emergency funds, and prepare for life after sports.
           </p>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => toggleSection("saving")}>
             <BookOpen className="w-4 h-4 mr-2" />
-            Start Learning
+            {openSection === "saving" ? "Close" : "Start Learning"}
           </Button>
+          {openSection === "saving" && (
+            <div className="mt-4 space-y-2 text-sm text-muted-foreground border-t border-border pt-4">
+              <p className="font-medium text-foreground">Saving Strategies:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>Automate 20% of every paycheck into savings</li>
+                <li>Build a 6-month emergency fund before investing</li>
+                <li>Use high-yield savings accounts for idle cash</li>
+                <li>Track expenses weekly to identify waste</li>
+                <li>Set up separate accounts for goals (car, house, etc.)</li>
+              </ul>
+            </div>
+          )}
         </Card>
 
         <Card className="p-6 bg-card border-border">
@@ -56,10 +71,22 @@ const FinancialLiteracy = () => {
           <p className="text-sm text-muted-foreground mb-4">
             Understand stocks, bonds, and investment vehicles to grow your wealth over time.
           </p>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => toggleSection("investing")}>
             <BookOpen className="w-4 h-4 mr-2" />
-            Explore Options
+            {openSection === "investing" ? "Close" : "Explore Options"}
           </Button>
+          {openSection === "investing" && (
+            <div className="mt-4 space-y-2 text-sm text-muted-foreground border-t border-border pt-4">
+              <p className="font-medium text-foreground">Investment Vehicles:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li><strong>Index Funds:</strong> Low-cost, diversified market exposure</li>
+                <li><strong>Roth IRA:</strong> Tax-free growth for retirement</li>
+                <li><strong>Bonds:</strong> Lower risk, steady returns</li>
+                <li><strong>Real Estate:</strong> Tangible assets with rental income potential</li>
+                <li><strong>Dollar-Cost Averaging:</strong> Invest consistently to reduce timing risk</li>
+              </ul>
+            </div>
+          )}
         </Card>
 
         <Card className="p-6 bg-card border-border">
@@ -70,10 +97,22 @@ const FinancialLiteracy = () => {
           <p className="text-sm text-muted-foreground mb-4">
             Set realistic financial goals and track your progress toward financial independence.
           </p>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => toggleSection("goals")}>
             <BookOpen className="w-4 h-4 mr-2" />
-            Set Goals
+            {openSection === "goals" ? "Close" : "Set Goals"}
           </Button>
+          {openSection === "goals" && (
+            <div className="mt-4 space-y-2 text-sm text-muted-foreground border-t border-border pt-4">
+              <p className="font-medium text-foreground">Goal-Setting Framework:</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li><strong>Short-term (0-1 yr):</strong> Emergency fund, pay off high-interest debt</li>
+                <li><strong>Mid-term (1-5 yr):</strong> Down payment, car fund, skill investment</li>
+                <li><strong>Long-term (5+ yr):</strong> Retirement, passive income streams</li>
+                <li>Use the SMART framework: Specific, Measurable, Achievable, Relevant, Time-bound</li>
+                <li>Review and adjust goals quarterly</li>
+              </ul>
+            </div>
+          )}
         </Card>
       </div>
 
