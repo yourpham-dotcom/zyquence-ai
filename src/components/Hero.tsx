@@ -9,6 +9,10 @@ const Hero = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto text-center space-y-8">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground/70 leading-tight">
+            Innovating the Next Level of Creative Intelligence
+          </h1>
+
           <div className="inline-flex flex-col items-center gap-4 px-8 py-6 rounded-2xl bg-card/50 backdrop-blur-sm border border-border/50 max-w-3xl">
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-muted-foreground" />
