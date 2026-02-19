@@ -13,6 +13,7 @@ const PROMPTS: Record<string, string> = {
   career: `You are a career counselor AI. Based on the user's interests, skills, and education, suggest 3-5 career paths. Return a JSON array where each object has: career (string), description (string), education (string array of steps), skills (string array), salary_range (string like "$50k-$80k"), match_reason (string). Return ONLY valid JSON array, no other text.`,
   resume: "You are a professional resume writer. Generate a clean, well-structured resume based on the provided information. Use professional language, action verbs, and quantified achievements where possible. Format it clearly with sections.",
   cover_letter: "You are a professional resume writer. Generate a compelling cover letter based on the provided information. Make it personalized, professional, and highlight relevant skills and experiences. Keep it to one page length.",
+  gpa_strategy: "You are an academic advisor AI. Analyze the student's academic profile, course load, and progress. Provide: 1) GPA Strategy (when to take harder classes, how to balance workload), 2) Graduation Risk Assessment, 3) Semester-by-semester recommendations, 4) Career alignment tips based on their major. Be specific and actionable. Include a disclaimer that students should verify with their institution.",
 };
 
 serve(async (req) => {

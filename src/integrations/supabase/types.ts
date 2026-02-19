@@ -14,6 +14,157 @@ export type Database = {
   }
   public: {
     Tables: {
+      academic_courses: {
+        Row: {
+          category: string | null
+          course_code: string
+          course_name: string
+          created_at: string
+          difficulty: string | null
+          grade: string | null
+          id: string
+          notes: string | null
+          prerequisites: string | null
+          semester_id: string | null
+          status: string
+          units: number
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          course_code: string
+          course_name: string
+          created_at?: string
+          difficulty?: string | null
+          grade?: string | null
+          id?: string
+          notes?: string | null
+          prerequisites?: string | null
+          semester_id?: string | null
+          status?: string
+          units?: number
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          course_code?: string
+          course_name?: string
+          created_at?: string
+          difficulty?: string | null
+          grade?: string | null
+          id?: string
+          notes?: string | null
+          prerequisites?: string | null
+          semester_id?: string | null
+          status?: string
+          units?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academic_courses_semester_id_fkey"
+            columns: ["semester_id"]
+            isOneToOne: false
+            referencedRelation: "academic_semesters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      academic_profiles: {
+        Row: {
+          created_at: string
+          expected_graduation_year: number | null
+          id: string
+          is_transfer: boolean | null
+          major: string
+          minor: string | null
+          school_name: string
+          start_semester: string
+          start_year: number
+          total_required_units: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expected_graduation_year?: number | null
+          id?: string
+          is_transfer?: boolean | null
+          major: string
+          minor?: string | null
+          school_name: string
+          start_semester: string
+          start_year: number
+          total_required_units?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expected_graduation_year?: number | null
+          id?: string
+          is_transfer?: boolean | null
+          major?: string
+          minor?: string | null
+          school_name?: string
+          start_semester?: string
+          start_year?: number
+          total_required_units?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      academic_semesters: {
+        Row: {
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          notes: string | null
+          profile_id: string | null
+          semester_gpa: number | null
+          semester_name: string
+          semester_type: string
+          semester_year: number
+          sort_order: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          notes?: string | null
+          profile_id?: string | null
+          semester_gpa?: number | null
+          semester_name: string
+          semester_type?: string
+          semester_year: number
+          sort_order?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          notes?: string | null
+          profile_id?: string | null
+          semester_gpa?: number | null
+          semester_name?: string
+          semester_type?: string
+          semester_year?: number
+          sort_order?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "academic_semesters_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "academic_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       artist_profiles: {
         Row: {
           background: string | null

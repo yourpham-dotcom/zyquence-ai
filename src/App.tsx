@@ -58,6 +58,7 @@ import AssignmentPlanner from "./pages/student-hub/AssignmentPlanner";
 import StudyAssistant from "./pages/student-hub/StudyAssistant";
 import CareerExplorer from "./pages/student-hub/CareerExplorer";
 import ResumeBuilder from "./pages/student-hub/ResumeBuilder";
+import AcademicBlueprint from "./pages/student-hub/AcademicBlueprint";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +130,7 @@ const App = () => (
             <Route path="study" element={<StudyAssistant />} />
             <Route path="career" element={<CareerExplorer />} />
             <Route path="resume" element={<ResumeBuilder />} />
+            <Route path="blueprint" element={<AcademicBlueprint />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
