@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Database, BarChart3, FlaskConical, Trophy, Briefcase, Upload, Code, Loader2 } from "lucide-react";
+import { Database, BarChart3, FlaskConical, Trophy, Briefcase, Upload, Code, Loader2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import ProGate from "@/components/ProGate";
 
 const DataIntelligence = () => {
+  const navigate = useNavigate();
   const { isPro, loading: subLoading } = useSubscription();
   const [stats, setStats] = useState({
     datasetsCount: 0,
@@ -109,7 +110,7 @@ const DataIntelligence = () => {
     <div className="h-screen bg-background overflow-y-auto">
       <div className="container mx-auto p-6 space-y-8">
         {/* Header */}
-        <div className="space-y-2">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
               <Database className="w-6 h-6 text-primary-foreground" />
@@ -119,6 +120,10 @@ const DataIntelligence = () => {
               <p className="text-muted-foreground">Master data analysis, SQL, and visualization</p>
             </div>
           </div>
+          <Button variant="outline" size="sm" className="rounded-xl" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4 mr-1.5" />
+            Back
+          </Button>
         </div>
 
         {/* Stats Overview */}
