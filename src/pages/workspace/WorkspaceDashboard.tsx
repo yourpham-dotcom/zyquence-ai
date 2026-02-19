@@ -100,7 +100,7 @@ const WorkspaceDashboard = () => {
         {quickCards.map((card) => (
           <Link key={card.title} to={card.path}>
             <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full dark:bg-background dark:border-border/30">
-              <CardContent className={cn("p-4 bg-gradient-to-br dark:bg-none", card.gradient)}>
+              <CardContent className="p-4">
                 <card.icon className={cn("h-5 w-5 mb-2", card.iconColor)} />
                 <h3 className="text-sm font-semibold text-foreground">{card.title}</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">{card.description}</p>
