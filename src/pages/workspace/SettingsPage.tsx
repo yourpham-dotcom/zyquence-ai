@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,26 @@ const SettingsPage = () => {
   const [publicProfile, setPublicProfile] = useState(true);
   const [saving, setSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Load preferences from database
+  useEffect(() => {
+    if (!user) return;
+    const loadPrefs = async () => {
+      const { data } = await supabase
+        .from("user_preferences")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        setNotifications(data.notifications);
+        setDarkMode(data.dark_mode);
+        setPublicProfile(data.public_profile);
+      }
+      setLoaded(true);
+    };
+    loadPrefs();
+  }, [user]);
 
   const handleToggle = (setter: (v: boolean) => void) => (value: boolean) => {
     setter(value);
@@ -30,9 +51,29 @@ const SettingsPage = () => {
   };
 
   const handleSave = async () => {
+    if (!user) return;
     setSaving(true);
-    // Simulate save delay for preferences
-    await new Promise((r) => setTimeout(r, 600));
+
+    const prefs = {
+      user_id: user.id,
+      notifications,
+      dark_mode: darkMode,
+      public_profile: publicProfile,
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data: existing } = await supabase
+      .from("user_preferences")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase.from("user_preferences").update(prefs).eq("user_id", user.id);
+    } else {
+      await supabase.from("user_preferences").insert(prefs);
+    }
+
     setSaving(false);
     setHasChanges(false);
     toast({ title: "Settings saved", description: "Your preferences have been updated." });
