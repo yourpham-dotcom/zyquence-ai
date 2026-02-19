@@ -7,11 +7,13 @@ import { useSidebar } from "@/components/ui/sidebar";
 const Basketball = lazy(() => import("@/components/studio/games/Basketball"));
 const PingPong = lazy(() => import("@/components/studio/games/PingPong"));
 const Racing = lazy(() => import("@/components/studio/games/Racing"));
+const Golf = lazy(() => import("@/components/studio/games/Golf"));
 
 const games = [
   { label: "Basketball", id: "basketball" },
   { label: "Ping Pong", id: "pingpong" },
   { label: "Racing", id: "racing" },
+  { label: "Golf", id: "golf" },
 ];
 
 export function SidebarMiniGames() {
@@ -27,6 +29,7 @@ export function SidebarMiniGames() {
       case "basketball": return <Basketball compact />;
       case "pingpong": return <PingPong compact />;
       case "racing": return <Racing compact />;
+      case "golf": return <Golf compact />;
       default: return null;
     }
   };
