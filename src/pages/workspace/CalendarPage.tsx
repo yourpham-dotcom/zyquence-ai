@@ -99,8 +99,9 @@ const CalendarPage = () => {
   };
 
   const selectedDateStr = (date ?? new Date()).toISOString().split("T")[0];
-  const eventsForDate = events.filter((e) => e.date === selectedDateStr);
-  const allEvents = events.sort((a, b) => a.time.localeCompare(b.time));
+  const eventsForDate = events
+    .filter((e) => e.date === selectedDateStr)
+    .sort((a, b) => a.time.localeCompare(b.time));
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -122,16 +123,14 @@ const CalendarPage = () => {
         <Card className="border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-semibold">
-              {eventsForDate.length > 0
-                ? `Events for ${(date ?? new Date()).toLocaleDateString()}`
-                : "All Saved Events"}
+              Events for {(date ?? new Date()).toLocaleDateString()}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 max-h-[400px] overflow-y-auto">
-            {(eventsForDate.length > 0 ? eventsForDate : allEvents).length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No events yet</p>
+            {eventsForDate.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">No events for this date</p>
             ) : (
-              (eventsForDate.length > 0 ? eventsForDate : allEvents).map((evt) => (
+              eventsForDate.map((evt) => (
                 <div
                   key={evt.id}
                   className="flex items-center gap-3 p-3 rounded-xl bg-accent/30 hover:bg-accent/50 transition-colors group"
