@@ -116,47 +116,47 @@ All colors MUST be HSL.
   }
 
   .dark {
-    /* Using same dark theme as default since Zyquence is cyber-themed */
-    --background: 222 47% 11%;
+    --background: 222 47% 5%;
     --foreground: 210 40% 98%;
-    --card: 217 32% 17%;
+    --card: 222 44% 8%;
     --card-foreground: 210 40% 98%;
-    --popover: 215 24% 26%;
+    --popover: 222 44% 10%;
     --popover-foreground: 210 40% 98%;
-    --primary: 0 0% 85%;
-    --primary-foreground: 0 0% 10%;
-    --secondary: 212 26% 83%;
-    --secondary-foreground: 228 84% 4%;
-    --muted: 215 16% 46%;
-    --muted-foreground: 210 40% 98%;
-    --accent: 228 84% 4%;
-    --accent-foreground: 215 20% 65%;
+    --primary: 0 0% 90%;
+    --primary-foreground: 0 0% 5%;
+    --secondary: 215 20% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 215 16% 30%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 222 44% 12%;
+    --accent-foreground: 215 20% 75%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 85% 97%;
-    --border: 215 19% 34%;
-    --input: 215 19% 34%;
+    --border: 215 19% 16%;
+    --input: 215 19% 16%;
     --ring: 0 0% 85%;
     --chart-1: 0 0% 75%;
     --chart-2: 0 0% 65%;
     --chart-3: 215 20% 65%;
     --chart-4: 215 16% 46%;
     --chart-5: 215 19% 34%;
-    --sidebar: 217 32% 17%;
+    --sidebar: 222 47% 5%;
+    --sidebar-background: 222 47% 5%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 0 0% 85%;
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 215 20% 65%;
-    --sidebar-accent-foreground: 228 84% 4%;
-    --sidebar-border: 215 19% 34%;
+    --sidebar-primary: 0 0% 90%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 222 44% 12%;
+    --sidebar-accent-foreground: 215 20% 75%;
+    --sidebar-border: 215 19% 16%;
     --sidebar-ring: 0 0% 85%;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.1);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.1);
+    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 2px 4px -1px hsl(0 0% 0% / 0.2);
+    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 4px 6px -1px hsl(0 0% 0% / 0.2);
+    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.2), 0 8px 10px -1px hsl(0 0% 0% / 0.2);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.4);
   }
 }
 
