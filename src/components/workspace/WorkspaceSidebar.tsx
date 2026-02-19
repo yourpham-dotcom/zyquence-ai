@@ -58,9 +58,9 @@ const toolsNav = [
 ];
 
 const socialNav = [
-  { title: "Social Media", path: "/dashboard/social", icon: Share2 },
-  { title: "Public Relations", path: "/dashboard/pr", icon: Megaphone },
-  { title: "Feedback", path: "/dashboard/feedback", icon: MessageCircle },
+  { title: "Community", path: "/connect", icon: Share2 },
+  { title: "Social Media", path: "/dashboard/social", icon: Megaphone },
+  { title: "Public Relations", path: "/dashboard/pr", icon: MessageCircle },
 ];
 
 const proNav = [
