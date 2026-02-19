@@ -49,6 +49,7 @@ import Portfolio from "./pages/Portfolio";
 import FreeDashboard from "./pages/FreeDashboard";
 import ProDashboard from "./pages/ProDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
+import MusicIntelligence from "./pages/MusicIntelligence";
 import ConnectLayout from "./pages/community/ConnectLayout";
 
 // Student Hub
@@ -121,6 +122,7 @@ const App = () => (
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
+          <Route path="/music-intelligence" element={<MusicIntelligence />} />
           <Route path="/connect" element={<ConnectLayout />} />
 
           {/* Student Hub */}
