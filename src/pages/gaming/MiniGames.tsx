@@ -28,6 +28,12 @@ const MiniGames = () => {
       title: "🏓 Ping Pong",
       description: "Keep the ball bouncing!",
       color: "from-green-500 to-emerald-500"
+    },
+    {
+      id: "golf" as GameType,
+      title: "⛳ Golf",
+      description: "Hit targets on the driving range!",
+      color: "from-emerald-500 to-teal-500"
     }
   ];
 

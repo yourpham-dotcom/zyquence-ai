@@ -39,7 +39,7 @@ import GolfTicker from "@/components/studio/GolfTicker";
 
 
 export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch" | "atlas";
-export type GameType = "pingpong" | "basketball" | "racing" | null;
+export type GameType = "pingpong" | "basketball" | "racing" | "golf" | null;
 
 const Studio = () => {
   const navigate = useNavigate();
