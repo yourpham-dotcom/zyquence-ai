@@ -7,18 +7,36 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, Bell, Moon, Globe, Shield, LogOut } from "lucide-react";
+import { Crown, Bell, Moon, Globe, Shield, LogOut, Save, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import FocusAreasSettings from "@/components/workspace/FocusAreasSettings";
 
 const SettingsPage = () => {
   const { user, signOut } = useAuth();
   const { isPro } = useSubscription();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
   const [publicProfile, setPublicProfile] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const handleToggle = (setter: (v: boolean) => void) => (value: boolean) => {
+    setter(value);
+    setHasChanges(true);
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    // Simulate save delay for preferences
+    await new Promise((r) => setTimeout(r, 600));
+    setSaving(false);
+    setHasChanges(false);
+    toast({ title: "Settings saved", description: "Your preferences have been updated." });
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -74,7 +92,7 @@ const SettingsPage = () => {
                 <p className="text-xs text-muted-foreground">Receive in-app notifications</p>
               </div>
             </div>
-            <Switch checked={notifications} onCheckedChange={setNotifications} />
+            <Switch checked={notifications} onCheckedChange={handleToggle(setNotifications)} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
@@ -85,7 +103,7 @@ const SettingsPage = () => {
                 <p className="text-xs text-muted-foreground">Use dark theme</p>
               </div>
             </div>
-            <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+            <Switch checked={darkMode} onCheckedChange={handleToggle(setDarkMode)} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
@@ -96,7 +114,7 @@ const SettingsPage = () => {
                 <p className="text-xs text-muted-foreground">Allow others to find you</p>
               </div>
             </div>
-            <Switch checked={publicProfile} onCheckedChange={setPublicProfile} />
+            <Switch checked={publicProfile} onCheckedChange={handleToggle(setPublicProfile)} />
           </div>
         </CardContent>
       </Card>
@@ -117,6 +135,19 @@ const SettingsPage = () => {
           </p>
         </CardContent>
       </Card>
+
+      {/* Save Button */}
+      <Button
+        onClick={handleSave}
+        disabled={!hasChanges || saving}
+        className="w-full"
+      >
+        {saving ? (
+          <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</>
+        ) : (
+          <><Save className="mr-2 h-4 w-4" /> Save Settings</>
+        )}
+      </Button>
 
       {/* Sign Out */}
       <Button variant="destructive" className="w-full" onClick={handleSignOut}>
