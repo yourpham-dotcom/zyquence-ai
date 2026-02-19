@@ -163,7 +163,9 @@ export function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {tradingNav.map((item) => (
+              {tradingNav
+                .filter((item) => !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
