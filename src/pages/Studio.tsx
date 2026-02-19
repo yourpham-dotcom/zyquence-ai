@@ -35,6 +35,7 @@ import FinancialLiteracy from "@/components/studio/FinancialLiteracy";
 import AthleteImageEngineer from "@/components/studio/AthleteImageEngineer";
 import ClutchMode from "@/components/studio/ClutchMode";
 import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
+import GolfTicker from "@/components/studio/GolfTicker";
 
 
 export type ToolType = "chat" | "code" | "python" | "journal" | "video" | "photo" | "security" | "sql" | "art" | "music" | "style" | "mental" | "recruiting" | "appbuilder" | "cybersec" | "financial" | "branding" | "clutch" | "atlas";
@@ -517,6 +518,7 @@ const Studio = () => {
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+          {isAthleteToolActive && <GolfTicker />}
           <div className="flex-1 overflow-hidden">
             {renderTool()}
           </div>
