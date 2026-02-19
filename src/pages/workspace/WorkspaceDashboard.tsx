@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -20,58 +20,10 @@ import {
   Crown,
   TrendingUp,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const WorkspaceDashboard = () => {
   const { user } = useAuth();
   const { isPro } = useSubscription();
-
-  const quickCards = [
-    {
-      title: "Calendar",
-      description: "3 events today",
-      icon: CalendarDays,
-      path: "/dashboard/calendar",
-      gradient: "from-blue-500/10 to-cyan-500/10",
-      iconColor: "text-blue-500",
-    },
-    {
-      title: "Finance",
-      description: "Track spending",
-      icon: DollarSign,
-      path: "/dashboard/finance",
-      gradient: "from-emerald-500/10 to-green-500/10",
-      iconColor: "text-emerald-500",
-    },
-    {
-      title: "Goals",
-      description: "4 active goals",
-      icon: Target,
-      path: "/dashboard/goals",
-      gradient: "from-orange-500/10 to-amber-500/10",
-      iconColor: "text-orange-500",
-    },
-    {
-      title: "AI Suggestions",
-      description: "Personalized tips",
-      icon: Sparkles,
-      path: "/dashboard/assistant",
-      gradient: "from-purple-500/10 to-pink-500/10",
-      iconColor: "text-purple-500",
-    },
-  ];
-
-  const tools = [
-    { icon: Palette, title: "Studio", description: "Music, photo, video, code & creative tools", path: "/studio", color: "from-orange-500 to-red-500" },
-    { icon: Globe, title: "Zyquence Atlas", description: "Lifestyle planning & city planner", path: "/studio", color: "from-emerald-500 to-teal-500" },
-  ];
-
-  const proModules = [
-    { icon: Database, title: "Data Intelligence", description: "SQL lab, datasets, visualizations", path: "/data-intelligence", color: "from-blue-500 to-cyan-500" },
-    { icon: Gamepad2, title: "Gaming Engine", description: "Wellness, code practice, sports", path: "/gaming-intelligence", color: "from-purple-500 to-pink-500" },
-    { icon: Cpu, title: "AI Builder", description: "Build custom AI tools", path: "/ai-builder", color: "from-indigo-500 to-violet-500" },
-    { icon: Music, title: "Artist Intelligence", description: "AI music identity & branding", path: "/artist-intelligence", color: "from-fuchsia-500 to-rose-500" },
-  ];
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -79,17 +31,14 @@ const WorkspaceDashboard = () => {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           {isPro && <Crown className="h-4 w-4 text-yellow-500" />}
-          <span className={cn(
-            "text-xs font-semibold uppercase tracking-wider",
-            isPro ? "text-yellow-500" : "text-muted-foreground"
-          )}>
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {isPro ? "Pro Plan" : "Free Plan"}
           </span>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+        <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'hsl(222, 47%, 11%)' }}>
           Welcome back
         </h1>
-        <p className="text-sm text-muted-foreground">{user?.email}</p>
+        <p className="text-sm" style={{ color: 'hsl(215, 20%, 45%)' }}>{user?.email}</p>
       </div>
 
       {/* Personalized News Feed */}
@@ -97,63 +46,103 @@ const WorkspaceDashboard = () => {
 
       {/* Quick Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {quickCards.map((card) => (
-          <Link key={card.title} to={card.path}>
-            <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full dark:bg-background dark:border-border/30">
-              <CardContent className="p-4">
-                <card.icon className={cn("h-5 w-5 mb-2", card.iconColor)} />
-                <h3 className="text-sm font-semibold text-foreground">{card.title}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">{card.description}</p>
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
+        <Link to="/dashboard/calendar">
+          <Card className="group hover:shadow-md transition-all duration-200 h-full">
+            <CardContent className="p-4">
+              <CalendarDays className="h-5 w-5 mb-2 text-blue-500" />
+              <h3 className="text-sm font-semibold" style={{ color: 'hsl(222, 47%, 11%)' }}>Calendar</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>3 events today</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/dashboard/finance">
+          <Card className="group hover:shadow-md transition-all duration-200 h-full">
+            <CardContent className="p-4">
+              <DollarSign className="h-5 w-5 mb-2 text-emerald-500" />
+              <h3 className="text-sm font-semibold" style={{ color: 'hsl(222, 47%, 11%)' }}>Finance</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>Track spending</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/dashboard/goals">
+          <Card className="group hover:shadow-md transition-all duration-200 h-full">
+            <CardContent className="p-4">
+              <Target className="h-5 w-5 mb-2 text-orange-500" />
+              <h3 className="text-sm font-semibold" style={{ color: 'hsl(222, 47%, 11%)' }}>Goals</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>4 active goals</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link to="/dashboard/assistant">
+          <Card className="group hover:shadow-md transition-all duration-200 h-full">
+            <CardContent className="p-4">
+              <Sparkles className="h-5 w-5 mb-2 text-purple-500" />
+              <h3 className="text-sm font-semibold" style={{ color: 'hsl(222, 47%, 11%)' }}>AI Suggestions</h3>
+              <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>Personalized tips</p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Your Tools */}
       <div>
-        <h2 className="text-base font-semibold text-foreground mb-3">Your Tools</h2>
+        <h2 className="text-base font-semibold mb-3" style={{ color: 'hsl(222, 47%, 11%)' }}>Your Tools</h2>
         <div className="grid sm:grid-cols-2 gap-4">
-          {tools.map((tool) => (
-            <Link key={tool.title} to={tool.path}>
-              <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full">
-                <CardContent className="p-5 flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tool.color} flex items-center justify-center shrink-0`}>
-                    <tool.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm">{tool.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{tool.description}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+          <Link to="/studio">
+            <Card className="group hover:shadow-md transition-all duration-200 h-full">
+              <CardContent className="p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shrink-0">
+                  <Palette className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm" style={{ color: 'hsl(222, 47%, 11%)' }}>Studio</h3>
+                  <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>Music, photo, video, code & creative tools</p>
+                </div>
+                <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" style={{ color: 'hsl(215, 20%, 45%)' }} />
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/studio">
+            <Card className="group hover:shadow-md transition-all duration-200 h-full">
+              <CardContent className="p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
+                  <Globe className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm" style={{ color: 'hsl(222, 47%, 11%)' }}>Zyquence Atlas</h3>
+                  <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>Lifestyle planning & city planner</p>
+                </div>
+                <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" style={{ color: 'hsl(215, 20%, 45%)' }} />
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
 
       {/* Pro Modules */}
       <div>
-        <h2 className="text-base font-semibold text-foreground mb-3">
-          {isPro ? "Pro Modules" : "Pro Modules"}
-        </h2>
+        <h2 className="text-base font-semibold mb-3" style={{ color: 'hsl(222, 47%, 11%)' }}>Pro Modules</h2>
         <div className="grid sm:grid-cols-2 gap-4">
-          {proModules.map((mod) => (
+          {[
+            { icon: Database, title: "Data Intelligence", description: "SQL lab, datasets, visualizations", path: "/data-intelligence", color: "from-blue-500 to-cyan-500" },
+            { icon: Gamepad2, title: "Gaming Engine", description: "Wellness, code practice, sports", path: "/gaming-intelligence", color: "from-purple-500 to-pink-500" },
+            { icon: Cpu, title: "AI Builder", description: "Build custom AI tools", path: "/ai-builder", color: "from-indigo-500 to-violet-500" },
+            { icon: Music, title: "Artist Intelligence", description: "AI music identity & branding", path: "/artist-intelligence", color: "from-fuchsia-500 to-rose-500" },
+          ].map((mod) => (
             <Link key={mod.title} to={isPro ? mod.path : "/pricing"}>
-              <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full">
+              <Card className="group hover:shadow-md transition-all duration-200 h-full">
                 <CardContent className="p-5 flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${mod.color} flex items-center justify-center shrink-0`}>
                     <mod.icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground text-sm">{mod.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{mod.description}</p>
+                    <h3 className="font-semibold text-sm" style={{ color: 'hsl(222, 47%, 11%)' }}>{mod.title}</h3>
+                    <p className="text-xs mt-0.5" style={{ color: 'hsl(215, 20%, 45%)' }}>{mod.description}</p>
                   </div>
                   {isPro ? (
-                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
+                    <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" style={{ color: 'hsl(215, 20%, 45%)' }} />
                   ) : (
-                    <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
+                    <Lock className="h-3.5 w-3.5 shrink-0 mt-1" style={{ color: 'hsl(215, 20%, 45%)' }} />
                   )}
                 </CardContent>
               </Card>
