@@ -45,21 +45,29 @@ export function useFocusAreas() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
+  const fetchAreas = useCallback(async () => {
     if (!user) { setLoading(false); return; }
+    const { data } = await supabase
+      .from("user_focus_areas")
+      .select("focus_areas")
+      .eq("user_id", user.id)
+      .maybeSingle();
     
-    const fetch = async () => {
-      const { data } = await supabase
-        .from("user_focus_areas")
-        .select("focus_areas")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      
-      if (data?.focus_areas) setFocusAreas(data.focus_areas);
-      setLoading(false);
-    };
-    fetch();
+    if (data?.focus_areas) setFocusAreas(data.focus_areas);
+    else setFocusAreas([]);
+    setLoading(false);
   }, [user]);
+
+  useEffect(() => {
+    fetchAreas();
+  }, [fetchAreas]);
+
+  // Listen for cross-component updates
+  useEffect(() => {
+    const handler = () => { fetchAreas(); };
+    window.addEventListener("focus-areas-updated", handler);
+    return () => window.removeEventListener("focus-areas-updated", handler);
+  }, [fetchAreas]);
 
   const saveFocusAreas = useCallback(async (areas: string[]) => {
     if (!user) return;
@@ -83,6 +91,7 @@ export function useFocusAreas() {
         .insert({ user_id: user.id, focus_areas: areas });
     }
     setSaving(false);
+    window.dispatchEvent(new Event("focus-areas-updated"));
   }, [user]);
 
   const toggleFocusArea = useCallback((areaId: string) => {
