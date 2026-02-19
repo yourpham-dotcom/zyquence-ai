@@ -62,6 +62,51 @@ export type Database = {
         }
         Relationships: []
       }
+      assignments: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_date: string | null
+          estimated_hours: number | null
+          id: string
+          notes: string | null
+          priority: string
+          status: string
+          subject: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          estimated_hours?: number | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          status?: string
+          subject?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          estimated_hours?: number | null
+          id?: string
+          notes?: string | null
+          priority?: string
+          status?: string
+          subject?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       community_groups: {
         Row: {
           category: string | null
@@ -1181,6 +1226,114 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      student_careers: {
+        Row: {
+          career_title: string
+          created_at: string
+          description: string | null
+          education_path: Json | null
+          id: string
+          match_score: number | null
+          salary_range: Json | null
+          skills_needed: Json | null
+          user_id: string
+        }
+        Insert: {
+          career_title: string
+          created_at?: string
+          description?: string | null
+          education_path?: Json | null
+          id?: string
+          match_score?: number | null
+          salary_range?: Json | null
+          skills_needed?: Json | null
+          user_id: string
+        }
+        Update: {
+          career_title?: string
+          created_at?: string
+          description?: string | null
+          education_path?: Json | null
+          id?: string
+          match_score?: number | null
+          salary_range?: Json | null
+          skills_needed?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      student_resumes: {
+        Row: {
+          content: Json | null
+          cover_letter: string | null
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      study_materials: {
+        Row: {
+          ai_generated: boolean | null
+          content: string | null
+          created_at: string
+          id: string
+          material_type: string
+          metadata: Json | null
+          source_text: string | null
+          subject: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_generated?: boolean | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          material_type?: string
+          metadata?: Json | null
+          source_text?: string | null
+          subject?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_generated?: boolean | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          material_type?: string
+          metadata?: Json | null
+          source_text?: string | null
+          subject?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       trading_journal_entries: {
         Row: {
