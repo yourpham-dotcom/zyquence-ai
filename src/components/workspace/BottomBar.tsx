@@ -1,15 +1,17 @@
 import { useState, useCallback, useRef } from "react";
-import { Youtube, Instagram, Music2, Globe, BookOpen, X } from "lucide-react";
+import { Youtube, Instagram, Music2, Globe, BookOpen, X, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+type PanelType = "youtube" | "instagram" | null;
+
 const links = [
-  { label: "YouTube", icon: Youtube, id: "youtube" as const, color: "text-red-500" },
-  { label: "Instagram", icon: Instagram, href: "https://www.instagram.com", color: "text-pink-500" },
-  { label: "Spotify", icon: Music2, href: "https://open.spotify.com", color: "text-green-500" },
-  { label: "Browse", icon: Globe, href: "https://www.google.com", color: "text-blue-500" },
-  { label: "Learn", icon: BookOpen, href: "https://www.khanacademy.org", color: "text-orange-500" },
+  { label: "YouTube", id: "youtube" as const, icon: Youtube, color: "text-red-500" },
+  { label: "Instagram", id: "instagram" as const, icon: Instagram, color: "text-pink-500" },
+  { label: "Spotify", id: "open" as const, icon: Music2, href: "https://open.spotify.com", color: "text-green-500" },
+  { label: "Browse", id: "open" as const, icon: Globe, href: "https://www.google.com", color: "text-blue-500" },
+  { label: "Learn", id: "open" as const, icon: BookOpen, href: "https://www.khanacademy.org", color: "text-orange-500" },
 ];
 
 const MIN_HEIGHT = 150;
@@ -17,7 +19,7 @@ const MAX_HEIGHT = 600;
 const DEFAULT_HEIGHT = 350;
 
 export function BottomBar() {
-  const [expanded, setExpanded] = useState(false);
+  const [activePanel, setActivePanel] = useState<PanelType>(null);
   const [videoUrl, setVideoUrl] = useState("");
   const [embedId, setEmbedId] = useState<string | null>(null);
   const [panelHeight, setPanelHeight] = useState(DEFAULT_HEIGHT);
@@ -43,10 +45,10 @@ export function BottomBar() {
   };
 
   const handleLinkClick = (link: typeof links[number]) => {
-    if (link.id === "youtube") {
-      setExpanded(!expanded);
-    } else if ("href" in link && (link as any).href) {
-      window.open((link as any).href, "_blank");
+    if (link.id === "youtube" || link.id === "instagram") {
+      setActivePanel(activePanel === link.id ? null : link.id);
+    } else if ("href" in link && link.href) {
+      window.open(link.href, "_blank");
     }
   };
 
@@ -76,7 +78,8 @@ export function BottomBar() {
     <div className="border-t border-border bg-background shrink-0 flex flex-col relative">
       {isDragging && <div className="fixed inset-0 z-50 cursor-ns-resize" />}
 
-      {expanded && (
+      {/* YouTube Panel */}
+      {activePanel === "youtube" && (
         <div className="border-b border-border bg-muted/30 animate-in slide-in-from-bottom-2 duration-200 flex flex-col">
           <div
             onMouseDown={onDragStart}
@@ -84,7 +87,6 @@ export function BottomBar() {
           >
             <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
-
           <div className="flex items-center justify-between px-4 pb-2">
             <div className="flex items-center gap-2">
               <Youtube className="h-4 w-4 text-red-500" />
@@ -94,7 +96,7 @@ export function BottomBar() {
               <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => window.open("https://www.youtube.com", "_blank")}>
                 Open YouTube
               </Button>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setExpanded(false)}>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActivePanel(null)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -131,6 +133,44 @@ export function BottomBar() {
         </div>
       )}
 
+      {/* Instagram Panel */}
+      {activePanel === "instagram" && (
+        <div className="border-b border-border bg-muted/30 animate-in slide-in-from-bottom-2 duration-200 flex flex-col">
+          <div
+            onMouseDown={onDragStart}
+            className="flex items-center justify-center py-2 cursor-ns-resize hover:bg-accent/30 transition-colors select-none"
+          >
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+          </div>
+          <div className="flex items-center justify-between px-4 pb-2">
+            <div className="flex items-center gap-2">
+              <Instagram className="h-4 w-4 text-pink-500" />
+              <span className="text-sm font-semibold text-foreground">Instagram</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={() => window.open("https://www.instagram.com", "_blank")}>
+                <ExternalLink className="h-3 w-3" />
+                Open in New Tab
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setActivePanel(null)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="px-4 pb-4 flex-1" style={{ height: panelHeight }}>
+            <div className="rounded-lg overflow-hidden h-full bg-black">
+              <iframe
+                src="https://www.instagram.com/"
+                className="w-full h-full"
+                title="Instagram"
+                sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bottom Icon Bar */}
       <div className="flex items-center justify-center gap-2 px-4 py-2">
         {links.map((link) => (
@@ -139,7 +179,7 @@ export function BottomBar() {
             onClick={() => handleLinkClick(link)}
             className={cn(
               "flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-lg hover:bg-accent/50 transition-colors group",
-              link.id === "youtube" && expanded && "bg-accent/50"
+              (link.id === "youtube" || link.id === "instagram") && activePanel === link.id && "bg-accent/50"
             )}
           >
             <link.icon className={cn("h-5 w-5", link.color)} />
