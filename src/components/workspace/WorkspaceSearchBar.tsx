@@ -1,28 +1,11 @@
-import { useState, useEffect } from "react";
-import { Sparkles, Moon, Sun } from "lucide-react";
+import { useState } from "react";
+import { Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export function WorkspaceSearchBar() {
   const [query, setQuery] = useState("");
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark"));
   const navigate = useNavigate();
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("zyquence-theme", next ? "dark" : "light");
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("zyquence-theme");
-    if (saved === "dark") {
-      document.documentElement.classList.add("dark");
-      setIsDark(true);
-    }
-  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && query.trim()) {
@@ -51,15 +34,6 @@ export function WorkspaceSearchBar() {
             </kbd>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-xl shrink-0"
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-        >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
       </div>
     </div>
   );
