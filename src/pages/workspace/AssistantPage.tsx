@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Plus, FileText, Search, ShoppingBag, CheckSquare, BarChart3, Mic } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -67,26 +66,41 @@ async function streamChat({
   onDone();
 }
 
+const ACTION_CHIPS = [
+  { label: "Summarize", icon: FileText },
+  { label: "Research", icon: Search },
+  { label: "Shopping", icon: ShoppingBag },
+  { label: "Fact Check", icon: CheckSquare },
+  { label: "Analyze", icon: BarChart3 },
+];
+
 const AssistantPage = () => {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [input, setInput] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "Hi! I'm your Zyquence AI assistant. I can help you plan your day, track goals, manage finances, or brainstorm creative projects. What would you like to do?" },
-  ]);
+  const [messages, setMessages] = useState<Msg[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async () => {
-    const text = input.trim();
-    if (!text || isLoading) return;
+  // Auto-resize textarea
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      inputRef.current.style.height = Math.min(inputRef.current.scrollHeight, 120) + "px";
+    }
+  }, [input]);
+
+  const handleSend = async (text?: string) => {
+    const content = (text || input).trim();
+    if (!content || isLoading) return;
     setInput("");
 
-    const userMsg: Msg = { role: "user", content: text };
+    const userMsg: Msg = { role: "user", content };
     const updated = [...messages, userMsg];
     setMessages(updated);
     setIsLoading(true);
@@ -116,62 +130,112 @@ const AssistantPage = () => {
     }
   };
 
-  const suggestions = ["Plan my week", "Create a budget", "Set fitness goals", "Start a new project"];
+  const hasMessages = messages.length > 0;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 h-full flex flex-col">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground">AI Assistant</h1>
-
-      <div className="flex-1 space-y-3 overflow-y-auto">
-        {messages.map((msg, i) => (
-          <div key={i} className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}>
-            <div
-              className={cn(
-                "px-4 py-3 rounded-2xl text-sm max-w-[80%] whitespace-pre-wrap",
-                msg.role === "assistant" ? "glass-bubble text-foreground" : "bg-primary text-primary-foreground"
-              )}
-            >
-              {msg.content}
-            </div>
-          </div>
-        ))}
-
-        {isLoading && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex justify-start">
-            <div className="px-4 py-3 rounded-2xl glass-bubble">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-            </div>
-          </div>
-        )}
-
-        {messages.length <= 1 && (
-          <div className="flex flex-wrap gap-2 pt-4">
-            {suggestions.map((s) => (
-              <button
-                key={s}
-                onClick={() => setInput(s)}
-                className="px-3 py-1.5 rounded-full text-xs border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
-              >
-                {s}
-              </button>
+    <div className="h-full flex flex-col">
+      {/* Messages area */}
+      {hasMessages ? (
+        <div className="flex-1 overflow-y-auto px-4">
+          <div className="max-w-3xl mx-auto space-y-4 py-6">
+            {messages.map((msg, i) => (
+              <div key={i} className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}>
+                <div
+                  className={cn(
+                    "px-4 py-3 rounded-2xl text-sm max-w-[80%] whitespace-pre-wrap",
+                    msg.role === "assistant"
+                      ? "bg-accent/50 text-foreground"
+                      : "bg-primary text-primary-foreground"
+                  )}
+                >
+                  {msg.content}
+                </div>
+              </div>
             ))}
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
 
-      <div className="flex gap-2 pt-4 border-t border-border">
-        <Input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          placeholder="Ask Zyquence anything..."
-          className="rounded-xl"
-          disabled={isLoading}
-        />
-        <Button onClick={handleSend} className="rounded-xl shrink-0" disabled={isLoading}>
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        </Button>
+            {isLoading && messages[messages.length - 1]?.role === "user" && (
+              <div className="flex justify-start">
+                <div className="px-4 py-3 rounded-2xl bg-accent/50">
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                </div>
+              </div>
+            )}
+            <div ref={bottomRef} />
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1" />
+      )}
+
+      {/* Input area - centered when no messages, bottom when chatting */}
+      <div className={cn(
+        "w-full px-4 transition-all duration-300",
+        hasMessages ? "pb-6" : "pb-6 -mt-[40%]"
+      )}>
+        <div className="max-w-2xl mx-auto space-y-4">
+          {/* Input box */}
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+            {/* Text area row */}
+            <div className="relative px-4 pt-3 pb-1">
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Ask anything..."
+                rows={1}
+                className="w-full resize-none bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none pr-10"
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* Bottom controls row */}
+            <div className="flex items-center justify-between px-3 pb-2.5 pt-1">
+              <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+                <Plus className="h-4 w-4" />
+              </button>
+
+              <div className="flex items-center gap-1.5">
+                <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+                  <Mic className="h-4 w-4" />
+                </button>
+                <Button
+                  size="icon"
+                  onClick={() => handleSend()}
+                  disabled={isLoading || !input.trim()}
+                  className="h-8 w-8 rounded-full bg-foreground text-background hover:bg-foreground/90"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Action chips */}
+          {!hasMessages && (
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {ACTION_CHIPS.map((chip) => (
+                <button
+                  key={chip.label}
+                  onClick={() => handleSend(chip.label + " this for me")}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-border bg-card text-sm text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-accent/30 transition-all"
+                >
+                  <chip.icon className="h-3.5 w-3.5" />
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

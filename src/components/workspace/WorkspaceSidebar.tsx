@@ -46,7 +46,7 @@ import { cn } from "@/lib/utils";
 
 const mainNav = [
   { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard, alwaysShow: true },
-  { title: "AI Assistant", path: "/dashboard/assistant", icon: Sparkles, alwaysShow: true },
+  { title: "Chat", path: "/dashboard/assistant", icon: Sparkles, alwaysShow: true },
   { title: "Calendar", path: "/dashboard/calendar", icon: CalendarDays, alwaysShow: false },
   { title: "Workspace", path: "/dashboard/workspace", icon: FolderKanban, alwaysShow: true },
   { title: "Finance", path: "/dashboard/finance", icon: DollarSign, alwaysShow: false },
