@@ -1182,6 +1182,30 @@ export type Database = {
           },
         ]
       }
+      user_focus_areas: {
+        Row: {
+          created_at: string
+          focus_areas: string[]
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          focus_areas?: string[]
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          focus_areas?: string[]
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
