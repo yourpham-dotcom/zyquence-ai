@@ -136,41 +136,28 @@ const WorkspaceDashboard = () => {
       {/* Pro Modules */}
       <div>
         <h2 className="text-base font-semibold text-foreground mb-3">
-          {isPro ? "Pro Modules" : "Unlock with Pro"}
+          {isPro ? "Pro Modules" : "Pro Modules"}
         </h2>
         <div className="grid sm:grid-cols-2 gap-4">
           {proModules.map((mod) => (
-            isPro ? (
-              <Link key={mod.title} to={mod.path}>
-                <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full">
-                  <CardContent className="p-5 flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${mod.color} flex items-center justify-center shrink-0`}>
-                      <mod.icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground text-sm">{mod.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">{mod.description}</p>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
-                  </CardContent>
-                </Card>
-              </Link>
-            ) : (
-              <Card key={mod.title} className="border-border/30 opacity-50">
+            <Link key={mod.title} to={isPro ? mod.path : "/pricing"}>
+              <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full">
                 <CardContent className="p-5 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-muted/30 flex items-center justify-center shrink-0">
-                    <mod.icon className="w-5 h-5 text-muted-foreground" />
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${mod.color} flex items-center justify-center shrink-0`}>
+                    <mod.icon className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="font-semibold text-foreground text-sm">{mod.title}</h3>
-                      <Lock className="h-3 w-3 text-muted-foreground" />
-                    </div>
+                    <h3 className="font-semibold text-foreground text-sm">{mod.title}</h3>
                     <p className="text-xs text-muted-foreground mt-0.5">{mod.description}</p>
                   </div>
+                  {isPro ? (
+                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
+                  ) : (
+                    <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
+                  )}
                 </CardContent>
               </Card>
-            )
+            </Link>
           ))}
         </div>
         {!isPro && (
