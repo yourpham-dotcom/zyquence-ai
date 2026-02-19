@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +26,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 const ALL_CATEGORIES = [
   "Technology",
@@ -48,8 +49,7 @@ interface NewsItem {
   source: string;
   category: Category;
   time: string;
-  image?: string;
-  url?: string;
+  url: string;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -64,30 +64,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   Health: "bg-green-500/15 text-green-500 border-green-500/20",
   Education: "bg-indigo-500/15 text-indigo-500 border-indigo-500/20",
 };
-
-const MOCK_NEWS_POOL: NewsItem[] = [
-  { id: "1", title: "OpenAI Announces GPT-6 with Real-Time Reasoning", source: "TechCrunch", category: "AI", time: "2h ago", url: "https://techcrunch.com/2026/02/19/openai-announces-gpt-6-real-time-reasoning/" },
-  { id: "2", title: "Apple Unveils New M5 Chip Architecture", source: "The Verge", category: "Technology", time: "3h ago", url: "https://www.theverge.com/2026/2/19/apple-m5-chip-architecture-unveiled" },
-  { id: "3", title: "S&P 500 Hits All-Time High Amid AI Boom", source: "Bloomberg", category: "Finance", time: "4h ago", url: "https://www.bloomberg.com/news/articles/2026-02-19/sp-500-all-time-high-ai-boom" },
-  { id: "4", title: "NBA Playoff Race Heats Up as Trade Deadline Approaches", source: "ESPN", category: "Sports", time: "5h ago", url: "https://www.espn.com/nba/story/_/id/nba-playoff-race-trade-deadline-2026" },
-  { id: "5", title: "Spotify Launches AI-Powered DJ for Podcasts", source: "Wired", category: "Music", time: "6h ago", url: "https://www.wired.com/story/spotify-ai-powered-dj-podcasts-2026/" },
-  { id: "6", title: "Y Combinator's W26 Batch: Record Number of AI Startups", source: "Forbes", category: "Startups", time: "7h ago", url: "https://www.forbes.com/sites/startups/2026/02/19/y-combinator-w26-batch-record-ai-startups/" },
-  { id: "7", title: "Remote Work Study: Productivity Up 23% With AI Tools", source: "HBR", category: "Business", time: "8h ago", url: "https://hbr.org/2026/02/remote-work-productivity-up-23-percent-with-ai-tools" },
-  { id: "8", title: "New Wellness Apps Leverage AI for Personalized Health", source: "Healthline", category: "Health", time: "9h ago", url: "https://www.healthline.com/health-news/wellness-apps-ai-personalized-health-2026" },
-  { id: "9", title: "Google DeepMind Achieves Breakthrough in Protein Design", source: "Nature", category: "AI", time: "1h ago", url: "https://www.nature.com/articles/d41586-026-00512-protein-design-deepmind" },
-  { id: "10", title: "Tesla Robotaxi Fleet Begins Operations in Austin", source: "Reuters", category: "Technology", time: "30m ago", url: "https://www.reuters.com/technology/tesla-robotaxi-fleet-begins-operations-austin-2026-02-19/" },
-  { id: "11", title: "Federal Reserve Signals Rate Cuts for Q3 2026", source: "CNBC", category: "Finance", time: "45m ago", url: "https://www.cnbc.com/2026/02/19/federal-reserve-signals-rate-cuts-q3-2026.html" },
-  { id: "12", title: "Champions League Quarterfinals Draw Announced", source: "Sky Sports", category: "Sports", time: "1h ago", url: "https://www.skysports.com/football/news/champions-league-quarterfinals-draw-2026" },
-  { id: "13", title: "Kendrick Lamar Drops Surprise Album with AI Visuals", source: "Complex", category: "Music", time: "2h ago", url: "https://www.complex.com/music/kendrick-lamar-surprise-album-ai-visuals-2026" },
-  { id: "14", title: "Stripe Launches AI-First Banking Platform for Startups", source: "TechCrunch", category: "Startups", time: "3h ago", url: "https://techcrunch.com/2026/02/19/stripe-ai-first-banking-platform-startups/" },
-  { id: "15", title: "Meta Introduces Spatial Computing SDK for Developers", source: "Ars Technica", category: "Technology", time: "4h ago", url: "https://arstechnica.com/gadgets/2026/02/meta-spatial-computing-sdk-developers/" },
-  { id: "16", title: "New Study Links Intermittent Fasting to Longevity Gains", source: "WebMD", category: "Health", time: "5h ago", url: "https://www.webmd.com/diet/news/20260219/intermittent-fasting-longevity-study" },
-];
-
-function shuffleAndPick(items: NewsItem[], count: number): NewsItem[] {
-  const shuffled = [...items].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
 
 interface ZyquenceNewsFeedProps {
   isPro: boolean;
@@ -104,20 +80,48 @@ const ZyquenceNewsFeed = ({ isPro }: ZyquenceNewsFeedProps) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [customInterest, setCustomInterest] = useState("");
   const [customInterests, setCustomInterests] = useState<string[]>([]);
-  const [newsPool, setNewsPool] = useState(() => shuffleAndPick(MOCK_NEWS_POOL, 8));
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const filteredNews = newsPool.filter((n) =>
-    preferences.includes(n.category)
-  );
+  const fetchNews = useCallback(async (categories: Category[]) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("fetch-news", {
+        body: { categories },
+      });
+      if (error) {
+        console.error("Error fetching news:", error);
+        return;
+      }
+      if (data?.success && data.news) {
+        setNews(data.news);
+      }
+    } catch (err) {
+      console.error("Failed to fetch news:", err);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  // Fetch on mount and when preferences change
+  useEffect(() => {
+    setIsLoading(true);
+    fetchNews(preferences);
+  }, [preferences, fetchNews]);
+
+  // Auto-refresh every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNews(preferences);
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [preferences, fetchNews]);
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setNewsPool(shuffleAndPick(MOCK_NEWS_POOL, 8));
-      setIsRefreshing(false);
-    }, 600);
-  }, []);
+    fetchNews(preferences);
+  }, [preferences, fetchNews]);
 
   const toggleBookmark = (id: string) => {
     setBookmarked((prev) => {
@@ -177,9 +181,9 @@ const ZyquenceNewsFeed = ({ isPro }: ZyquenceNewsFeedProps) => {
           size="sm"
           className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           onClick={handleRefresh}
-          disabled={isRefreshing}
+          disabled={isRefreshing || isLoading}
         >
-          <RefreshCw className={cn("h-3.5 w-3.5", isRefreshing && "animate-spin")} />
+          <RefreshCw className={cn("h-3.5 w-3.5", (isRefreshing || isLoading) && "animate-spin")} />
           Refresh
         </Button>
       </div>
@@ -199,61 +203,75 @@ const ZyquenceNewsFeed = ({ isPro }: ZyquenceNewsFeedProps) => {
       {/* Scrollable news cards */}
       <ScrollArea className="w-full">
         <div className="flex gap-3 pb-3">
-          {filteredNews.map((item) => (
-            <a
-              key={item.id}
-              href={item.url || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Card className="group min-w-[260px] max-w-[280px] shrink-0 border-border/50 hover:border-primary/30 bg-card/80 backdrop-blur-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 overflow-hidden cursor-pointer">
+          {isLoading && news.length === 0 ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Card key={i} className="min-w-[260px] max-w-[280px] shrink-0 border-border/50 bg-card/80 animate-pulse">
                 <CardContent className="p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-[10px] font-medium px-1.5 py-0",
-                        CATEGORY_COLORS[item.category]
-                      )}
-                    >
-                      {item.category}
-                    </Badge>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleBookmark(item.id);
-                      }}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      {bookmarked.has(item.id) ? (
-                        <BookmarkCheck className="h-3.5 w-3.5 text-primary" />
-                      ) : (
-                        <Bookmark className="h-3.5 w-3.5" />
-                      )}
-                    </button>
+                  <div className="h-4 w-16 bg-muted rounded" />
+                  <div className="space-y-1.5">
+                    <div className="h-4 w-full bg-muted rounded" />
+                    <div className="h-4 w-3/4 bg-muted rounded" />
                   </div>
-                  <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
-                    {item.title}
-                  </h3>
-                  <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{item.source}</span>
-                      <span>·</span>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {item.time}
-                      </div>
-                    </div>
-                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+                  <div className="h-3 w-24 bg-muted rounded" />
                 </CardContent>
               </Card>
-            </a>
-          ))}
-          {filteredNews.length === 0 && (
+            ))
+          ) : (
+            news.map((item) => (
+              <a
+                key={item.id}
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Card className="group min-w-[260px] max-w-[280px] shrink-0 border-border/50 hover:border-primary/30 bg-card/80 backdrop-blur-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 overflow-hidden cursor-pointer">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] font-medium px-1.5 py-0",
+                          CATEGORY_COLORS[item.category]
+                        )}
+                      >
+                        {item.category}
+                      </Badge>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleBookmark(item.id);
+                        }}
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {bookmarked.has(item.id) ? (
+                          <BookmarkCheck className="h-3.5 w-3.5 text-primary" />
+                        ) : (
+                          <Bookmark className="h-3.5 w-3.5" />
+                        )}
+                      </button>
+                    </div>
+                    <h3 className="text-sm font-semibold text-foreground leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{item.source}</span>
+                        <span>·</span>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {item.time}
+                        </div>
+                      </div>
+                      <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </a>
+            ))
+          )}
+          {!isLoading && news.length === 0 && (
             <div className="flex items-center justify-center w-full min-h-[100px] text-sm text-muted-foreground">
               No news matching your preferences. Adjust your settings.
             </div>
@@ -273,17 +291,11 @@ const ZyquenceNewsFeed = ({ isPro }: ZyquenceNewsFeedProps) => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-5 pt-2">
-            {/* Categories */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-foreground">
-                Categories
-              </h4>
+              <h4 className="text-sm font-medium text-foreground">Categories</h4>
               <div className="space-y-2">
                 {ALL_CATEGORIES.map((cat) => (
-                  <div
-                    key={cat}
-                    className="flex items-center justify-between py-1"
-                  >
+                  <div key={cat} className="flex items-center justify-between py-1">
                     <span className="text-sm text-foreground">{cat}</span>
                     <Switch
                       checked={preferences.includes(cat)}
@@ -293,12 +305,8 @@ const ZyquenceNewsFeed = ({ isPro }: ZyquenceNewsFeedProps) => {
                 ))}
               </div>
             </div>
-
-            {/* Custom interests */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-foreground">
-                Custom Interests
-              </h4>
+              <h4 className="text-sm font-medium text-foreground">Custom Interests</h4>
               <div className="flex gap-2">
                 <Input
                   placeholder="e.g. NBA, Crypto, Design"
@@ -307,31 +315,16 @@ const ZyquenceNewsFeed = ({ isPro }: ZyquenceNewsFeedProps) => {
                   onKeyDown={(e) => e.key === "Enter" && addCustomInterest()}
                   className="h-8 text-sm"
                 />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="h-8 px-2"
-                  onClick={addCustomInterest}
-                >
+                <Button size="sm" variant="outline" className="h-8 px-2" onClick={addCustomInterest}>
                   <Plus className="h-3.5 w-3.5" />
                 </Button>
               </div>
               {customInterests.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {customInterests.map((interest) => (
-                    <Badge
-                      key={interest}
-                      variant="secondary"
-                      className="text-xs gap-1 pr-1"
-                    >
+                    <Badge key={interest} variant="secondary" className="text-xs gap-1 pr-1">
                       {interest}
-                      <button
-                        onClick={() =>
-                          setCustomInterests((prev) =>
-                            prev.filter((i) => i !== interest)
-                          )
-                        }
-                      >
+                      <button onClick={() => setCustomInterests((prev) => prev.filter((i) => i !== interest))}>
                         <X className="h-3 w-3" />
                       </button>
                     </Badge>
