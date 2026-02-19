@@ -460,6 +460,42 @@ export type Database = {
           },
         ]
       }
+      goals: {
+        Row: {
+          color: string
+          completed: number
+          created_at: string
+          id: string
+          milestones: number
+          progress: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          completed?: number
+          created_at?: string
+          id?: string
+          milestones?: number
+          progress?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          completed?: number
+          created_at?: string
+          id?: string
+          milestones?: number
+          progress?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       identity_results: {
         Row: {
           archetype: string | null
