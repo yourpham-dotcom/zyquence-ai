@@ -63,6 +63,7 @@ const tradingNav = [
 const toolsNav = [
   { title: "Studio", path: "/studio", icon: Palette },
   { title: "Music Intelligence", path: "/music-intelligence", icon: Disc3 },
+  { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music },
   { title: "Zyquence Atlas", path: "/studio", icon: Globe },
 ];
 
@@ -80,7 +81,6 @@ const proNav = [
   { title: "Data Intelligence", path: "/data-intelligence", icon: Database },
   { title: "Gaming Engine", path: "/gaming-intelligence", icon: Gamepad2 },
   { title: "AI Builder", path: "/ai-builder", icon: Cpu },
-  { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music },
 ];
 
 export function WorkspaceSidebar() {
