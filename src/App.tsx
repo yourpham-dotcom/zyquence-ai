@@ -21,6 +21,7 @@ import WorkspacePage from "./pages/workspace/WorkspacePage";
 import GoalsPage from "./pages/workspace/GoalsPage";
 import AssistantPage from "./pages/workspace/AssistantPage";
 import SettingsPage from "./pages/workspace/SettingsPage";
+import TradingJournal from "./pages/workspace/TradingJournal";
 
 // Existing pages
 import Studio from "./pages/Studio";
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="goals" element={<GoalsPage />} />
             <Route path="assistant" element={<AssistantPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="trading" element={<TradingJournal />} />
           </Route>
 
           {/* Legacy dashboards (redirect to new workspace) */}

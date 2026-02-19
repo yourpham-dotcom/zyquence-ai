@@ -22,6 +22,7 @@ import {
   Share2,
   Megaphone,
   MessageCircle,
+  LineChart,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -51,6 +52,10 @@ const mainNav = [
   { title: "Workspace", path: "/dashboard/workspace", icon: FolderKanban, alwaysShow: true },
   { title: "Finance", path: "/dashboard/finance", icon: DollarSign, alwaysShow: false },
   { title: "Goals", path: "/dashboard/goals", icon: Target, alwaysShow: false },
+];
+
+const tradingNav = [
+  { title: "Trading Journal", path: "/dashboard/trading", icon: LineChart },
 ];
 
 const toolsNav = [
@@ -133,6 +138,36 @@ export function WorkspaceSidebar() {
                     <NavLink
                       to={item.path}
                       end={item.path === "/dashboard"}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                        )
+                      }
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <Separator className="mx-4 bg-sidebar-border" />
+
+        {/* Trading */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {tradingNav.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <NavLink
+                      to={item.path}
                       className={({ isActive }) =>
                         cn(
                           "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",

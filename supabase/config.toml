@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.stock-quotes]
 verify_jwt = false
+
+[functions.trade-reflection]
+verify_jwt = false
