@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -29,9 +30,9 @@ const Navigation = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#mission" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/mission" className="text-muted-foreground hover:text-foreground transition-colors">
               Mission
-            </a>
+            </Link>
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
@@ -88,9 +89,9 @@ const Navigation = () => {
 
         {isOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-4">
-            <a href="#mission" className="block text-muted-foreground hover:text-foreground transition-colors">
+            <Link to="/mission" className="block text-muted-foreground hover:text-foreground transition-colors">
               Mission
-            </a>
+            </Link>
             <a href="#features" className="block text-muted-foreground hover:text-foreground transition-colors">
               Features
             </a>
