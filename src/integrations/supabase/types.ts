@@ -465,6 +465,7 @@ export type Database = {
           color: string
           completed: number
           created_at: string
+          description: string | null
           id: string
           milestones: number
           progress: number
@@ -476,6 +477,7 @@ export type Database = {
           color?: string
           completed?: number
           created_at?: string
+          description?: string | null
           id?: string
           milestones?: number
           progress?: number
@@ -487,6 +489,7 @@ export type Database = {
           color?: string
           completed?: number
           created_at?: string
+          description?: string | null
           id?: string
           milestones?: number
           progress?: number
