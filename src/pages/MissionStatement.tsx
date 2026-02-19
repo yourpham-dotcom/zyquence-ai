@@ -1,9 +1,11 @@
+import { Link } from "react-router-dom";
+
 const MissionStatement = () => {
   return (
     <div className="min-h-screen bg-background px-6 py-8">
-      <a href="/" className="inline-block text-sm text-muted-foreground hover:text-foreground transition-colors mb-12">
+      <Link to="/" className="inline-block text-sm text-muted-foreground hover:text-foreground transition-colors mb-12">
         ← Back to home
-      </a>
+      </Link>
       <div className="max-w-3xl mx-auto text-center space-y-6">
         <h1 className="text-4xl md:text-5xl font-bold">
           <span className="text-gradient">Mission Statement</span>
