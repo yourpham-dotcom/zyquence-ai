@@ -180,7 +180,7 @@ const SettingsPage = () => {
       {/* Save Button */}
       <Button
         onClick={handleSave}
-        disabled={!hasChanges || saving}
+        disabled={saving}
         className="w-full"
       >
         {saving ? (
