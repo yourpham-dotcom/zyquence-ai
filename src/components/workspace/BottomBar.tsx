@@ -72,6 +72,27 @@ export function BottomBar() {
     window.addEventListener("mouseup", onUp);
   }, [panelHeight]);
 
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    setIsDragging(true);
+    startY.current = e.touches[0].clientY;
+    startHeight.current = panelHeight;
+
+    const onMove = (ev: TouchEvent) => {
+      const delta = startY.current - ev.touches[0].clientY;
+      const newH = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, startHeight.current + delta));
+      setPanelHeight(newH);
+    };
+
+    const onUp = () => {
+      setIsDragging(false);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onUp);
+    };
+
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onUp);
+  }, [panelHeight]);
+
   return (
     <div className="border-t border-border bg-background shrink-0 flex flex-col relative">
       {isDragging && <div className="fixed inset-0 z-50 cursor-ns-resize" />}
@@ -81,7 +102,8 @@ export function BottomBar() {
         <div className="border-b border-border bg-muted/30 animate-in slide-in-from-bottom-2 duration-200 flex flex-col">
           <div
             onMouseDown={onDragStart}
-            className="flex items-center justify-center py-2 cursor-ns-resize hover:bg-accent/30 transition-colors select-none"
+            onTouchStart={onTouchStart}
+            className="flex items-center justify-center py-2 cursor-ns-resize hover:bg-accent/30 transition-colors select-none touch-none"
           >
             <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
