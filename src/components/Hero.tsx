@@ -9,7 +9,7 @@ const Hero = () => {
 
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto text-center space-y-8">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground/70 leading-tight">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-foreground leading-tight">
             Innovating the Next Level of Creative Intelligence
           </h1>
 

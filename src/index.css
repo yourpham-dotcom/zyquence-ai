@@ -27,7 +27,7 @@ All colors MUST be HSL.
     --secondary-foreground: 210 40% 98%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted-foreground: 0 0% 80%;
 
     --accent: 0 0% 6%;
     --accent-foreground: 0 0% 75%;
@@ -182,7 +182,19 @@ All colors MUST be HSL.
 
 @layer utilities {
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[hsl(var(--cyber-blue))] to-[hsl(var(--cyber-cyan))];
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80;
+  }
+
+  :root .text-gradient {
+    @apply from-[hsl(0_0%_100%)] to-[hsl(0_0%_80%)];
+  }
+
+  .light .text-gradient {
+    @apply from-[hsl(0_0%_10%)] to-[hsl(0_0%_30%)];
+  }
+
+  .aurora .text-gradient {
+    @apply from-[hsl(280_80%_70%)] to-[hsl(200_80%_60%)];
   }
 
   .glow-text {
