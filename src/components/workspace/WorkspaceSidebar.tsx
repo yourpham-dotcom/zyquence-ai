@@ -23,6 +23,7 @@ import {
   Megaphone,
   MessageCircle,
   LineChart,
+  GraduationCap,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -67,6 +68,10 @@ const socialNav = [
   { title: "Community", path: "/connect", icon: Share2 },
   { title: "Social Media", path: "/dashboard/social", icon: Megaphone },
   { title: "Public Relations", path: "/dashboard/pr", icon: MessageCircle },
+];
+
+const studentNav = [
+  { title: "Student Hub", path: "/student-hub", icon: GraduationCap },
 ];
 
 const proNav = [
@@ -164,6 +169,36 @@ export function WorkspaceSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {tradingNav
+                .filter((item) => !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                          isActive
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                        )
+                      }
+                    >
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Student Hub */}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {studentNav
                 .filter((item) => !visibleTools || visibleTools.has(item.title))
                 .map((item) => (
                 <SidebarMenuItem key={item.title}>

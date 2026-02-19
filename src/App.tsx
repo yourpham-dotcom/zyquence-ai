@@ -51,6 +51,14 @@ import ProDashboard from "./pages/ProDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
 import ConnectLayout from "./pages/community/ConnectLayout";
 
+// Student Hub
+import StudentHubLayout from "./pages/student-hub/StudentHubLayout";
+import StudentDashboard from "./pages/student-hub/StudentDashboard";
+import AssignmentPlanner from "./pages/student-hub/AssignmentPlanner";
+import StudyAssistant from "./pages/student-hub/StudyAssistant";
+import CareerExplorer from "./pages/student-hub/CareerExplorer";
+import ResumeBuilder from "./pages/student-hub/ResumeBuilder";
+
 const queryClient = new QueryClient();
 
 const Loading = () => (
@@ -113,6 +121,15 @@ const App = () => (
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
           <Route path="/connect" element={<ConnectLayout />} />
+
+          {/* Student Hub */}
+          <Route path="/student-hub" element={<StudentHubLayout />}>
+            <Route index element={<StudentDashboard />} />
+            <Route path="assignments" element={<AssignmentPlanner />} />
+            <Route path="study" element={<StudyAssistant />} />
+            <Route path="career" element={<CareerExplorer />} />
+            <Route path="resume" element={<ResumeBuilder />} />
+          </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
