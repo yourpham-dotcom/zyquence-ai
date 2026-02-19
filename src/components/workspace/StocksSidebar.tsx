@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -8,6 +8,8 @@ import {
   ChevronLeft,
   BarChart3,
   RefreshCw,
+  PanelRightClose,
+  GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +43,11 @@ const CHART_SYMBOLS = [
   { symbol: "NVDA", label: "NVDA" },
 ];
 
-function TradingViewMiniChart({ symbol, label }: { symbol: string; label: string }) {
+const MIN_WIDTH = 220;
+const MAX_WIDTH = 480;
+const DEFAULT_WIDTH = 288;
+
+function TradingViewMiniChart({ symbol }: { symbol: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,10 +82,41 @@ function TradingViewMiniChart({ symbol, label }: { symbol: string; label: string
 }
 
 export function StocksSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [stocks, setStocks] = useState(MOCK_STOCKS);
   const [selectedChart, setSelectedChart] = useState(CHART_SYMBOLS[0]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  // Resize drag handler
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+
+    const startX = e.clientX;
+    const startWidth = width;
+
+    const onMouseMove = (ev: MouseEvent) => {
+      const delta = startX - ev.clientX; // dragging left = wider
+      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + delta));
+      setWidth(newWidth);
+    };
+
+    const onMouseUp = () => {
+      setIsDragging(false);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  }, [width]);
 
   // Simulate live updates
   useEffect(() => {
@@ -102,14 +139,16 @@ export function StocksSidebar() {
     setTimeout(() => setRefreshing(false), 600);
   };
 
-  if (collapsed) {
+  // Hidden state — show a small open button
+  if (hidden) {
     return (
       <div className="w-10 border-l border-border bg-card/30 flex flex-col items-center pt-3 shrink-0">
         <Button
           variant="ghost"
           size="icon"
           className="h-8 w-8 mb-2"
-          onClick={() => setCollapsed(false)}
+          onClick={() => setHidden(false)}
+          title="Open Markets"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -119,106 +158,131 @@ export function StocksSidebar() {
   }
 
   return (
-    <div className="w-72 border-l border-border bg-card/30 flex flex-col shrink-0 h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between px-3 py-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          <BarChart3 className="h-4 w-4 text-primary" />
-          <h3 className="text-sm font-semibold text-foreground">Markets</h3>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={handleRefresh}
-          >
-            <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7"
-            onClick={() => setCollapsed(true)}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+    <div
+      ref={sidebarRef}
+      className="border-l border-border bg-card/30 flex shrink-0 h-screen relative"
+      style={{ width }}
+    >
+      {/* Drag handle */}
+      <div
+        onMouseDown={handleMouseDown}
+        className={cn(
+          "absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 group flex items-center justify-center",
+          "hover:bg-primary/20 transition-colors",
+          isDragging && "bg-primary/30"
+        )}
+      >
+        <div className={cn(
+          "absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 flex items-center justify-center rounded-r-md",
+          "opacity-0 group-hover:opacity-100 transition-opacity bg-accent/80",
+          isDragging && "opacity-100"
+        )}>
+          <GripVertical className="h-3 w-3 text-muted-foreground" />
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
-        <div className="p-3 space-y-4">
-          {/* Chart selector tabs */}
-          <div className="flex gap-1 flex-wrap">
-            {CHART_SYMBOLS.map((cs) => (
-              <button
-                key={cs.symbol}
-                onClick={() => setSelectedChart(cs)}
-                className={cn(
-                  "px-2 py-1 rounded text-[10px] font-medium transition-colors",
-                  selectedChart.symbol === cs.symbol
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-accent/50 text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {cs.label}
-              </button>
-            ))}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* Header */}
+        <div className="flex items-center justify-between px-3 py-3 border-b border-border">
+          <div className="flex items-center gap-2 min-w-0">
+            <BarChart3 className="h-4 w-4 text-primary shrink-0" />
+            <h3 className="text-sm font-semibold text-foreground truncate">Markets</h3>
           </div>
-
-          {/* TradingView Chart */}
-          <TradingViewMiniChart
-            key={selectedChart.symbol}
-            symbol={selectedChart.symbol}
-            label={selectedChart.label}
-          />
-
-          {/* Stock Tickers */}
-          <div>
-            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-              Watchlist
-            </h4>
-            <div className="space-y-0.5">
-              {stocks.map((stock) => (
-                <div
-                  key={stock.symbol}
-                  className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-accent/30 transition-colors group cursor-default"
-                >
-                  <div className="min-w-0">
-                    <span className="text-xs font-semibold text-foreground block">
-                      {stock.symbol.replace("-USD", "").replace("^", "")}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate block">
-                      {stock.name}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-mono font-medium text-foreground block">
-                      {stock.price >= 1000
-                        ? stock.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                        : stock.price.toFixed(2)}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-[10px] font-mono flex items-center gap-0.5 justify-end",
-                        stock.change >= 0 ? "text-emerald-500" : "text-red-500"
-                      )}
-                    >
-                      {stock.change >= 0 ? (
-                        <TrendingUp className="h-2.5 w-2.5" />
-                      ) : (
-                        <TrendingDown className="h-2.5 w-2.5" />
-                      )}
-                      {stock.change >= 0 ? "+" : ""}
-                      {stock.changePercent.toFixed(2)}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <div className="flex items-center gap-0.5 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={handleRefresh}
+              title="Refresh"
+            >
+              <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => setHidden(true)}
+              title="Close sidebar"
+            >
+              <PanelRightClose className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </div>
-      </ScrollArea>
+
+        <ScrollArea className="flex-1">
+          <div className="p-3 space-y-4">
+            {/* Chart selector tabs */}
+            <div className="flex gap-1 flex-wrap">
+              {CHART_SYMBOLS.map((cs) => (
+                <button
+                  key={cs.symbol}
+                  onClick={() => setSelectedChart(cs)}
+                  className={cn(
+                    "px-2 py-1 rounded text-[10px] font-medium transition-colors",
+                    selectedChart.symbol === cs.symbol
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-accent/50 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {cs.label}
+                </button>
+              ))}
+            </div>
+
+            {/* TradingView Chart */}
+            <TradingViewMiniChart
+              key={selectedChart.symbol}
+              symbol={selectedChart.symbol}
+            />
+
+            {/* Stock Tickers */}
+            <div>
+              <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                Watchlist
+              </h4>
+              <div className="space-y-0.5">
+                {stocks.map((stock) => (
+                  <div
+                    key={stock.symbol}
+                    className="flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-accent/30 transition-colors cursor-default"
+                  >
+                    <div className="min-w-0">
+                      <span className="text-xs font-semibold text-foreground block truncate">
+                        {stock.symbol.replace("-USD", "").replace("^", "")}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground truncate block">
+                        {stock.name}
+                      </span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="text-xs font-mono font-medium text-foreground block">
+                        {stock.price >= 1000
+                          ? stock.price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                          : stock.price.toFixed(2)}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[10px] font-mono flex items-center gap-0.5 justify-end",
+                          stock.change >= 0 ? "text-emerald-500" : "text-red-500"
+                        )}
+                      >
+                        {stock.change >= 0 ? (
+                          <TrendingUp className="h-2.5 w-2.5" />
+                        ) : (
+                          <TrendingDown className="h-2.5 w-2.5" />
+                        )}
+                        {stock.change >= 0 ? "+" : ""}
+                        {stock.changePercent.toFixed(2)}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
