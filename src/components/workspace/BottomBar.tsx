@@ -35,7 +35,7 @@ export function BottomBar() {
   const [embedId, setEmbedId] = useState<string | null>(null);
   const [panelHeight, setPanelHeight] = useState(DEFAULT_HEIGHT);
   const [activeGame, setActiveGame] = useState("basketball");
-  const dragging = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
   const startY = useRef(0);
   const startHeight = useRef(0);
 
@@ -66,19 +66,18 @@ export function BottomBar() {
 
   const onDragStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dragging.current = true;
+    setIsDragging(true);
     startY.current = e.clientY;
     startHeight.current = panelHeight;
 
     const onMove = (ev: MouseEvent) => {
-      if (!dragging.current) return;
       const delta = startY.current - ev.clientY;
       const newH = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, startHeight.current + delta));
       setPanelHeight(newH);
     };
 
     const onUp = () => {
-      dragging.current = false;
+      setIsDragging(false);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mouseup", onUp);
     };
@@ -97,15 +96,18 @@ export function BottomBar() {
   };
 
   return (
-    <div className="border-t border-border bg-background shrink-0 flex flex-col">
+    <div className="border-t border-border bg-background shrink-0 flex flex-col relative">
+      {/* Drag overlay to prevent iframes from stealing mouse events */}
+      {isDragging && <div className="fixed inset-0 z-50 cursor-ns-resize" />}
+
       {activePanel && (
         <div className="border-b border-border bg-muted/30 animate-in slide-in-from-bottom-2 duration-200 flex flex-col">
           {/* Drag Handle */}
           <div
             onMouseDown={onDragStart}
-            className="flex items-center justify-center py-1 cursor-ns-resize hover:bg-accent/30 transition-colors"
+            className="flex items-center justify-center py-2 cursor-ns-resize hover:bg-accent/30 transition-colors select-none"
           >
-            <GripHorizontal className="h-4 w-4 text-muted-foreground" />
+            <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
           </div>
 
           {/* YouTube Panel */}
