@@ -66,22 +66,22 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 const MOCK_NEWS_POOL: NewsItem[] = [
-  { id: "1", title: "OpenAI Announces GPT-6 with Real-Time Reasoning", source: "TechCrunch", category: "AI", time: "2h ago", url: "https://techcrunch.com" },
-  { id: "2", title: "Apple Unveils New M5 Chip Architecture", source: "The Verge", category: "Technology", time: "3h ago", url: "https://theverge.com" },
-  { id: "3", title: "S&P 500 Hits All-Time High Amid AI Boom", source: "Bloomberg", category: "Finance", time: "4h ago", url: "https://bloomberg.com" },
-  { id: "4", title: "NBA Playoff Race Heats Up as Trade Deadline Approaches", source: "ESPN", category: "Sports", time: "5h ago", url: "https://espn.com" },
-  { id: "5", title: "Spotify Launches AI-Powered DJ for Podcasts", source: "Wired", category: "Music", time: "6h ago", url: "https://wired.com" },
-  { id: "6", title: "Y Combinator's W26 Batch: Record Number of AI Startups", source: "Forbes", category: "Startups", time: "7h ago", url: "https://forbes.com" },
-  { id: "7", title: "Remote Work Study: Productivity Up 23% With AI Tools", source: "HBR", category: "Business", time: "8h ago", url: "https://hbr.org" },
-  { id: "8", title: "New Wellness Apps Leverage AI for Personalized Health", source: "Healthline", category: "Health", time: "9h ago", url: "https://healthline.com" },
-  { id: "9", title: "Google DeepMind Achieves Breakthrough in Protein Design", source: "Nature", category: "AI", time: "1h ago", url: "https://nature.com" },
-  { id: "10", title: "Tesla Robotaxi Fleet Begins Operations in Austin", source: "Reuters", category: "Technology", time: "30m ago", url: "https://reuters.com" },
-  { id: "11", title: "Federal Reserve Signals Rate Cuts for Q3 2026", source: "CNBC", category: "Finance", time: "45m ago", url: "https://cnbc.com" },
-  { id: "12", title: "Champions League Quarterfinals Draw Announced", source: "Sky Sports", category: "Sports", time: "1h ago", url: "https://skysports.com" },
-  { id: "13", title: "Kendrick Lamar Drops Surprise Album with AI Visuals", source: "Complex", category: "Music", time: "2h ago", url: "https://complex.com" },
-  { id: "14", title: "Stripe Launches AI-First Banking Platform for Startups", source: "TechCrunch", category: "Startups", time: "3h ago", url: "https://techcrunch.com" },
-  { id: "15", title: "Meta Introduces Spatial Computing SDK for Developers", source: "Ars Technica", category: "Technology", time: "4h ago", url: "https://arstechnica.com" },
-  { id: "16", title: "New Study Links Intermittent Fasting to Longevity Gains", source: "WebMD", category: "Health", time: "5h ago", url: "https://webmd.com" },
+  { id: "1", title: "OpenAI Announces GPT-6 with Real-Time Reasoning", source: "TechCrunch", category: "AI", time: "2h ago", url: "https://techcrunch.com/2026/02/19/openai-announces-gpt-6-real-time-reasoning/" },
+  { id: "2", title: "Apple Unveils New M5 Chip Architecture", source: "The Verge", category: "Technology", time: "3h ago", url: "https://www.theverge.com/2026/2/19/apple-m5-chip-architecture-unveiled" },
+  { id: "3", title: "S&P 500 Hits All-Time High Amid AI Boom", source: "Bloomberg", category: "Finance", time: "4h ago", url: "https://www.bloomberg.com/news/articles/2026-02-19/sp-500-all-time-high-ai-boom" },
+  { id: "4", title: "NBA Playoff Race Heats Up as Trade Deadline Approaches", source: "ESPN", category: "Sports", time: "5h ago", url: "https://www.espn.com/nba/story/_/id/nba-playoff-race-trade-deadline-2026" },
+  { id: "5", title: "Spotify Launches AI-Powered DJ for Podcasts", source: "Wired", category: "Music", time: "6h ago", url: "https://www.wired.com/story/spotify-ai-powered-dj-podcasts-2026/" },
+  { id: "6", title: "Y Combinator's W26 Batch: Record Number of AI Startups", source: "Forbes", category: "Startups", time: "7h ago", url: "https://www.forbes.com/sites/startups/2026/02/19/y-combinator-w26-batch-record-ai-startups/" },
+  { id: "7", title: "Remote Work Study: Productivity Up 23% With AI Tools", source: "HBR", category: "Business", time: "8h ago", url: "https://hbr.org/2026/02/remote-work-productivity-up-23-percent-with-ai-tools" },
+  { id: "8", title: "New Wellness Apps Leverage AI for Personalized Health", source: "Healthline", category: "Health", time: "9h ago", url: "https://www.healthline.com/health-news/wellness-apps-ai-personalized-health-2026" },
+  { id: "9", title: "Google DeepMind Achieves Breakthrough in Protein Design", source: "Nature", category: "AI", time: "1h ago", url: "https://www.nature.com/articles/d41586-026-00512-protein-design-deepmind" },
+  { id: "10", title: "Tesla Robotaxi Fleet Begins Operations in Austin", source: "Reuters", category: "Technology", time: "30m ago", url: "https://www.reuters.com/technology/tesla-robotaxi-fleet-begins-operations-austin-2026-02-19/" },
+  { id: "11", title: "Federal Reserve Signals Rate Cuts for Q3 2026", source: "CNBC", category: "Finance", time: "45m ago", url: "https://www.cnbc.com/2026/02/19/federal-reserve-signals-rate-cuts-q3-2026.html" },
+  { id: "12", title: "Champions League Quarterfinals Draw Announced", source: "Sky Sports", category: "Sports", time: "1h ago", url: "https://www.skysports.com/football/news/champions-league-quarterfinals-draw-2026" },
+  { id: "13", title: "Kendrick Lamar Drops Surprise Album with AI Visuals", source: "Complex", category: "Music", time: "2h ago", url: "https://www.complex.com/music/kendrick-lamar-surprise-album-ai-visuals-2026" },
+  { id: "14", title: "Stripe Launches AI-First Banking Platform for Startups", source: "TechCrunch", category: "Startups", time: "3h ago", url: "https://techcrunch.com/2026/02/19/stripe-ai-first-banking-platform-startups/" },
+  { id: "15", title: "Meta Introduces Spatial Computing SDK for Developers", source: "Ars Technica", category: "Technology", time: "4h ago", url: "https://arstechnica.com/gadgets/2026/02/meta-spatial-computing-sdk-developers/" },
+  { id: "16", title: "New Study Links Intermittent Fasting to Longevity Gains", source: "WebMD", category: "Health", time: "5h ago", url: "https://www.webmd.com/diet/news/20260219/intermittent-fasting-longevity-study" },
 ];
 
 function shuffleAndPick(items: NewsItem[], count: number): NewsItem[] {
