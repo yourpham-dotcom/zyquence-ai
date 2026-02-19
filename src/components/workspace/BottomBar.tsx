@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Youtube, Instagram, Music2, Globe, BookOpen, X } from "lucide-react";
+import { useState, useCallback, useRef } from "react";
+import { Youtube, Instagram, Music2, Globe, BookOpen, X, GripHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,18 @@ const links = [
   { label: "Learn", icon: BookOpen, href: "https://www.khanacademy.org", color: "text-orange-500" },
 ];
 
+const MIN_HEIGHT = 150;
+const MAX_HEIGHT = 600;
+const DEFAULT_HEIGHT = 350;
+
 export function BottomBar() {
   const [expanded, setExpanded] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
   const [embedId, setEmbedId] = useState<string | null>(null);
+  const [panelHeight, setPanelHeight] = useState(DEFAULT_HEIGHT);
+  const dragging = useRef(false);
+  const startY = useRef(0);
+  const startHeight = useRef(0);
 
   const extractVideoId = (url: string): string | null => {
     const patterns = [
@@ -42,11 +50,42 @@ export function BottomBar() {
     }
   };
 
+  const onDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    dragging.current = true;
+    startY.current = e.clientY;
+    startHeight.current = panelHeight;
+
+    const onMove = (ev: MouseEvent) => {
+      if (!dragging.current) return;
+      const delta = startY.current - ev.clientY;
+      const newH = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, startHeight.current + delta));
+      setPanelHeight(newH);
+    };
+
+    const onUp = () => {
+      dragging.current = false;
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, [panelHeight]);
+
   return (
     <div className="border-t border-border bg-background shrink-0 flex flex-col">
       {expanded && (
-        <div className="border-b border-border bg-muted/30 animate-in slide-in-from-bottom-2 duration-200">
-          <div className="flex items-center justify-between px-4 pt-3 pb-2">
+        <div className="border-b border-border bg-muted/30 animate-in slide-in-from-bottom-2 duration-200 flex flex-col">
+          {/* Drag Handle */}
+          <div
+            onMouseDown={onDragStart}
+            className="flex items-center justify-center py-1 cursor-ns-resize hover:bg-accent/30 transition-colors"
+          >
+            <GripHorizontal className="h-4 w-4 text-muted-foreground" />
+          </div>
+
+          <div className="flex items-center justify-between px-4 pb-2">
             <div className="flex items-center gap-2">
               <Youtube className="h-4 w-4 text-red-500" />
               <span className="text-sm font-semibold text-foreground">YouTube Player</span>
@@ -79,9 +118,9 @@ export function BottomBar() {
             </Button>
           </div>
 
-          {embedId ? (
-            <div className="px-4 pb-4">
-              <div className="rounded-lg overflow-hidden bg-black aspect-video max-h-[300px]">
+          <div className="px-4 pb-4 flex-1" style={{ height: panelHeight }}>
+            {embedId ? (
+              <div className="rounded-lg overflow-hidden bg-black h-full">
                 <iframe
                   src={`https://www.youtube.com/embed/${embedId}?autoplay=1&rel=0`}
                   allow="autoplay; encrypted-media; picture-in-picture"
@@ -90,16 +129,14 @@ export function BottomBar() {
                   title="YouTube Player"
                 />
               </div>
-            </div>
-          ) : (
-            <div className="px-4 pb-4">
-              <div className="rounded-lg bg-muted/50 flex flex-col items-center justify-center h-32 gap-2 text-muted-foreground">
+            ) : (
+              <div className="rounded-lg bg-muted/50 flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
                 <Youtube className="h-8 w-8 text-red-500/50" />
                 <p className="text-xs">Paste a YouTube link above to watch here</p>
                 <p className="text-[10px]">Or click "Open YouTube" to browse in a new tab</p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
 
