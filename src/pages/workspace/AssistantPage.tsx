@@ -33,8 +33,7 @@ const AssistantPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 h-full flex flex-col">
-      <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-        <Sparkles className="h-5 w-5 text-purple-500" />
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">
         AI Assistant
       </h1>
 
@@ -48,11 +47,7 @@ const AssistantPage = () => {
               msg.role === "user" ? "justify-end" : "justify-start"
             )}
           >
-            {msg.role === "ai" && (
-              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                <Bot className="h-4 w-4 text-primary" />
-              </div>
-            )}
+            {msg.role === "ai" && null}
             <div
               className={cn(
                 "px-4 py-3 rounded-2xl text-sm max-w-[80%]",
