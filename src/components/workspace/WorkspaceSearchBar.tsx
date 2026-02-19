@@ -1,27 +1,41 @@
 import { useState, useEffect } from "react";
-import { Sparkles, Sun, Moon } from "lucide-react";
+import { Sparkles, Sun, Moon, Palette } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
+type Theme = "dark" | "light" | "aurora";
+
+const THEME_ORDER: Theme[] = ["dark", "light", "aurora"];
+
+const applyTheme = (theme: Theme) => {
+  const root = document.documentElement;
+  root.classList.remove("light", "aurora");
+  document.body.classList.remove("aurora-bg");
+  if (theme === "light") root.classList.add("light");
+  if (theme === "aurora") {
+    root.classList.add("aurora");
+    document.body.classList.add("aurora-bg");
+  }
+};
+
 export function WorkspaceSearchBar() {
   const [query, setQuery] = useState("");
-  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains("light"));
+  const [theme, setTheme] = useState<Theme>("dark");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = localStorage.getItem("zyquence-theme");
-    if (saved === "light") {
-      document.documentElement.classList.add("light");
-      setIsLight(true);
-    }
+    const saved = (localStorage.getItem("zyquence-theme") || "dark") as Theme;
+    setTheme(saved);
+    applyTheme(saved);
   }, []);
 
-  const toggleTheme = () => {
-    const next = !isLight;
-    setIsLight(next);
-    document.documentElement.classList.toggle("light", next);
-    localStorage.setItem("zyquence-theme", next ? "light" : "dark");
+  const cycleTheme = () => {
+    const idx = THEME_ORDER.indexOf(theme);
+    const next = THEME_ORDER[(idx + 1) % THEME_ORDER.length];
+    setTheme(next);
+    applyTheme(next);
+    localStorage.setItem("zyquence-theme", next);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -30,6 +44,8 @@ export function WorkspaceSearchBar() {
       setQuery("");
     }
   };
+
+  const ThemeIcon = theme === "light" ? Moon : theme === "aurora" ? Palette : Sun;
 
   return (
     <div className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl px-6 py-3">
@@ -55,10 +71,10 @@ export function WorkspaceSearchBar() {
           variant="ghost"
           size="icon"
           className="h-9 w-9 rounded-xl shrink-0"
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
+          onClick={cycleTheme}
+          aria-label="Cycle theme"
         >
-          {isLight ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          <ThemeIcon className="h-4 w-4" />
         </Button>
       </div>
     </div>
