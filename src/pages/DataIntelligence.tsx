@@ -120,7 +120,7 @@ const DataIntelligence = () => {
               <p className="text-muted-foreground">Master data analysis, SQL, and visualization</p>
             </div>
           </div>
-          <Button variant="outline" size="sm" className="rounded-xl" onClick={() => navigate(-1)}>
+          <Button variant="outline" size="sm" className="rounded-xl" onClick={() => window.history.length > 1 ? navigate(-1) : navigate("/dashboard")}>
             <ArrowLeft className="h-4 w-4 mr-1.5" />
             Back
           </Button>
