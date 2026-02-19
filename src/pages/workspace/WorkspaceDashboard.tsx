@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import ZyquenceNewsFeed from "@/components/workspace/ZyquenceNewsFeed";
 import {
   CalendarDays,
   DollarSign,
@@ -90,6 +91,9 @@ const WorkspaceDashboard = () => {
         </h1>
         <p className="text-sm text-muted-foreground">{user?.email}</p>
       </div>
+
+      {/* Personalized News Feed */}
+      <ZyquenceNewsFeed isPro={isPro} />
 
       {/* Quick Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
