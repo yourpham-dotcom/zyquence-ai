@@ -24,6 +24,7 @@ import {
   MessageCircle,
   LineChart,
   GraduationCap,
+  Disc3,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -61,6 +62,7 @@ const tradingNav = [
 
 const toolsNav = [
   { title: "Studio", path: "/studio", icon: Palette },
+  { title: "Music Intelligence", path: "/studio", icon: Disc3 },
   { title: "Zyquence Atlas", path: "/studio", icon: Globe },
 ];
 

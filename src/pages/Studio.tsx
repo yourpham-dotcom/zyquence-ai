@@ -269,7 +269,7 @@ const Studio = () => {
 
                 {/* Media & Arts */}
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Media & Arts</p>
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Music Intelligence</p>
                   <div className="grid grid-cols-2 gap-3">
                     {mediaTools.map((tool) => (
                       <Button
@@ -442,7 +442,7 @@ const Studio = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Media & Arts Tools Dropdown */}
+          {/* Music Intelligence Tools Dropdown */}
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -454,11 +454,11 @@ const Studio = () => {
                     style={sidebarWidth > 64 ? { width: `${sidebarWidth - 16}px` } : {}}
                   >
                     <Disc3 className="h-5 w-5" />
-                    {sidebarWidth > 100 && <span className="ml-2 text-sm">Media & Arts</span>}
+                    {sidebarWidth > 100 && <span className="ml-2 text-sm">Music Intelligence</span>}
                   </Button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent side="right">Media & Arts</TooltipContent>
+              <TooltipContent side="right">Music Intelligence</TooltipContent>
             </Tooltip>
             <DropdownMenuContent side="right" align="start" className="w-52 bg-popover border-border">
               {mediaTools.map((tool) => (
