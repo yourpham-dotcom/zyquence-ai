@@ -26,6 +26,7 @@ import {
   GraduationCap,
   Disc3,
   BookOpen,
+  Code2,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -63,6 +64,7 @@ const tradingNav = [
 
 const toolsNav = [
   { title: "Studio", path: "/studio", icon: Palette },
+  { title: "Code Studio", path: "/code-studio", icon: Code2 },
   { title: "Music Intelligence", path: "/music-intelligence", icon: Disc3 },
   { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music },
   { title: "Zyquence Atlas", path: "/studio", icon: Globe },

@@ -51,6 +51,7 @@ import ProDashboard from "./pages/ProDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
 import MusicIntelligence from "./pages/MusicIntelligence";
 import ConnectLayout from "./pages/community/ConnectLayout";
+import CodeStudio from "./pages/CodeStudio";
 
 // Student Hub
 import StudentHubLayout from "./pages/student-hub/StudentHubLayout";
@@ -123,6 +124,7 @@ const App = () => (
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
           <Route path="/music-intelligence" element={<MusicIntelligence />} />
+          <Route path="/code-studio" element={<CodeStudio />} />
           <Route path="/connect" element={<ConnectLayout />} />
 
           {/* Student Hub */}
