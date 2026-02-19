@@ -40,6 +40,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { MiniCalendar } from "./MiniCalendar";
 import { SidebarMiniGames } from "./SidebarMiniGames";
+import { SidebarSpotify } from "./SidebarSpotify";
 import { cn } from "@/lib/utils";
 
 const mainNav = [
@@ -256,6 +257,8 @@ export function WorkspaceSidebar() {
             <div className="px-3 py-2">
               <MiniCalendar />
             </div>
+            <Separator className="mx-4 bg-sidebar-border" />
+            <SidebarSpotify />
             <Separator className="mx-4 bg-sidebar-border" />
             <SidebarMiniGames />
           </>
