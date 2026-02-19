@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Mission = () => {
   return (
     <section id="mission" className="py-24 relative overflow-hidden">
@@ -5,14 +7,14 @@ const Mission = () => {
       
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center space-y-4">
+          <Link to="/mission" className="block text-center space-y-4 group">
             <h2 className="text-4xl md:text-5xl font-bold">
               <span className="text-gradient">Our Mission</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto group-hover:text-foreground transition-colors">
               Empowering everyone to unlock their creative potential and develop real skills
             </p>
-          </div>
+          </Link>
         </div>
       </div>
     </section>
