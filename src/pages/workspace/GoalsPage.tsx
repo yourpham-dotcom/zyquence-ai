@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 interface Goal {
   id: string;
   title: string;
+  description?: string | null;
   progress: number;
   milestones: number;
   completed: number;
@@ -35,6 +36,7 @@ const GoalsPage = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newMilestones, setNewMilestones] = useState("4");
   const [newColor, setNewColor] = useState("bg-blue-500");
+  const [newDescription, setNewDescription] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,6 +66,7 @@ const GoalsPage = () => {
     const { data, error } = await supabase.from("goals").insert({
       user_id: user.id,
       title: newTitle.trim(),
+      description: newDescription.trim() || null,
       milestones: parseInt(newMilestones) || 4,
       color: newColor,
     }).select().single();
@@ -71,6 +74,7 @@ const GoalsPage = () => {
     if (error) { toast.error("Failed to create goal"); return; }
     if (data) setGoals(prev => [data, ...prev]);
     setNewTitle("");
+    setNewDescription("");
     setNewMilestones("4");
     setNewColor("bg-blue-500");
     setDialogOpen(false);
@@ -124,6 +128,10 @@ const GoalsPage = () => {
                   <Input placeholder="e.g. Run 100 miles this month" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
                 </div>
                 <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Input placeholder="Describe your goal..." value={newDescription} onChange={e => setNewDescription(e.target.value)} />
+                </div>
+                <div className="space-y-2">
                   <Label>Milestones</Label>
                   <Input type="number" min="1" max="20" value={newMilestones} onChange={e => setNewMilestones(e.target.value)} />
                 </div>
@@ -175,6 +183,9 @@ const GoalsPage = () => {
                   <Target className={cn("h-5 w-5 mt-0.5 shrink-0", goal.color.replace("bg-", "text-"))} />
                   <div className="flex-1 min-w-0">
                     <h3 className="text-sm font-semibold text-foreground">{goal.title}</h3>
+                    {goal.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{goal.description}</p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-0.5">
                       {goal.completed}/{goal.milestones} milestones
                     </p>
