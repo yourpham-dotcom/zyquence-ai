@@ -139,6 +139,18 @@ const FinancePage = () => {
     updated.savings = updated.income - totalSpent > 0 ? updated.income - totalSpent : 0;
     save(updated);
   };
+  const clearItems = (catId: string) => {
+    const updated: BudgetData = {
+      ...budget,
+      categories: budget.categories.map((c) =>
+        c.id === catId ? { ...c, items: [], spent: 0 } : c
+      ),
+    };
+    const totalSpent = updated.categories.reduce((s, c) => s + c.spent, 0);
+    updated.expenses = totalSpent;
+    updated.savings = updated.income - totalSpent > 0 ? updated.income - totalSpent : 0;
+    save(updated);
+  };
 
   // --- Dialog editing ---
   const openEditor = () => {
@@ -302,6 +314,16 @@ const FinancePage = () => {
                       >
                         <Plus className="h-3 w-3 mr-1" /> Add Item
                       </Button>
+                      {cat.items.length > 0 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
+                          onClick={() => clearItems(cat.id)}
+                        >
+                          <X className="h-3 w-3 mr-1" /> Clear All
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
