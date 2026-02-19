@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, X, Loader2, Copy, Plus } from "lucide-react";
+import { Send, X, Loader2, Copy, Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
-import type { CodeFile } from "@/pages/CodeStudio";
+import type { CodeFileRecord } from "@/hooks/useCodeProjects";
 
 interface Message {
   role: "user" | "assistant";
@@ -12,14 +12,23 @@ interface Message {
 }
 
 interface Props {
-  activeFile?: CodeFile;
+  activeFile?: CodeFileRecord;
+  allFiles: CodeFileRecord[];
+  projectName: string;
   onInsertCode: (code: string) => void;
   onClose: () => void;
 }
 
 const FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/code-studio-ai`;
 
-const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
+const QUICK_ACTIONS = [
+  { label: "Generate", prompt: "Generate code for: " },
+  { label: "Refactor", prompt: "Refactor this code to be cleaner and more efficient" },
+  { label: "Debug", prompt: "Find and fix bugs in this code" },
+  { label: "Explain", prompt: "Explain this code step by step" },
+];
+
+const CodeStudioAIPanel = ({ activeFile, allFiles, projectName, onInsertCode, onClose }: Props) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,8 +39,8 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = async () => {
-    const text = input.trim();
+  const send = async (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text || loading) return;
 
     const userMsg: Message = { role: "user", content: text };
@@ -43,6 +52,9 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
     let assistantContent = "";
 
     try {
+      // Build project context
+      const fileList = allFiles.filter(f => !f.is_folder).map(f => `${f.path === "/" ? "" : f.path}/${f.name}`).join(", ");
+
       const resp = await fetch(FUNCTION_URL, {
         method: "POST",
         headers: {
@@ -51,21 +63,25 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
         },
         body: JSON.stringify({
           messages: allMsgs,
-          context: activeFile
-            ? { fileName: activeFile.name, language: activeFile.language, code: activeFile.content.slice(0, 3000) }
-            : undefined,
+          context: {
+            projectName,
+            fileList,
+            ...(activeFile ? {
+              fileName: activeFile.name,
+              language: activeFile.language,
+              code: activeFile.content.slice(0, 4000),
+            } : {}),
+          },
         }),
       });
 
       if (resp.status === 429) {
         toast({ title: "Rate limited", description: "Please wait a moment and try again.", variant: "destructive" });
-        setLoading(false);
-        return;
+        setLoading(false); return;
       }
       if (resp.status === 402) {
         toast({ title: "Credits required", description: "Please add credits to continue.", variant: "destructive" });
-        setLoading(false);
-        return;
+        setLoading(false); return;
       }
       if (!resp.ok || !resp.body) throw new Error("Failed to start stream");
 
@@ -120,25 +136,42 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
 
   return (
     <div className="w-80 bg-[#252526] border-l border-[#3c3c3c] flex flex-col shrink-0">
-      {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-[#3c3c3c]">
-        <span className="text-xs font-semibold text-[#cccccc]/80">AI Assistant</span>
+        <div className="flex items-center gap-1.5">
+          <Sparkles className="h-3.5 w-3.5 text-[#007acc]" />
+          <span className="text-xs font-semibold text-[#cccccc]/80">AI Assistant</span>
+        </div>
         <Button variant="ghost" size="icon" className="h-5 w-5 text-[#cccccc]/40 hover:bg-[#3c3c3c]" onClick={onClose}>
           <X className="h-3.5 w-3.5" />
         </Button>
       </div>
 
-      {/* Messages */}
       <ScrollArea className="flex-1 p-3">
         {messages.length === 0 && (
-          <div className="text-center text-[#cccccc]/30 text-xs py-8 space-y-2">
-            <p className="font-medium">AI Coding Assistant</p>
+          <div className="text-center text-[#cccccc]/30 text-xs py-6 space-y-3">
+            <Sparkles className="h-8 w-8 mx-auto text-[#007acc]/40" />
+            <p className="font-medium text-[#cccccc]/50">AI Coding Assistant</p>
             <p>Ask questions, generate code, debug, or refactor.</p>
             {activeFile && (
-              <p className="text-[10px] text-[#007acc]/80">
-                Context: {activeFile.name}
-              </p>
+              <p className="text-[10px] text-[#007acc]/80">Context: {activeFile.name}</p>
             )}
+            <div className="flex flex-wrap gap-1.5 justify-center pt-2">
+              {QUICK_ACTIONS.map((a) => (
+                <button
+                  key={a.label}
+                  className="px-2 py-1 rounded bg-[#3c3c3c] text-[10px] text-[#cccccc]/70 hover:bg-[#4c4c4c] transition-colors"
+                  onClick={() => {
+                    if (a.prompt.endsWith(": ")) {
+                      setInput(a.prompt);
+                    } else {
+                      send(a.prompt);
+                    }
+                  }}
+                >
+                  {a.label}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -155,29 +188,21 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
               {msg.role === "assistant" && extractCode(msg.content) && (
                 <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#555]">
                   <Button
-                    variant="ghost"
-                    size="sm"
+                    variant="ghost" size="sm"
                     className="h-6 text-[10px] text-[#4ec9b0] hover:bg-[#2a2d2e] gap-1"
                     onClick={() => {
                       const code = extractCode(msg.content);
-                      if (code) {
-                        onInsertCode(code);
-                        toast({ title: "Code inserted into editor" });
-                      }
+                      if (code) { onInsertCode(code); toast({ title: "Code inserted into editor" }); }
                     }}
                   >
                     <Plus className="h-3 w-3" /> Insert
                   </Button>
                   <Button
-                    variant="ghost"
-                    size="sm"
+                    variant="ghost" size="sm"
                     className="h-6 text-[10px] text-[#cccccc]/60 hover:bg-[#2a2d2e] gap-1"
                     onClick={() => {
                       const code = extractCode(msg.content);
-                      if (code) {
-                        navigator.clipboard.writeText(code);
-                        toast({ title: "Copied to clipboard" });
-                      }
+                      if (code) { navigator.clipboard.writeText(code); toast({ title: "Copied to clipboard" }); }
                     }}
                   >
                     <Copy className="h-3 w-3" /> Copy
@@ -189,24 +214,19 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
         ))}
         {loading && (
           <div className="flex items-center gap-2 text-xs text-[#cccccc]/40">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            Thinking...
+            <Loader2 className="h-3 w-3 animate-spin" /> Thinking...
           </div>
         )}
         <div ref={scrollRef} />
       </ScrollArea>
 
-      {/* Input */}
       <div className="p-2 border-t border-[#3c3c3c]">
         <div className="flex gap-1.5">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                send();
-              }
+              if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
             }}
             placeholder="Ask anything about code..."
             className="min-h-[36px] max-h-[100px] resize-none text-xs bg-[#3c3c3c] border-[#555] text-[#cccccc] placeholder:text-[#cccccc]/30"
@@ -215,7 +235,7 @@ const CodeStudioAIPanel = ({ activeFile, onInsertCode, onClose }: Props) => {
           <Button
             size="icon"
             className="h-9 w-9 bg-[#007acc] hover:bg-[#005a9e] shrink-0"
-            onClick={send}
+            onClick={() => send()}
             disabled={loading || !input.trim()}
           >
             <Send className="h-3.5 w-3.5" />

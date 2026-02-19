@@ -1,8 +1,8 @@
 import Editor from "@monaco-editor/react";
-import type { CodeFile } from "@/pages/CodeStudio";
+import type { CodeFileRecord } from "@/hooks/useCodeProjects";
 
 interface Props {
-  file: CodeFile;
+  file: CodeFileRecord;
   onChange: (content: string) => void;
 }
 

@@ -14,7 +14,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    let systemPrompt = `You are an expert coding assistant inside Zyquence Code Studio. You help users write, debug, refactor, and understand code.
+    let systemPrompt = `You are an expert coding assistant inside Zyquence Code Studio — a GitHub + Cursor-style development environment. You help users write, debug, refactor, and understand code.
 
 Rules:
 - Provide clear, well-commented code examples
@@ -22,10 +22,22 @@ Rules:
 - Be concise but thorough
 - Suggest best practices and modern patterns
 - If asked to debug, explain the issue clearly before providing a fix
-- Support all major programming languages`;
+- Support all major programming languages
+- When refactoring, explain what you changed and why`;
 
     if (context) {
-      systemPrompt += `\n\nThe user is currently editing a file called "${context.fileName}" (${context.language}). Here is their current code:\n\`\`\`${context.language}\n${context.code}\n\`\`\``;
+      if (context.projectName) {
+        systemPrompt += `\n\nProject: "${context.projectName}"`;
+      }
+      if (context.fileList) {
+        systemPrompt += `\nProject files: ${context.fileList}`;
+      }
+      if (context.fileName) {
+        systemPrompt += `\n\nCurrently editing: "${context.fileName}" (${context.language})`;
+        if (context.code) {
+          systemPrompt += `\n\`\`\`${context.language}\n${context.code}\n\`\`\``;
+        }
+      }
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
