@@ -25,6 +25,7 @@ import {
   LineChart,
   GraduationCap,
   Disc3,
+  BookOpen,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -65,6 +66,7 @@ const toolsNav = [
   { title: "Music Intelligence", path: "/music-intelligence", icon: Disc3 },
   { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music },
   { title: "Zyquence Atlas", path: "/studio", icon: Globe },
+  { title: "Journal", path: "/gaming-intelligence/journal", icon: BookOpen },
 ];
 
 const socialNav = [
