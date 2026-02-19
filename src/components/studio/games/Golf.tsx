@@ -628,7 +628,7 @@ const Golf = ({ compact = false }: GolfProps) => {
       <div className="flex flex-col items-center justify-center h-full gap-4 p-4">
         <div className="text-center space-y-2">
           <div className="text-5xl">⛳</div>
-          <h2 className="text-2xl font-bold">Topgolf Arcade</h2>
+          <h2 className="text-2xl font-bold">Golf Arcade</h2>
           <p className="text-muted-foreground text-sm">Hit targets on the driving range!</p>
         </div>
         <div className="flex flex-col gap-2 w-full max-w-[200px]">
