@@ -59,7 +59,7 @@ export function SidebarMiniGames() {
               </Button>
             ))}
           </div>
-          <div className="rounded-lg overflow-hidden bg-sidebar-accent/30" style={{ height: 250 }}>
+          <div className="rounded-lg overflow-auto bg-sidebar-accent/30" style={{ height: 420 }}>
             <Suspense fallback={<div className="flex items-center justify-center h-full text-[10px] text-sidebar-foreground/50">Loading...</div>}>
               {renderGame()}
             </Suspense>
