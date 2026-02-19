@@ -10,6 +10,7 @@ export function SidebarSpotify() {
   const [view, setView] = useState<"home" | "search" | "playlist">("home");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewingPlaylistId, setViewingPlaylistId] = useState<string | null>(null);
+  const [trackList, setTrackList] = useState<SpotifyTrack[]>([]);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const spotify = useSpotify();
 
@@ -26,8 +27,46 @@ export function SidebarSpotify() {
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
   }, [searchQuery, spotify.isConnected]);
 
+  // Get the current active track list for skip functionality
+  const getCurrentTrackList = (): SpotifyTrack[] => {
+    if (view === "search" && spotify.searchResults.length > 0) return spotify.searchResults;
+    if (view === "playlist" && spotify.playlistTracks.length > 0) return spotify.playlistTracks;
+    return trackList;
+  };
+
   const handleTrackClick = (track: SpotifyTrack) => {
+    // Remember the current list context for skip
+    const list = view === "search" ? spotify.searchResults : view === "playlist" ? spotify.playlistTracks : [];
+    setTrackList(list);
     spotify.playTrack(track);
+  };
+
+  const handleSkipNext = () => {
+    const list = getCurrentTrackList();
+    if (!spotify.currentTrack || list.length === 0) {
+      spotify.skipNext();
+      return;
+    }
+    const idx = list.findIndex(t => t.id === spotify.currentTrack?.id);
+    if (idx >= 0 && idx < list.length - 1) {
+      spotify.playTrack(list[idx + 1]);
+    } else if (list.length > 0) {
+      spotify.playTrack(list[0]); // wrap around
+    }
+  };
+
+  const handleSkipPrev = () => {
+    const list = getCurrentTrackList();
+    if (!spotify.currentTrack || list.length === 0) {
+      spotify.skipPrev();
+      return;
+    }
+    const idx = list.findIndex(t => t.id === spotify.currentTrack?.id);
+    if (idx > 0) {
+      spotify.playTrack(list[idx - 1]);
+    } else if (list.length > 0) {
+      spotify.playTrack(list[list.length - 1]); // wrap around
+    }
   };
 
   const openPlaylist = (id: string) => {
@@ -181,13 +220,13 @@ export function SidebarSpotify() {
                   </p>
                 )}
                 <div className="flex items-center justify-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={spotify.skipPrev} disabled={!spotify.currentTrack}>
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleSkipPrev} disabled={!spotify.currentTrack}>
                     <SkipBack className="w-3 h-3" />
                   </Button>
                   <Button size="icon" className="h-6 w-6 bg-primary text-primary-foreground hover:bg-primary/90" onClick={spotify.togglePlay} disabled={!spotify.isConnected}>
                     {spotify.isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={spotify.skipNext} disabled={!spotify.currentTrack}>
+                  <Button variant="ghost" size="icon" className="h-5 w-5" onClick={handleSkipNext} disabled={!spotify.currentTrack}>
                     <SkipForward className="w-3 h-3" />
                   </Button>
                 </div>
