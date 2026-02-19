@@ -26,6 +26,7 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useFocusAreas } from "@/hooks/useFocusAreas";
 import {
   Sidebar,
   SidebarContent,
@@ -44,12 +45,12 @@ import { SidebarSpotify } from "./SidebarSpotify";
 import { cn } from "@/lib/utils";
 
 const mainNav = [
-  { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { title: "AI Assistant", path: "/dashboard/assistant", icon: Sparkles },
-  { title: "Calendar", path: "/dashboard/calendar", icon: CalendarDays },
-  { title: "Workspace", path: "/dashboard/workspace", icon: FolderKanban },
-  { title: "Finance", path: "/dashboard/finance", icon: DollarSign },
-  { title: "Goals", path: "/dashboard/goals", icon: Target },
+  { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard, alwaysShow: true },
+  { title: "AI Assistant", path: "/dashboard/assistant", icon: Sparkles, alwaysShow: true },
+  { title: "Calendar", path: "/dashboard/calendar", icon: CalendarDays, alwaysShow: false },
+  { title: "Workspace", path: "/dashboard/workspace", icon: FolderKanban, alwaysShow: true },
+  { title: "Finance", path: "/dashboard/finance", icon: DollarSign, alwaysShow: false },
+  { title: "Goals", path: "/dashboard/goals", icon: Target, alwaysShow: false },
 ];
 
 const toolsNav = [
@@ -73,9 +74,11 @@ const proNav = [
 export function WorkspaceSidebar() {
   const { user, signOut } = useAuth();
   const { isPro } = useSubscription();
+  const { getVisibleTools } = useFocusAreas();
   const navigate = useNavigate();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const visibleTools = getVisibleTools();
 
   const handleSignOut = async () => {
     await signOut();
@@ -122,7 +125,9 @@ export function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNav.map((item) => (
+              {mainNav
+                .filter((item) => item.alwaysShow || !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
@@ -153,7 +158,9 @@ export function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {toolsNav.map((item) => (
+              {toolsNav
+                .filter((item) => !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
@@ -183,7 +190,9 @@ export function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {socialNav.map((item) => (
+              {socialNav
+                .filter((item) => !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
@@ -211,7 +220,9 @@ export function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {proNav.map((item) => (
+              {proNav
+                .filter((item) => !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     {isPro ? (
