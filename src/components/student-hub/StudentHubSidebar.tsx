@@ -7,11 +7,13 @@ import {
   FileText,
   ChevronLeft,
   GraduationCap,
+  Map,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { title: "Dashboard", path: "/student-hub", icon: LayoutDashboard, end: true },
+  { title: "Academic Blueprint", path: "/student-hub/blueprint", icon: Map },
   { title: "Assignments", path: "/student-hub/assignments", icon: BookOpen },
   { title: "Study Assistant", path: "/student-hub/study", icon: Brain },
   { title: "Career Explorer", path: "/student-hub/career", icon: Compass },
