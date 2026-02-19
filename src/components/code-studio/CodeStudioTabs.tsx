@@ -1,11 +1,11 @@
-import { X } from "lucide-react";
+import { X, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { CodeFile } from "@/pages/CodeStudio";
+import type { CodeFileRecord } from "@/hooks/useCodeProjects";
 
 interface Props {
-  files: CodeFile[];
+  files: CodeFileRecord[];
   openTabs: string[];
-  activeFileId: string;
+  activeFileId: string | null;
   onTabClick: (id: string) => void;
   onTabClose: (id: string) => void;
 }
@@ -23,7 +23,7 @@ const CodeStudioTabs = ({ files, openTabs, activeFileId, onTabClick, onTabClose 
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 text-xs cursor-pointer border-r border-[#3c3c3c] shrink-0 group transition-colors",
               isActive
-                ? "bg-[#1e1e1e] text-[#ffffff] border-t-2 border-t-[#007acc]"
+                ? "bg-[#1e1e1e] text-white border-t-2 border-t-[#007acc]"
                 : "bg-[#2d2d2d] text-[#cccccc]/60 hover:bg-[#2a2d2e] border-t-2 border-t-transparent"
             )}
             onClick={() => onTabClick(tabId)}

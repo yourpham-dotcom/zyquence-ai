@@ -258,6 +258,86 @@ export type Database = {
         }
         Relationships: []
       }
+      code_files: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          is_folder: boolean | null
+          language: string | null
+          name: string
+          path: string
+          project_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_folder?: boolean | null
+          language?: string | null
+          name: string
+          path?: string
+          project_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_folder?: boolean | null
+          language?: string | null
+          name?: string
+          path?: string
+          project_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "code_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "code_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      code_projects: {
+        Row: {
+          created_at: string
+          description: string | null
+          github_repo_url: string | null
+          id: string
+          language: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          github_repo_url?: string | null
+          id?: string
+          language?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          github_repo_url?: string | null
+          id?: string
+          language?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       community_groups: {
         Row: {
           category: string | null
