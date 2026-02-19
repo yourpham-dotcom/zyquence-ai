@@ -31,7 +31,7 @@ export const FOCUS_AREA_TOOL_MAP: Record<FocusAreaId, string[]> = {
   students: ["AI Suggestions", "Goals", "Data Intelligence", "Student Hub"],
   business: ["AI Builder", "Goals"],
   creators: ["Studio", "Artist Intelligence"],
-  music: ["Studio", "Artist Intelligence"],
+  music: ["Studio", "Artist Intelligence", "Music Intelligence"],
   health: ["Goals", "Zyquence Atlas"],
   "ai-tech": ["AI Builder", "Data Intelligence", "AI Suggestions"],
   networking: ["Community"],
