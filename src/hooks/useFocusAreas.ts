@@ -17,6 +17,7 @@ export const FOCUS_AREA_OPTIONS = [
   { id: "travel", label: "Travel", icon: "✈️", description: "Explore & plan trips" },
   { id: "lifestyle", label: "Lifestyle", icon: "🌟", description: "Daily life & style" },
   { id: "education", label: "Education", icon: "🎓", description: "Learning & courses" },
+  { id: "trading", label: "Trading", icon: "📈", description: "Trade journaling & analytics" },
 ] as const;
 
 export type FocusAreaId = (typeof FOCUS_AREA_OPTIONS)[number]["id"];
@@ -37,6 +38,7 @@ export const FOCUS_AREA_TOOL_MAP: Record<FocusAreaId, string[]> = {
   travel: ["Zyquence Atlas"],
   lifestyle: ["Zyquence Atlas", "Calendar"],
   education: ["Data Intelligence", "AI Suggestions", "Gaming Engine"],
+  trading: ["Trading Journal"],
 };
 
 export function useFocusAreas() {
