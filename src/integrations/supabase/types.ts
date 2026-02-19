@@ -1182,6 +1182,87 @@ export type Database = {
           },
         ]
       }
+      trading_journal_entries: {
+        Row: {
+          ai_feedback: string | null
+          asset_type: string
+          confidence_level: number | null
+          created_at: string
+          emotion_after: string | null
+          emotion_before: string | null
+          entry_price: number
+          exit_price: number | null
+          id: string
+          lesson_learned: string | null
+          mistakes_made: string | null
+          position_size: number
+          profit_loss: number | null
+          screenshot_url: string | null
+          setup_description: string | null
+          strategy_used: string | null
+          symbol: string
+          timeframe: string
+          trade_date: string
+          trade_type: string
+          updated_at: string
+          user_id: string
+          what_went_well: string | null
+          what_went_wrong: string | null
+        }
+        Insert: {
+          ai_feedback?: string | null
+          asset_type: string
+          confidence_level?: number | null
+          created_at?: string
+          emotion_after?: string | null
+          emotion_before?: string | null
+          entry_price: number
+          exit_price?: number | null
+          id?: string
+          lesson_learned?: string | null
+          mistakes_made?: string | null
+          position_size: number
+          profit_loss?: number | null
+          screenshot_url?: string | null
+          setup_description?: string | null
+          strategy_used?: string | null
+          symbol: string
+          timeframe: string
+          trade_date?: string
+          trade_type: string
+          updated_at?: string
+          user_id: string
+          what_went_well?: string | null
+          what_went_wrong?: string | null
+        }
+        Update: {
+          ai_feedback?: string | null
+          asset_type?: string
+          confidence_level?: number | null
+          created_at?: string
+          emotion_after?: string | null
+          emotion_before?: string | null
+          entry_price?: number
+          exit_price?: number | null
+          id?: string
+          lesson_learned?: string | null
+          mistakes_made?: string | null
+          position_size?: number
+          profit_loss?: number | null
+          screenshot_url?: string | null
+          setup_description?: string | null
+          strategy_used?: string | null
+          symbol?: string
+          timeframe?: string
+          trade_date?: string
+          trade_type?: string
+          updated_at?: string
+          user_id?: string
+          what_went_well?: string | null
+          what_went_wrong?: string | null
+        }
+        Relationships: []
+      }
       user_focus_areas: {
         Row: {
           created_at: string
