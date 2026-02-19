@@ -128,6 +128,42 @@ All colors MUST be HSL.
     --sidebar-border: 0 0% 88%;
     --sidebar-ring: 0 0% 15%;
   }
+
+  .aurora {
+    --background: 260 30% 8%;
+    --foreground: 210 40% 98%;
+    --card: 260 25% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 260 25% 10%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 280 80% 70%;
+    --primary-foreground: 260 30% 5%;
+    --secondary: 260 20% 16%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 260 15% 18%;
+    --muted-foreground: 260 10% 60%;
+    --accent: 200 60% 20%;
+    --accent-foreground: 200 40% 80%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 85% 97%;
+    --border: 260 15% 18%;
+    --input: 260 15% 18%;
+    --ring: 280 60% 65%;
+    --chart-1: 280 80% 70%;
+    --chart-2: 200 80% 60%;
+    --chart-3: 340 70% 65%;
+    --chart-4: 160 60% 50%;
+    --chart-5: 40 80% 60%;
+    --sidebar: 260 30% 6%;
+    --sidebar-background: 260 30% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 280 80% 70%;
+    --sidebar-primary-foreground: 260 30% 5%;
+    --sidebar-accent: 260 20% 14%;
+    --sidebar-accent-foreground: 200 40% 80%;
+    --sidebar-border: 260 15% 18%;
+    --sidebar-ring: 280 60% 65%;
+  }
 }
 
 @layer base {
@@ -180,6 +216,16 @@ All colors MUST be HSL.
 
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .aurora-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 80%, hsl(280 80% 40% / 0.4), transparent),
+      radial-gradient(ellipse 60% 50% at 80% 20%, hsl(200 80% 50% / 0.35), transparent),
+      radial-gradient(ellipse 70% 70% at 50% 50%, hsl(340 70% 45% / 0.25), transparent),
+      radial-gradient(ellipse 50% 40% at 70% 70%, hsl(160 60% 40% / 0.2), transparent),
+      linear-gradient(135deg, hsl(260 30% 8%) 0%, hsl(240 25% 6%) 50%, hsl(280 20% 10%) 100%);
+    background-attachment: fixed;
   }
 }
 
