@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.student-ai]
 verify_jwt = false
+
+[functions.code-studio-ai]
+verify_jwt = false
