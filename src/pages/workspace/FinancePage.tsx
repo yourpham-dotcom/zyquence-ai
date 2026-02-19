@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DollarSign, TrendingUp, TrendingDown, PiggyBank, Receipt, Pencil, Plus, X, ChevronDown, ChevronRight } from "lucide-react";
+import FinancialAdvisor from "@/components/workspace/FinancialAdvisor";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -309,6 +310,9 @@ const FinancePage = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Financial Advisor AI */}
+      <FinancialAdvisor budgetData={budget} />
 
       {/* Budget Editor Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
