@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Crown, Bell, Moon, Globe, Shield, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import FocusAreasSettings from "@/components/workspace/FocusAreasSettings";
 
 const SettingsPage = () => {
   const { user, signOut } = useAuth();
@@ -99,6 +100,9 @@ const SettingsPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Focus Areas */}
+      <FocusAreasSettings />
 
       {/* Privacy & Security */}
       <Card>
