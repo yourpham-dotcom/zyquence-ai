@@ -98,6 +98,18 @@ const App = () => (
             <Route path="trading" element={<TradingJournal />} />
           </Route>
 
+          {/* Elite dashboard — same layout, elite guard */}
+          <Route path="/elite" element={<WorkspaceLayout />}>
+            <Route index element={<WorkspaceDashboard />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="finance" element={<FinancePage />} />
+            <Route path="workspace" element={<WorkspacePage />} />
+            <Route path="goals" element={<GoalsPage />} />
+            <Route path="assistant" element={<AssistantPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="trading" element={<TradingJournal />} />
+          </Route>
+
           {/* Legacy dashboards (redirect to new workspace) */}
           <Route path="/pro-dashboard" element={<Navigate to="/dashboard" replace />} />
           <Route path="/free-dashboard" element={<Navigate to="/dashboard" replace />} />
