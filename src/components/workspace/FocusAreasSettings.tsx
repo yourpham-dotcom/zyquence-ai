@@ -1,10 +1,14 @@
 import { useFocusAreas, FOCUS_AREA_OPTIONS } from "@/hooks/useFocusAreas";
+import { useEliteAccess } from "@/hooks/useEliteAccess";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Lock } from "lucide-react";
+
+const FREE_PRO_AREA_IDS = ["athlete", "health", "productivity"];
 
 const FocusAreasSettings = () => {
   const { focusAreas, loading, saving, toggleFocusArea } = useFocusAreas();
+  const { isElite } = useEliteAccess();
 
   if (loading) {
     return (
@@ -30,31 +34,39 @@ const FocusAreasSettings = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {FOCUS_AREA_OPTIONS.map((area) => {
             const selected = focusAreas.includes(area.id);
+            const locked = !isElite && !FREE_PRO_AREA_IDS.includes(area.id);
             return (
               <button
                 key={area.id}
-                onClick={() => toggleFocusArea(area.id)}
-                disabled={saving}
+                onClick={() => !locked && toggleFocusArea(area.id)}
+                disabled={saving || locked}
                 className={cn(
                   "relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-4 text-center transition-all duration-200",
-                  "hover:scale-[1.02] active:scale-[0.98]",
-                  selected
+                  locked
+                    ? "border-border/30 bg-card/50 opacity-50 cursor-not-allowed"
+                    : "hover:scale-[1.02] active:scale-[0.98]",
+                  selected && !locked
                     ? "border-primary bg-primary/10 shadow-sm"
-                    : "border-border/50 bg-card hover:border-primary/30"
+                    : !locked
+                    ? "border-border/50 bg-card hover:border-primary/30"
+                    : ""
                 )}
               >
                 <span className="text-2xl">{area.icon}</span>
                 <span className={cn(
                   "text-xs font-semibold",
-                  selected ? "text-primary" : "text-foreground"
+                  selected && !locked ? "text-primary" : "text-foreground"
                 )}>
                   {area.label}
                 </span>
                 <span className="text-[10px] text-muted-foreground leading-tight">
                   {area.description}
                 </span>
-                {selected && (
+                {selected && !locked && (
                   <div className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-primary" />
+                )}
+                {locked && (
+                  <Lock className="absolute top-1.5 right-1.5 h-3 w-3 text-muted-foreground" />
                 )}
               </button>
             );
