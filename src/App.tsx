@@ -49,6 +49,7 @@ import Missions from "./pages/Missions";
 import Portfolio from "./pages/Portfolio";
 import FreeDashboard from "./pages/FreeDashboard";
 import ProDashboard from "./pages/ProDashboard";
+import EliteDashboard from "./pages/EliteDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
 import MusicIntelligence from "./pages/MusicIntelligence";
 import ConnectLayout from "./pages/community/ConnectLayout";
@@ -128,6 +129,7 @@ const App = () => (
           <Route path="/music-intelligence" element={<MusicIntelligence />} />
           <Route path="/code-studio" element={<CodeStudio />} />
           <Route path="/connect" element={<ConnectLayout />} />
+          <Route path="/elite" element={<EliteDashboard />} />
 
           {/* Student Hub */}
           <Route path="/student-hub" element={<StudentHubLayout />}>
