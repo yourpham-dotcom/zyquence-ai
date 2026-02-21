@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, User, LogOut } from "lucide-react";
+import { Menu, User, LogOut, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -16,6 +16,7 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
   const { isPro } = useSubscription();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     await signOut();
@@ -65,6 +66,10 @@ const Navigation = () => {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive focus:text-destructive">
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign out
@@ -111,6 +116,10 @@ const Navigation = () => {
             {user ? (
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                <Button variant="outline" className="w-full" onClick={() => navigate("/dashboard")}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
                 <Button variant="outline" className="w-full text-destructive" onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign out
