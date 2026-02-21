@@ -148,14 +148,14 @@ export function WorkspaceSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Home">
-                  <NavLink
-                    to="/"
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                <SidebarMenuButton tooltip="Home">
+                  <button
+                    onClick={() => navigate("/")}
+                    className="flex items-center gap-3 w-full"
                   >
                     <Home className="h-4 w-4 shrink-0" />
                     {!collapsed && <span>Home</span>}
-                  </NavLink>
+                  </button>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {mainNav
