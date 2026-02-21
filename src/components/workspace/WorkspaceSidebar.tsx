@@ -147,6 +147,17 @@ export function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Home">
+                  <NavLink
+                    to="/"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  >
+                    <Home className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Home</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               {mainNav
                 .filter((item) => item.alwaysShow || !visibleTools || visibleTools.has(item.title))
                 .map((item) => (
