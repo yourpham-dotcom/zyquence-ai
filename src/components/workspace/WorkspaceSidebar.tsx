@@ -27,6 +27,7 @@ import {
   Disc3,
   BookOpen,
   Code2,
+  Home,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -108,9 +109,14 @@ export function WorkspaceSidebar() {
         <div className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             {!collapsed && (
-              <span className="text-lg font-bold tracking-tight text-sidebar-foreground">
+              <NavLink to="/" className="text-lg font-bold tracking-tight text-sidebar-foreground hover:opacity-80 transition-opacity">
                 Zyquence
-              </span>
+              </NavLink>
+            )}
+            {collapsed && (
+              <NavLink to="/" className="text-sidebar-foreground hover:opacity-80 transition-opacity">
+                <Home className="h-4 w-4" />
+              </NavLink>
             )}
             <SidebarTrigger className="text-sidebar-foreground/60 hover:text-sidebar-foreground" />
           </div>
