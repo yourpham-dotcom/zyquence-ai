@@ -1,15 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   Gamepad2, Brain, Palette, Code, Shield, Home, Car, 
   Music, Utensils, Trophy, Sparkles, BookOpen, Dumbbell,
-  FileCode, Camera, Building, Loader2
+  FileCode, Camera, Building, Loader2, ArrowLeft
 } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
 import ProGate from "@/components/ProGate";
 
 const GamingIntelligence = () => {
+  const navigate = useNavigate();
   const { isPro, loading: subLoading } = useSubscription();
 
   if (subLoading) {
@@ -115,6 +116,15 @@ const GamingIntelligence = () => {
     <div className="h-screen bg-background overflow-y-auto">
       <div className="container mx-auto p-6 space-y-8">
         <div className="space-y-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/dashboard")}
+            className="mb-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Back to Dashboard
+          </Button>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center">
               <Gamepad2 className="w-6 h-6 text-primary-foreground" />
