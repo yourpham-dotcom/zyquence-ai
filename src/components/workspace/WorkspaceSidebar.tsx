@@ -29,7 +29,7 @@ import {
   Code2,
   Home,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useEliteAccess } from "@/hooks/useEliteAccess";
@@ -95,10 +95,12 @@ export function WorkspaceSidebar() {
   const { isElite } = useEliteAccess();
   const { getVisibleTools } = useFocusAreas();
   const navigate = useNavigate();
+  const location = useLocation();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const visibleTools = getVisibleTools();
-  const showAllNav = isElite; // Only elite sees full nav; pro sees limited
+  const isEliteRoute = location.pathname.startsWith("/elite");
+  const showAllNav = isElite && isEliteRoute; // Only show extra nav on /elite route
 
   const handleSignOut = async () => {
     await signOut();
