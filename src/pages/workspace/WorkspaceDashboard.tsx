@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useEliteAccess } from "@/hooks/useEliteAccess";
 import { useFocusAreas } from "@/hooks/useFocusAreas";
 import ZyquenceNewsFeed from "@/components/workspace/ZyquenceNewsFeed";
 import {
@@ -25,6 +26,10 @@ import { cn } from "@/lib/utils";
 const WorkspaceDashboard = () => {
   const { user } = useAuth();
   const { isPro } = useSubscription();
+  const { isElite } = useEliteAccess();
+  const location = useLocation();
+  const isEliteRoute = location.pathname.startsWith("/elite");
+  const displayTier = isEliteRoute && isElite ? "elite" : isPro ? "pro" : "free";
   const { getVisibleTools, loading: focusLoading } = useFocusAreas();
   const visibleTools = getVisibleTools();
 
@@ -52,9 +57,16 @@ const WorkspaceDashboard = () => {
       {/* Welcome */}
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          {isPro && <Crown className="h-4 w-4 text-yellow-500" />}
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {isPro ? "Pro Plan" : "Free Plan"}
+          {displayTier === "elite" ? (
+            <Crown className="h-4 w-4 text-amber-400" />
+          ) : isPro ? (
+            <Crown className="h-4 w-4 text-yellow-500" />
+          ) : null}
+          <span className={cn(
+            "text-xs font-semibold uppercase tracking-wider",
+            displayTier === "elite" ? "text-amber-400" : "text-muted-foreground"
+          )}>
+            {displayTier === "elite" ? "Elite Plan" : isPro ? "Pro Plan" : "Free Plan"}
           </span>
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -64,7 +76,7 @@ const WorkspaceDashboard = () => {
       </div>
 
       {/* Personalized News Feed */}
-      <ZyquenceNewsFeed isPro={isPro} />
+      <ZyquenceNewsFeed isPro={isPro || displayTier === "elite"} />
 
       {/* Quick Cards */}
       {quickCards.length > 0 && (
@@ -114,7 +126,7 @@ const WorkspaceDashboard = () => {
           <h2 className="text-base font-semibold text-foreground mb-3">Pro Modules</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {proModules.map((mod) => (
-              <Link key={mod.title} to={isPro ? mod.path : "/pricing"}>
+              <Link key={mod.title} to={(isPro || displayTier === "elite") ? mod.path : "/pricing"}>
                 <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 overflow-hidden h-full">
                   <CardContent className="p-5 flex items-start gap-4">
                     <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${mod.color} flex items-center justify-center shrink-0`}>
@@ -124,7 +136,7 @@ const WorkspaceDashboard = () => {
                       <h3 className="font-semibold text-foreground text-sm">{mod.title}</h3>
                       <p className="text-xs text-muted-foreground mt-0.5">{mod.description}</p>
                     </div>
-                    {isPro ? (
+                    {(isPro || displayTier === "elite") ? (
                       <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
                     ) : (
                       <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
@@ -134,7 +146,7 @@ const WorkspaceDashboard = () => {
               </Link>
             ))}
           </div>
-          {!isPro && (
+          {!isPro && displayTier !== "elite" && (
             <div className="mt-4 text-center">
               <Button asChild size="sm" className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white">
                 <Link to="/pricing">
