@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   LayoutDashboard,
   Sparkles,
+  Wand2,
   CalendarDays,
   FolderKanban,
   DollarSign,
@@ -58,6 +59,7 @@ const mainNav = [
   { title: "Workspace", path: "/dashboard/workspace", icon: FolderKanban, alwaysShow: true },
   { title: "Finance", path: "/dashboard/finance", icon: DollarSign, alwaysShow: false },
   { title: "Goals", path: "/dashboard/goals", icon: Target, alwaysShow: false },
+  { title: "Creator Productivity", path: "/dashboard/creator-productivity", icon: Wand2, alwaysShow: false },
 ];
 
 const tradingNav = [
