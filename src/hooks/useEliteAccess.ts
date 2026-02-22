@@ -1,6 +1,6 @@
 import { useAuth } from "./useAuth";
 
-const ELITE_EMAILS = ["yourpham@gmail.com"];
+const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com"];
 
 export const useEliteAccess = () => {
   const { user, loading } = useAuth();
