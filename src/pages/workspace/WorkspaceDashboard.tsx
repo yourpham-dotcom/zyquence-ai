@@ -11,6 +11,7 @@ import {
   DollarSign,
   Target,
   Sparkles,
+  Wand2,
   Palette,
   Globe,
   Database,
@@ -43,6 +44,7 @@ const WorkspaceDashboard = () => {
   const tools = [
     { icon: Palette, title: "Studio", description: "Music, photo, video, code & creative tools", path: "/studio", color: "from-orange-500 to-red-500" },
     { icon: Globe, title: "Zyquence Atlas", description: "Lifestyle planning & city planner", path: "/studio", color: "from-emerald-500 to-teal-500" },
+    { icon: Wand2, title: "Creator Productivity", description: "AI productivity coach for creators", path: "/dashboard/creator-productivity", color: "from-violet-500 to-fuchsia-500" },
   ].filter((t) => !visibleTools || visibleTools.has(t.title));
 
   const proModules = [
