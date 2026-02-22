@@ -40,7 +40,7 @@ export const FOCUS_AREA_TOOL_MAP: Record<FocusAreaId, string[]> = {
   lifestyle: ["Zyquence Atlas", "Calendar"],
   education: ["Data Intelligence", "AI Suggestions", "Gaming Engine"],
   trading: ["Trading Journal"],
-  "creator-productivity": ["Studio", "Goals", "AI Suggestions", "Calendar"],
+  "creator-productivity": ["Studio", "Goals", "AI Suggestions", "Calendar", "Creator Productivity"],
 };
 
 export function useFocusAreas() {
