@@ -243,8 +243,9 @@ export function WorkflowMap({ nodes, edges, onNodeUpdate, onNodeDelete, onNodeAd
       >
         <svg
           ref={svgRef}
-          className="w-full h-full"
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: "0 0" }}
+          width="100%"
+          height="100%"
+          style={{ overflow: "visible", transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: "0 0" }}
         >
           <defs>
             <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
