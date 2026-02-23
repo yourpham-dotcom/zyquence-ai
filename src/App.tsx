@@ -147,7 +147,7 @@ const App = () => (
           <Route path="/music-intelligence" element={<MusicIntelligence />} />
           <Route path="/code-studio" element={<CodeStudio />} />
           <Route path="/connect" element={<ConnectLayout />} />
-          <Route path="/elite" element={<EliteDashboard />} />
+          {/* EliteDashboard removed — /elite now uses WorkspaceLayout above */}
 
           {/* Student Hub */}
           <Route path="/student-hub" element={<StudentHubLayout />}>
