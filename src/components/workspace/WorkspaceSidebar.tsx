@@ -29,6 +29,7 @@ import {
   BookOpen,
   Code2,
   Home,
+  Workflow,
 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +65,10 @@ const mainNav = [
 
 const tradingNav = [
   { title: "Trading Journal", path: "/dashboard/trading", icon: LineChart },
+];
+
+const opsNav = [
+  { title: "Workflow Engine", path: "/dashboard/ops", icon: Workflow },
 ];
 
 const toolsNav = [
@@ -194,6 +199,36 @@ export function WorkspaceSidebar() {
 
         {showAllNav && (
           <>
+            <Separator className="mx-4 bg-sidebar-border" />
+
+            {/* Workflow Engine (Zyquence Ops) */}
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {opsNav.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild tooltip={item.title}>
+                        <NavLink
+                          to={item.path}
+                          className={({ isActive }) =>
+                            cn(
+                              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                              isActive
+                                ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                                : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                            )
+                          }
+                        >
+                          <item.icon className="h-4 w-4 shrink-0" />
+                          {!collapsed && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
             <Separator className="mx-4 bg-sidebar-border" />
 
             {/* Trading */}
