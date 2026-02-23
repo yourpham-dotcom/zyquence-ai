@@ -200,11 +200,10 @@ export function WorkspaceSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {showAllNav && (
+        {/* Workflow Engine - visible for Pro and Elite */}
+        {(isPro || showAllNav) && (
           <>
             <Separator className="mx-4 bg-sidebar-border" />
-
-            {/* Workflow Engine (Zyquence Ops) */}
             <SidebarGroup>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -231,7 +230,11 @@ export function WorkspaceSidebar() {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+          </>
+        )}
 
+        {showAllNav && (
+          <>
             <Separator className="mx-4 bg-sidebar-border" />
 
             {/* Trading */}
