@@ -12,9 +12,10 @@ import { toast } from "@/hooks/use-toast";
 import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, Trash2, BarChart3,
-  Milestone, ListTodo, Pencil, X, Save
+  Milestone, ListTodo, Pencil, X, Save, Map, Send, Sparkles
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
+import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
 
 type OpsProject = {
   id: string;
@@ -64,7 +65,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project";
+type View = "dashboard" | "create" | "project" | "roadmap";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -95,6 +96,11 @@ export default function ZyquenceOps() {
   const [notes, setNotes] = useState("");
   const [generating, setGenerating] = useState(false);
   const [editingTask, setEditingTask] = useState<EditingTask | null>(null);
+
+  // Roadmap AI adjust state
+  const [adjustInput, setAdjustInput] = useState("");
+  const [adjusting, setAdjusting] = useState(false);
+
   useEffect(() => {
     if (user) fetchAll();
   }, [user]);
@@ -200,7 +206,6 @@ export default function ZyquenceOps() {
   const updateTaskStatus = async (taskId: string, status: string) => {
     await supabase.from("ops_tasks").update({ status }).eq("id", taskId);
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t));
-    // Recalc project progress
     if (selectedProject) {
       const projectTasks = tasks.filter(t => t.project_id === selectedProject.id);
       const done = projectTasks.filter(t => t.id === taskId ? status === "complete" : t.status === "complete").length;
@@ -221,6 +226,7 @@ export default function ZyquenceOps() {
   };
 
   const openProject = (p: OpsProject) => { setSelectedProject(p); setView("project"); };
+  const openRoadmap = (p: OpsProject) => { setSelectedProject(p); setView("roadmap"); };
 
   const startEditTask = (task: OpsTask) => {
     setEditingTask({
@@ -271,6 +277,81 @@ export default function ZyquenceOps() {
     setTasks(prev => [...prev, newTask]);
     startEditTask(newTask);
   };
+
+  // AI Smart Adjust
+  const handleAdjustRoadmap = async () => {
+    if (!adjustInput.trim() || !selectedProject) return;
+    setAdjusting(true);
+    try {
+      const projectTasks = tasks.filter(t => t.project_id === selectedProject.id).map(t => ({
+        id: t.id, title: t.title, deadline: t.deadline, status: t.status, phase: t.phase, assigned_to: t.assigned_to,
+      }));
+      const projectMilestones = milestones.filter(m => m.project_id === selectedProject.id).map(m => ({
+        id: m.id, title: m.title, target_date: m.target_date, is_completed: m.is_completed,
+      }));
+
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/ops-adjust-roadmap`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_KEY}` },
+        body: JSON.stringify({
+          adjustment: adjustInput,
+          tasks: projectTasks,
+          milestones: projectMilestones,
+          projectGoal: selectedProject.goal,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Adjustment failed");
+      }
+
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+
+      // Apply task adjustments
+      if (result.adjustedTasks?.length) {
+        for (const adj of result.adjustedTasks) {
+          if (adj.id && adj.new_deadline) {
+            const newDeadline = new Date(adj.new_deadline).toISOString();
+            await supabase.from("ops_tasks").update({ deadline: newDeadline }).eq("id", adj.id);
+            setTasks(prev => prev.map(t => t.id === adj.id ? { ...t, deadline: newDeadline } : t));
+          }
+        }
+      }
+
+      // Apply milestone adjustments
+      if (result.adjustedMilestones?.length) {
+        for (const adj of result.adjustedMilestones) {
+          if (adj.id && adj.new_target_date) {
+            const newDate = new Date(adj.new_target_date).toISOString();
+            await supabase.from("ops_milestones").update({ target_date: newDate }).eq("id", adj.id);
+            setMilestones(prev => prev.map(m => m.id === adj.id ? { ...m, target_date: newDate } : m));
+          }
+        }
+      }
+
+      toast({
+        title: "Roadmap adjusted",
+        description: result.summary || `${result.adjustedTasks?.length || 0} tasks updated.`,
+      });
+
+      if (result.warnings?.length) {
+        toast({
+          title: "⚠️ Timeline warnings",
+          description: result.warnings.join("; "),
+          variant: "destructive",
+        });
+      }
+
+      setAdjustInput("");
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setAdjusting(false);
+    }
+  };
+
   // Dashboard stats
   const activeProjects = projects.filter(p => p.status === "active");
   const allTasks = tasks;
@@ -369,7 +450,10 @@ export default function ZyquenceOps() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 ml-4">
+                      <div className="flex items-center gap-2 ml-4">
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); openRoadmap(p); }}>
+                          <Map className="h-3 w-3 mr-1" /> Roadmap
+                        </Button>
                         <div className="text-right">
                           <span className="text-sm font-medium">{pProgress}%</span>
                           <Progress value={pProgress} className="w-20 h-1.5 mt-1" />
@@ -395,39 +479,215 @@ export default function ZyquenceOps() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div>
           <Button variant="ghost" size="sm" onClick={() => setView("dashboard")} className="mb-2 -ml-2 text-muted-foreground">← Back</Button>
-          <h1 className="text-2xl font-bold tracking-tight">AI Project Generator</h1>
-          <p className="text-sm text-muted-foreground">Describe your goal and AI will generate a structured project plan.</p>
+          <h1 className="text-2xl font-bold tracking-tight">AI Roadmap Engine</h1>
+          <p className="text-sm text-muted-foreground">Describe your goal and AI will generate a structured execution roadmap.</p>
         </div>
 
         <Card>
           <CardContent className="p-6 space-y-4">
             <div>
+              <label className="text-sm font-medium mb-1.5 block">Project / Goal Description</label>
+              <Textarea value={goal} onChange={e => setGoal(e.target.value)} placeholder="e.g. Launch a sports card drop in 30 days, Release an EP in 2 months..." rows={4} />
+            </div>
+            <div>
               <label className="text-sm font-medium mb-1.5 block">Project Title</label>
               <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Q1 Product Launch" />
             </div>
-            <div>
-              <label className="text-sm font-medium mb-1.5 block">Goal Description</label>
-              <Textarea value={goal} onChange={e => setGoal(e.target.value)} placeholder="Describe what you want to achieve..." rows={4} />
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium mb-1.5 block">Deadline (optional)</label>
+                <label className="text-sm font-medium mb-1.5 block">Target Deadline (optional)</label>
                 <Input type="date" value={deadline} onChange={e => setDeadline(e.target.value)} />
               </div>
               <div>
-                <label className="text-sm font-medium mb-1.5 block">Team Members</label>
+                <label className="text-sm font-medium mb-1.5 block">Team Members (optional)</label>
                 <Input value={teamInput} onChange={e => setTeamInput(e.target.value)} placeholder="Alice, Bob, Charlie" />
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Notes / Constraints</label>
+              <label className="text-sm font-medium mb-1.5 block">Notes / Constraints (optional)</label>
               <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Any constraints, budget limits, preferences..." rows={2} />
             </div>
             <Button onClick={handleGenerate} disabled={generating} className="w-full">
-              {generating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating plan...</> : <><Zap className="h-4 w-4 mr-2" /> Generate Project Plan</>}
+              {generating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating Roadmap...</> : <><Sparkles className="h-4 w-4 mr-2" /> Generate Roadmap</>}
             </Button>
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  // ─── ROADMAP VIEW ───
+  if (view === "roadmap" && selectedProject) {
+    const projectTasks = tasks.filter(t => t.project_id === selectedProject.id);
+    const projectMilestones = milestones.filter(m => m.project_id === selectedProject.id);
+    const pDone = projectTasks.filter(t => t.status === "complete").length;
+    const pProgress = projectTasks.length ? Math.round((pDone / projectTasks.length) * 100) : 0;
+
+    // Roadmap insights
+    const delayedPhases = [...new Set(
+      projectTasks
+        .filter(t => t.deadline && isPast(new Date(t.deadline)) && t.status !== "complete")
+        .map(t => t.phase)
+        .filter(Boolean)
+    )];
+    const upcomingMilestones = projectMilestones.filter(m => m.target_date && !m.is_completed);
+
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => setView("project")} className="mb-2 -ml-2 text-muted-foreground">← Back to Project</Button>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <Map className="h-5 w-5 text-primary" />
+                <h1 className="text-2xl font-bold tracking-tight">{selectedProject.title} — Roadmap</h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-0.5">{selectedProject.goal}</p>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-bold">{pProgress}%</span>
+              <Progress value={pProgress} className="w-32 h-2 mt-1" />
+            </div>
+          </div>
+        </div>
+
+        {/* Insights row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <Card className="border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Target className="h-4 w-4 text-amber-500" />
+                <span className="text-xs font-medium text-muted-foreground">Upcoming Milestones</span>
+              </div>
+              {upcomingMilestones.length > 0 ? (
+                <div className="space-y-1">
+                  {upcomingMilestones.slice(0, 3).map(m => (
+                    <p key={m.id} className="text-xs">
+                      {m.title} <span className="text-muted-foreground">· {m.target_date ? format(new Date(m.target_date), "MMM d") : ""}</span>
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">All milestones complete ✓</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="h-4 w-4 text-destructive" />
+                <span className="text-xs font-medium text-muted-foreground">Delayed Phases</span>
+              </div>
+              {delayedPhases.length > 0 ? (
+                <div className="space-y-1">
+                  {delayedPhases.map(p => <p key={p} className="text-xs text-destructive">{p}</p>)}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground">No delays detected ✓</p>
+              )}
+            </CardContent>
+          </Card>
+          <Card className="border-border/50">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <ListTodo className="h-4 w-4 text-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Next Priorities</span>
+              </div>
+              {(() => {
+                const next = projectTasks
+                  .filter(t => t.status !== "complete" && t.deadline)
+                  .sort((a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime())
+                  .slice(0, 3);
+                return next.length > 0 ? (
+                  <div className="space-y-1">
+                    {next.map(t => (
+                      <p key={t.id} className="text-xs truncate">
+                        {t.title} <span className="text-muted-foreground">· {format(new Date(t.deadline!), "MMM d")}</span>
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">All tasks complete ✓</p>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Timeline */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Map className="h-4 w-4" /> Execution Timeline
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4 overflow-x-auto">
+            <div className="min-w-[600px]">
+              <RoadmapTimeline
+                tasks={projectTasks}
+                milestones={projectMilestones}
+                projectDeadline={selectedProject.deadline}
+                projectStart={selectedProject.created_at}
+                onTaskClick={(task) => {
+                  const opsTask = tasks.find(t => t.id === task.id);
+                  if (opsTask) startEditTask(opsTask);
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Smart Adjust */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" /> AI Smart Adjust
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <p className="text-xs text-muted-foreground mb-3">
+              Describe a change and AI will recalculate your timeline, shifting dependencies automatically.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={adjustInput}
+                onChange={e => setAdjustInput(e.target.value)}
+                placeholder='e.g. "Marketing is delayed by 3 days" or "Add a QA phase before launch"'
+                className="flex-1"
+                onKeyDown={e => e.key === "Enter" && handleAdjustRoadmap()}
+              />
+              <Button onClick={handleAdjustRoadmap} disabled={adjusting || !adjustInput.trim()} size="sm">
+                {adjusting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Editing task overlay */}
+        {editingTask && (
+          <Card>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm">Edit Task</CardTitle>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setEditingTask(null)}><X className="h-3.5 w-3.5" /></Button>
+              </div>
+            </CardHeader>
+            <CardContent className="pb-4 space-y-2">
+              <Input value={editingTask.title} onChange={e => setEditingTask({ ...editingTask, title: e.target.value })} placeholder="Title" className="h-8 text-sm" />
+              <Input value={editingTask.description} onChange={e => setEditingTask({ ...editingTask, description: e.target.value })} placeholder="Description" className="h-8 text-xs" />
+              <div className="grid grid-cols-3 gap-2">
+                <Input value={editingTask.assigned_to} onChange={e => setEditingTask({ ...editingTask, assigned_to: e.target.value })} placeholder="Assigned to" className="h-8 text-xs" />
+                <select value={editingTask.priority} onChange={e => setEditingTask({ ...editingTask, priority: e.target.value })} className="h-8 rounded-md border border-input bg-background px-2 text-xs">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                <Input type="date" value={editingTask.deadline} onChange={e => setEditingTask({ ...editingTask, deadline: e.target.value })} className="h-8 text-xs" />
+              </div>
+              <Button size="sm" onClick={saveEditTask}><Save className="h-3.5 w-3.5 mr-1" /> Save</Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }
@@ -459,6 +719,9 @@ export default function ZyquenceOps() {
               <p className="text-sm text-muted-foreground">{selectedProject.goal}</p>
             </div>
             <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={() => setView("roadmap")}>
+                <Map className="h-4 w-4 mr-1.5" /> View Roadmap
+              </Button>
               <div className="text-right">
                 <span className="text-lg font-bold">{selectedProject.progress}%</span>
                 <Progress value={selectedProject.progress} className="w-32 h-2 mt-1" />

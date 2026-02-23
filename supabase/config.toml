@@ -50,3 +50,6 @@ verify_jwt = false
 
 [functions.creator-productivity]
 verify_jwt = false
+
+[functions.ops-adjust-roadmap]
+verify_jwt = false
