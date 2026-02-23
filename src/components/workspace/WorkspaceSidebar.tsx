@@ -77,7 +77,7 @@ const toolsNav = [
   { title: "Code Studio", path: "/code-studio", icon: Code2 },
   { title: "Music Intelligence", path: "/music-intelligence", icon: Disc3 },
   { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music },
-  { title: "Zyquence Atlas", path: "/studio", icon: Globe },
+  { title: "Atlas", path: "/studio", icon: Globe },
   { title: "Journal", path: "/gaming-intelligence/journal", icon: BookOpen },
 ];
 
