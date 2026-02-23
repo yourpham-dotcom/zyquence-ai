@@ -24,6 +24,7 @@ import AssistantPage from "./pages/workspace/AssistantPage";
 import SettingsPage from "./pages/workspace/SettingsPage";
 import TradingJournal from "./pages/workspace/TradingJournal";
 import CreatorProductivity from "./pages/workspace/CreatorProductivity";
+import ZyquenceOps from "./pages/workspace/ZyquenceOps";
 
 // Existing pages
 import Studio from "./pages/Studio";
@@ -98,6 +99,7 @@ const App = () => (
             <Route path="settings" element={<SettingsPage />} />
             <Route path="trading" element={<TradingJournal />} />
             <Route path="creator-productivity" element={<CreatorProductivity />} />
+            <Route path="ops" element={<ZyquenceOps />} />
           </Route>
 
           {/* Elite dashboard — same layout, elite guard */}
@@ -111,6 +113,7 @@ const App = () => (
             <Route path="settings" element={<SettingsPage />} />
             <Route path="trading" element={<TradingJournal />} />
             <Route path="creator-productivity" element={<CreatorProductivity />} />
+            <Route path="ops" element={<ZyquenceOps />} />
           </Route>
 
           {/* Legacy dashboards (redirect to new workspace) */}

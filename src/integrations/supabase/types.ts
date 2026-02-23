@@ -1143,6 +1143,151 @@ export type Database = {
           },
         ]
       }
+      ops_milestones: {
+        Row: {
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          project_id: string
+          target_date: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          project_id: string
+          target_date?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          project_id?: string
+          target_date?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_milestones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ops_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ops_projects: {
+        Row: {
+          created_at: string
+          deadline: string | null
+          goal: string
+          id: string
+          notes: string | null
+          phases: Json | null
+          progress: number | null
+          status: string
+          team_members: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deadline?: string | null
+          goal: string
+          id?: string
+          notes?: string | null
+          phases?: Json | null
+          progress?: number | null
+          status?: string
+          team_members?: Json | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deadline?: string | null
+          goal?: string
+          id?: string
+          notes?: string | null
+          phases?: Json | null
+          progress?: number | null
+          status?: string
+          team_members?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ops_tasks: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          deadline: string | null
+          dependencies: Json | null
+          description: string | null
+          id: string
+          notes: string | null
+          phase: string | null
+          priority: string
+          project_id: string
+          sort_order: number | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          deadline?: string | null
+          dependencies?: Json | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          phase?: string | null
+          priority?: string
+          project_id: string
+          sort_order?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          deadline?: string | null
+          dependencies?: Json | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          phase?: string | null
+          priority?: string
+          project_id?: string
+          sort_order?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ops_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ops_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_comments: {
         Row: {
           content: string

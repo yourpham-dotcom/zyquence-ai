@@ -44,3 +44,9 @@ verify_jwt = false
 
 [functions.code-studio-ai]
 verify_jwt = false
+
+[functions.ops-generate-project]
+verify_jwt = false
+
+[functions.creator-productivity]
+verify_jwt = false
