@@ -12,7 +12,8 @@ import { toast } from "@/hooks/use-toast";
 import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, Trash2, BarChart3,
-  Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch
+  Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
+  BookOpen, Package, MessageSquare
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
@@ -471,6 +472,19 @@ export default function ZyquenceOps() {
             </CardContent>
           </Card>
         )}
+
+        {/* Quick access buttons */}
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <BookOpen className="h-4 w-4" /> Journal
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Package className="h-4 w-4" /> Inventory Management
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <MessageSquare className="h-4 w-4" /> Chat
+          </Button>
+        </div>
 
         {/* Projects list */}
         <div className="space-y-3">
