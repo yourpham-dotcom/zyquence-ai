@@ -70,8 +70,6 @@ const tradingNav = [
 
 const opsNav = [
   { title: "Workflow Engine", path: "/dashboard/ops", icon: Workflow },
-  { title: "Roadmaps", path: "/dashboard/ops", icon: MapIcon },
-  { title: "Workflow Maps", path: "/dashboard/ops", icon: Share2 },
 ];
 
 const toolsNav = [
