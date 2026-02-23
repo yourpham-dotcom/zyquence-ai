@@ -205,6 +205,49 @@ export default function ZyquenceOps() {
       }));
       if (milestoneInserts.length) await supabase.from("ops_milestones").insert(milestoneInserts);
 
+      // Auto-generate workflow map for the new project
+      try {
+        const wfRes = await fetch(`${SUPABASE_URL}/functions/v1/ops-generate-workflow`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_KEY}` },
+          body: JSON.stringify({ goal, notes: notes || null, teamMembers }),
+        });
+        if (wfRes.ok) {
+          const wfData = await wfRes.json();
+          if (wfData.nodes?.length) {
+            const nodeIdMap = new Map<string, string>();
+            for (let i = 0; i < wfData.nodes.length; i++) {
+              const n = wfData.nodes[i];
+              const { data: inserted } = await supabase.from("workflow_nodes").insert({
+                project_id: project.id,
+                user_id: user!.id,
+                label: n.label,
+                description: n.description || null,
+                owner: n.owner || null,
+                node_type: n.node_type || "step",
+                status: n.status || "pending",
+                sort_order: i,
+                position_x: 0,
+                position_y: 0,
+              }).select().single();
+              if (inserted) nodeIdMap.set(n.id, inserted.id);
+            }
+            const edgeInserts = (wfData.edges || [])
+              .filter((e: any) => nodeIdMap.has(e.from) && nodeIdMap.has(e.to))
+              .map((e: any) => ({
+                project_id: project.id,
+                user_id: user!.id,
+                source_node_id: nodeIdMap.get(e.from),
+                target_node_id: nodeIdMap.get(e.to),
+                label: e.label || null,
+              }));
+            if (edgeInserts.length) await supabase.from("workflow_edges").insert(edgeInserts);
+          }
+        }
+      } catch (wfErr) {
+        console.error("Workflow auto-generation failed:", wfErr);
+      }
+
       toast({ title: "Project generated!", description: `${taskInserts.length} tasks created across ${plan.phases?.length || 0} phases.` });
       setTitle(""); setGoal(""); setDeadline(""); setTeamInput(""); setNotes("");
       await fetchAll();
