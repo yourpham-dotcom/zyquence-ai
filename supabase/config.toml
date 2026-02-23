@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.ops-adjust-roadmap]
 verify_jwt = false
+
+[functions.ops-generate-workflow]
+verify_jwt = false

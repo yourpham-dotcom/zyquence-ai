@@ -12,10 +12,11 @@ import { toast } from "@/hooks/use-toast";
 import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, Trash2, BarChart3,
-  Milestone, ListTodo, Pencil, X, Save, Map, Send, Sparkles
+  Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
+import { WorkflowMap, type WorkflowNode, type WorkflowEdge } from "@/components/ops/WorkflowMap";
 
 type OpsProject = {
   id: string;
@@ -65,7 +66,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -85,6 +86,8 @@ export default function ZyquenceOps() {
   const [projects, setProjects] = useState<OpsProject[]>([]);
   const [tasks, setTasks] = useState<OpsTask[]>([]);
   const [milestones, setMilestones] = useState<OpsMilestone[]>([]);
+  const [workflowNodes, setWorkflowNodes] = useState<WorkflowNode[]>([]);
+  const [workflowEdges, setWorkflowEdges] = useState<WorkflowEdge[]>([]);
   const [selectedProject, setSelectedProject] = useState<OpsProject | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -97,6 +100,12 @@ export default function ZyquenceOps() {
   const [generating, setGenerating] = useState(false);
   const [editingTask, setEditingTask] = useState<EditingTask | null>(null);
 
+  // Workflow create state
+  const [wfGoal, setWfGoal] = useState("");
+  const [wfNotes, setWfNotes] = useState("");
+  const [wfTeam, setWfTeam] = useState("");
+  const [wfGenerating, setWfGenerating] = useState(false);
+
   // Roadmap AI adjust state
   const [adjustInput, setAdjustInput] = useState("");
   const [adjusting, setAdjusting] = useState(false);
@@ -107,14 +116,18 @@ export default function ZyquenceOps() {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [pRes, tRes, mRes] = await Promise.all([
+    const [pRes, tRes, mRes, wnRes, weRes] = await Promise.all([
       supabase.from("ops_projects").select("*").order("created_at", { ascending: false }),
       supabase.from("ops_tasks").select("*").order("sort_order"),
       supabase.from("ops_milestones").select("*").order("target_date"),
+      supabase.from("workflow_nodes").select("*").order("sort_order"),
+      supabase.from("workflow_edges").select("*"),
     ]);
     if (pRes.data) setProjects(pRes.data as unknown as OpsProject[]);
     if (tRes.data) setTasks(tRes.data as unknown as OpsTask[]);
     if (mRes.data) setMilestones(mRes.data as unknown as OpsMilestone[]);
+    if (wnRes.data) setWorkflowNodes(wnRes.data as unknown as WorkflowNode[]);
+    if (weRes.data) setWorkflowEdges(weRes.data as unknown as WorkflowEdge[]);
     setLoading(false);
   };
 
@@ -227,6 +240,7 @@ export default function ZyquenceOps() {
 
   const openProject = (p: OpsProject) => { setSelectedProject(p); setView("project"); };
   const openRoadmap = (p: OpsProject) => { setSelectedProject(p); setView("roadmap"); };
+  const openWorkflow = (p: OpsProject) => { setSelectedProject(p); setView("workflow"); };
 
   const startEditTask = (task: OpsTask) => {
     setEditingTask({
@@ -452,7 +466,10 @@ export default function ZyquenceOps() {
                       </div>
                       <div className="flex items-center gap-2 ml-4">
                         <Button variant="outline" size="sm" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); openRoadmap(p); }}>
-                          <Map className="h-3 w-3 mr-1" /> Roadmap
+                          <MapIcon className="h-3 w-3 mr-1" /> Roadmap
+                        </Button>
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); openWorkflow(p); }}>
+                          <GitBranch className="h-3 w-3 mr-1" /> Workflow
                         </Button>
                         <div className="text-right">
                           <span className="text-sm font-medium">{pProgress}%</span>
@@ -539,7 +556,7 @@ export default function ZyquenceOps() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <Map className="h-5 w-5 text-primary" />
+                <MapIcon className="h-5 w-5 text-primary" />
                 <h1 className="text-2xl font-bold tracking-tight">{selectedProject.title} — Roadmap</h1>
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">{selectedProject.goal}</p>
@@ -618,7 +635,7 @@ export default function ZyquenceOps() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Map className="h-4 w-4" /> Execution Timeline
+              <MapIcon className="h-4 w-4" /> Execution Timeline
             </CardTitle>
           </CardHeader>
           <CardContent className="pb-4 overflow-x-auto">
@@ -720,7 +737,10 @@ export default function ZyquenceOps() {
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" size="sm" onClick={() => setView("roadmap")}>
-                <Map className="h-4 w-4 mr-1.5" /> View Roadmap
+                <MapIcon className="h-4 w-4 mr-1.5" /> Roadmap
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setView("workflow")}>
+                <GitBranch className="h-4 w-4 mr-1.5" /> Workflow Map
               </Button>
               <div className="text-right">
                 <span className="text-lg font-bold">{selectedProject.progress}%</span>
@@ -850,6 +870,221 @@ export default function ZyquenceOps() {
             </Card>
           )}
         </div>
+      </div>
+    );
+  }
+
+  // ─── WORKFLOW GENERATION HANDLER ───
+  const handleGenerateWorkflow = async () => {
+    if (!wfGoal.trim() || !selectedProject) {
+      toast({ title: "Missing fields", description: "Goal description is required.", variant: "destructive" });
+      return;
+    }
+    setWfGenerating(true);
+    try {
+      const teamMembers = wfTeam.split(",").map(s => s.trim()).filter(Boolean);
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/ops-generate-workflow`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${SUPABASE_KEY}` },
+        body: JSON.stringify({ goal: wfGoal, notes: wfNotes || null, teamMembers }),
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error || "Generation failed"); }
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+
+      // Save nodes
+      const nodeIdMap = new Map();
+      for (let i = 0; i < (result.nodes || []).length; i++) {
+        const n = result.nodes[i];
+        const { data, error } = await supabase.from("workflow_nodes").insert({
+          project_id: selectedProject.id,
+          user_id: user!.id,
+          label: n.label,
+          description: n.description || null,
+          owner: n.owner || null,
+          status: n.status || "pending",
+          node_type: n.node_type || "step",
+          position_x: 0,
+          position_y: 0,
+          sort_order: i,
+        }).select().single();
+        if (data) nodeIdMap.set(n.id, data.id);
+      }
+
+      // Save edges
+      for (const e of result.edges || []) {
+        const sourceId = nodeIdMap.get(e.from);
+        const targetId = nodeIdMap.get(e.to);
+        if (sourceId && targetId) {
+          await supabase.from("workflow_edges").insert({
+            project_id: selectedProject.id,
+            user_id: user!.id,
+            source_node_id: sourceId,
+            target_node_id: targetId,
+            label: e.label || null,
+          });
+        }
+      }
+
+      toast({ title: "Workflow Map generated!", description: `${result.nodes?.length || 0} steps created.` });
+      setWfGoal(""); setWfNotes(""); setWfTeam("");
+      await fetchAll();
+      setView("workflow");
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally {
+      setWfGenerating(false);
+    }
+  };
+
+  // Workflow node handlers
+  const handleNodeUpdate = async (node: WorkflowNode) => {
+    await supabase.from("workflow_nodes").update({
+      label: node.label, description: node.description, owner: node.owner, status: node.status,
+    }).eq("id", node.id);
+    setWorkflowNodes(prev => prev.map(n => n.id === node.id ? { ...n, ...node } : n));
+    toast({ title: "Node updated" });
+  };
+
+  const handleNodeDelete = async (nodeId: string) => {
+    await supabase.from("workflow_nodes").delete().eq("id", nodeId);
+    setWorkflowNodes(prev => prev.filter(n => n.id !== nodeId));
+    setWorkflowEdges(prev => prev.filter(e => e.source_node_id !== nodeId && e.target_node_id !== nodeId));
+    toast({ title: "Node deleted" });
+  };
+
+  const handleNodeAdd = async () => {
+    if (!selectedProject) return;
+    const maxOrder = workflowNodes.filter(n => n.project_id === selectedProject.id).reduce((m, n) => Math.max(m, n.sort_order), 0);
+    const { data } = await supabase.from("workflow_nodes").insert({
+      project_id: selectedProject.id,
+      user_id: user!.id,
+      label: "New Step",
+      status: "pending",
+      node_type: "step",
+      position_x: 300,
+      position_y: 200,
+      sort_order: maxOrder + 1,
+    }).select().single();
+    if (data) setWorkflowNodes(prev => [...prev, data as unknown as WorkflowNode]);
+  };
+
+  const handleNodePositionUpdate = (nodeId: string, x: number, y: number) => {
+    setWorkflowNodes(prev => prev.map(n => n.id === nodeId ? { ...n, position_x: x, position_y: y } : n));
+    // Debounced save (just update local for now, save on next interaction)
+    supabase.from("workflow_nodes").update({ position_x: x, position_y: y }).eq("id", nodeId).then(() => {});
+  };
+
+  // ─── CREATE WORKFLOW VIEW ───
+  if (view === "create-workflow" && selectedProject) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => setView("project")} className="mb-2 -ml-2 text-muted-foreground">← Back</Button>
+          <div className="flex items-center gap-2">
+            <GitBranch className="h-5 w-5 text-primary" />
+            <h1 className="text-2xl font-bold tracking-tight">Generate Workflow Map</h1>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">Describe the process and AI will generate an interactive workflow diagram.</p>
+        </div>
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Process / Goal Description</label>
+              <Textarea value={wfGoal} onChange={e => setWfGoal(e.target.value)} placeholder="e.g. Launch a marketing campaign from ideation to analytics review..." rows={4} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Team Members (optional)</label>
+                <Input value={wfTeam} onChange={e => setWfTeam(e.target.value)} placeholder="Alice, Bob, Charlie" />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Notes / Constraints (optional)</label>
+                <Input value={wfNotes} onChange={e => setWfNotes(e.target.value)} placeholder="Budget limits, timeline..." />
+              </div>
+            </div>
+            <Button onClick={handleGenerateWorkflow} disabled={wfGenerating} className="w-full">
+              {wfGenerating ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating Workflow...</> : <><Sparkles className="h-4 w-4 mr-2" /> Generate Workflow Map</>}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ─── WORKFLOW VIEW ───
+  if (view === "workflow" && selectedProject) {
+    const projectNodes = workflowNodes.filter(n => n.project_id === selectedProject.id);
+    const projectEdges = workflowEdges.filter(e => e.project_id === selectedProject.id);
+
+    // Stats
+    const completedSteps = projectNodes.filter(n => n.status === "complete").length;
+    const blockedSteps = projectNodes.filter(n => n.status === "blocked").length;
+    const inProgressSteps = projectNodes.filter(n => n.status === "in_progress").length;
+
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => setView("project")} className="mb-2 -ml-2 text-muted-foreground">← Back to Project</Button>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <GitBranch className="h-5 w-5 text-primary" />
+                <h1 className="text-2xl font-bold tracking-tight">{selectedProject.title} — Workflow Map</h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-0.5">{selectedProject.goal}</p>
+            </div>
+            <Button size="sm" onClick={() => setView("create-workflow")}>
+              <Sparkles className="h-4 w-4 mr-1.5" /> Generate New
+            </Button>
+          </div>
+        </div>
+
+        {/* Workflow insights */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: "Total Steps", value: projectNodes.length, icon: GitBranch, color: "text-foreground" },
+            { label: "In Progress", value: inProgressSteps, icon: Clock, color: "text-blue-500" },
+            { label: "Completed", value: completedSteps, icon: CheckCircle2, color: "text-green-500" },
+            { label: "Blocked", value: blockedSteps, icon: AlertTriangle, color: "text-destructive" },
+          ].map(s => (
+            <Card key={s.label} className="border-border/50">
+              <CardContent className="p-3">
+                <div className="flex items-center gap-2">
+                  <s.icon className={`h-3.5 w-3.5 ${s.color}`} />
+                  <span className="text-xs text-muted-foreground">{s.label}</span>
+                </div>
+                <p className="text-xl font-bold mt-0.5">{s.value}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Workflow diagram */}
+        {projectNodes.length > 0 ? (
+          <Card>
+            <CardContent className="p-4">
+              <WorkflowMap
+                nodes={projectNodes}
+                edges={projectEdges}
+                onNodeUpdate={handleNodeUpdate}
+                onNodeDelete={handleNodeDelete}
+                onNodeAdd={handleNodeAdd}
+                onNodePositionUpdate={handleNodePositionUpdate}
+              />
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-dashed">
+            <CardContent className="p-8 text-center">
+              <GitBranch className="h-8 w-8 mx-auto text-muted-foreground/40 mb-2" />
+              <p className="text-sm text-muted-foreground mb-3">No workflow map yet for this project.</p>
+              <Button size="sm" onClick={() => setView("create-workflow")}>
+                <Sparkles className="h-4 w-4 mr-1.5" /> Generate Workflow Map
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }

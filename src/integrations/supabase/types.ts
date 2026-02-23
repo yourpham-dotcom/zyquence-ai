@@ -1846,6 +1846,111 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_edges: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          project_id: string
+          source_node_id: string
+          target_node_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          project_id: string
+          source_node_id: string
+          target_node_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          project_id?: string
+          source_node_id?: string
+          target_node_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_edges_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ops_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_edges_source_node_id_fkey"
+            columns: ["source_node_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_edges_target_node_id_fkey"
+            columns: ["target_node_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflow_nodes: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          label: string
+          node_type: string
+          owner: string | null
+          position_x: number
+          position_y: number
+          project_id: string
+          sort_order: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          label: string
+          node_type?: string
+          owner?: string | null
+          position_x?: number
+          position_y?: number
+          project_id: string
+          sort_order?: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          label?: string
+          node_type?: string
+          owner?: string | null
+          position_x?: number
+          position_y?: number
+          project_id?: string
+          sort_order?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_nodes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ops_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
