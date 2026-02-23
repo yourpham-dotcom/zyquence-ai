@@ -1060,6 +1060,57 @@ export type Database = {
           },
         ]
       }
+      inventory_items: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          location: string | null
+          min_stock: number | null
+          name: string
+          notes: string | null
+          quantity: number
+          sku: string | null
+          status: string
+          unit: string | null
+          unit_price: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          min_stock?: number | null
+          name: string
+          notes?: string | null
+          quantity?: number
+          sku?: string | null
+          status?: string
+          unit?: string | null
+          unit_price?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          min_stock?: number | null
+          name?: string
+          notes?: string | null
+          quantity?: number
+          sku?: string | null
+          status?: string
+          unit?: string | null
+          unit_price?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       music_projects: {
         Row: {
           bpm: number | null

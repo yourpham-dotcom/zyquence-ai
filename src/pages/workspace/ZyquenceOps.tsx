@@ -18,6 +18,7 @@ import {
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
 import { WorkflowMap, type WorkflowNode, type WorkflowEdge } from "@/components/ops/WorkflowMap";
+import InventoryManagement from "@/components/ops/InventoryManagement";
 
 type OpsProject = {
   id: string;
@@ -67,7 +68,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -478,7 +479,7 @@ export default function ZyquenceOps() {
           <Button variant="outline" size="sm" className="gap-1.5">
             <BookOpen className="h-4 w-4" /> Journal
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("inventory")}>
             <Package className="h-4 w-4" /> Inventory Management
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5">
@@ -1144,6 +1145,11 @@ export default function ZyquenceOps() {
         )}
       </div>
     );
+  }
+
+  // ─── INVENTORY VIEW ───
+  if (view === "inventory") {
+    return <InventoryManagement onBack={() => setView("dashboard")} />;
   }
 
   return null;
