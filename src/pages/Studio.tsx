@@ -109,7 +109,7 @@ const Studio = () => {
     { id: "cybersec" as ToolType, icon: Shield, label: "Sports Cybersecurity" },
     { id: "financial" as ToolType, icon: DollarSign, label: "Financial Literacy" },
     { id: "branding" as ToolType, icon: Star, label: "Image Engineer" },
-    { id: "atlas" as ToolType, icon: Compass, label: "Zyquence Atlas" },
+    
   ];
 
   const creativeTools = [
