@@ -254,6 +254,23 @@ export default function ZyquenceOps() {
     setEditingTask(null);
     toast({ title: "Task updated" });
   };
+
+  const addBlankTask = async (projectId: string, phase?: string) => {
+    const maxOrder = tasks.filter(t => t.project_id === projectId).reduce((m, t) => Math.max(m, t.sort_order), 0);
+    const { data, error } = await supabase.from("ops_tasks").insert({
+      project_id: projectId,
+      user_id: user!.id,
+      title: "New Task",
+      status: "not_started",
+      priority: "medium",
+      phase: phase || null,
+      sort_order: maxOrder + 1,
+    }).select().single();
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    const newTask = data as unknown as OpsTask;
+    setTasks(prev => [...prev, newTask]);
+    startEditTask(newTask);
+  };
   // Dashboard stats
   const activeProjects = projects.filter(p => p.status === "active");
   const allTasks = tasks;
@@ -441,9 +458,14 @@ export default function ZyquenceOps() {
               <h1 className="text-2xl font-bold tracking-tight">{selectedProject.title}</h1>
               <p className="text-sm text-muted-foreground">{selectedProject.goal}</p>
             </div>
-            <div className="text-right">
-              <span className="text-lg font-bold">{selectedProject.progress}%</span>
-              <Progress value={selectedProject.progress} className="w-32 h-2 mt-1" />
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <span className="text-lg font-bold">{selectedProject.progress}%</span>
+                <Progress value={selectedProject.progress} className="w-32 h-2 mt-1" />
+              </div>
+              <Button size="sm" onClick={() => addBlankTask(selectedProject.id, phases[0] || undefined)}>
+                <Plus className="h-4 w-4 mr-1.5" /> Add Task
+              </Button>
             </div>
           </div>
         </div>
