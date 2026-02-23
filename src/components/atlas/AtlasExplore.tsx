@@ -100,6 +100,7 @@ const AtlasExplore = ({ mode }: AtlasExploreProps) => {
           <AtlasMap
             center={[34.0522, -118.2437]}
             places={getFilteredPlaces().map(p => ({ name: p.name, type: p.type, lat: p.lat, lng: p.lng }))}
+            searchQuery={searchQuery}
           />
         </Suspense>
       )}

@@ -10,13 +10,15 @@ interface Place {
 interface AtlasMapProps {
   center: [number, number];
   places?: Place[];
+  searchQuery?: string;
 }
 
-const AtlasMap = ({ center, places = [] }: AtlasMapProps) => {
+const AtlasMap = ({ center, places = [], searchQuery }: AtlasMapProps) => {
   const [lat, lng] = center;
-  
-  const markers = places.map(p => `markers=color:red%7Clabel:${p.name.charAt(0)}%7C${p.lat},${p.lng}`).join("&");
-  const src = `https://www.google.com/maps/embed/v1/view?key=${GOOGLE_MAPS_API_KEY}&center=${lat},${lng}&zoom=14${places.length > 0 ? "" : ""}`;
+
+  const src = searchQuery?.trim()
+    ? `https://www.google.com/maps/embed/v1/search?key=${GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(searchQuery)}&center=${lat},${lng}&zoom=14`
+    : `https://www.google.com/maps/embed/v1/view?key=${GOOGLE_MAPS_API_KEY}&center=${lat},${lng}&zoom=14`;
 
   return (
     <div className="w-full h-[300px] rounded border border-border overflow-hidden">
