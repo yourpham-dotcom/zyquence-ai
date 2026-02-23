@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, Trash2, BarChart3,
-  Milestone, ListTodo
+  Milestone, ListTodo, Pencil, X, Save
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 
@@ -69,6 +69,15 @@ type View = "dashboard" | "create" | "project";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+type EditingTask = {
+  id: string;
+  title: string;
+  description: string;
+  assigned_to: string;
+  priority: string;
+  deadline: string;
+};
+
 export default function ZyquenceOps() {
   const { user } = useAuth();
   const [view, setView] = useState<View>("dashboard");
@@ -85,7 +94,7 @@ export default function ZyquenceOps() {
   const [teamInput, setTeamInput] = useState("");
   const [notes, setNotes] = useState("");
   const [generating, setGenerating] = useState(false);
-
+  const [editingTask, setEditingTask] = useState<EditingTask | null>(null);
   useEffect(() => {
     if (user) fetchAll();
   }, [user]);
@@ -213,6 +222,38 @@ export default function ZyquenceOps() {
 
   const openProject = (p: OpsProject) => { setSelectedProject(p); setView("project"); };
 
+  const startEditTask = (task: OpsTask) => {
+    setEditingTask({
+      id: task.id,
+      title: task.title,
+      description: task.description || "",
+      assigned_to: task.assigned_to || "",
+      priority: task.priority || "medium",
+      deadline: task.deadline ? task.deadline.split("T")[0] : "",
+    });
+  };
+
+  const saveEditTask = async () => {
+    if (!editingTask) return;
+    const deadlineVal = editingTask.deadline ? new Date(editingTask.deadline).toISOString() : null;
+    await supabase.from("ops_tasks").update({
+      title: editingTask.title,
+      description: editingTask.description || null,
+      assigned_to: editingTask.assigned_to || null,
+      priority: editingTask.priority,
+      deadline: deadlineVal,
+    }).eq("id", editingTask.id);
+    setTasks(prev => prev.map(t => t.id === editingTask.id ? {
+      ...t,
+      title: editingTask.title,
+      description: editingTask.description || null,
+      assigned_to: editingTask.assigned_to || null,
+      priority: editingTask.priority,
+      deadline: deadlineVal,
+    } : t));
+    setEditingTask(null);
+    toast({ title: "Task updated" });
+  };
   // Dashboard stats
   const activeProjects = projects.filter(p => p.status === "active");
   const allTasks = tasks;
@@ -439,42 +480,67 @@ export default function ZyquenceOps() {
                 <CardContent className="pb-3">
                   <div className="space-y-2">
                     {phaseTasks.map(task => (
-                      <div key={task.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border/50 hover:border-border transition-colors">
-                        <button
-                          onClick={() => {
-                            const next = task.status === "not_started" ? "in_progress" : task.status === "in_progress" ? "complete" : "not_started";
-                            updateTaskStatus(task.id, next);
-                          }}
-                          className="shrink-0"
-                        >
-                          {task.status === "complete" ? (
-                            <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          ) : task.status === "in_progress" ? (
-                            <Clock className="h-4 w-4 text-blue-500" />
-                          ) : (
-                            <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
-                          )}
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium ${task.status === "complete" ? "line-through text-muted-foreground" : ""}`}>{task.title}</p>
-                          {task.description && <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>}
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          {task.assigned_to && (
-                            <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded flex items-center gap-1">
-                              <Users className="h-2.5 w-2.5" />{task.assigned_to}
-                            </span>
-                          )}
-                          {task.priority && <span className={`text-[10px] font-medium uppercase ${priorityColors[task.priority] || ""}`}>{task.priority}</span>}
-                          {task.deadline && (
-                            <span className={`text-[10px] ${isPast(new Date(task.deadline)) && task.status !== "complete" ? "text-destructive" : "text-muted-foreground"}`}>
-                              {format(new Date(task.deadline), "MMM d")}
-                            </span>
-                          )}
-                          <Badge variant="outline" className={`text-[10px] px-1.5 ${statusColors[task.status] || ""}`}>
-                            {task.status.replace("_", " ")}
-                          </Badge>
-                        </div>
+                      <div key={task.id} className="rounded-lg border border-border/50 hover:border-border transition-colors">
+                        {editingTask?.id === task.id ? (
+                          <div className="p-3 space-y-2">
+                            <div className="flex items-center gap-2">
+                              <Input value={editingTask.title} onChange={e => setEditingTask({ ...editingTask, title: e.target.value })} placeholder="Title" className="h-8 text-sm" />
+                              <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={saveEditTask}><Save className="h-3.5 w-3.5" /></Button>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => setEditingTask(null)}><X className="h-3.5 w-3.5" /></Button>
+                            </div>
+                            <Input value={editingTask.description} onChange={e => setEditingTask({ ...editingTask, description: e.target.value })} placeholder="Description" className="h-8 text-xs" />
+                            <div className="grid grid-cols-3 gap-2">
+                              <Input value={editingTask.assigned_to} onChange={e => setEditingTask({ ...editingTask, assigned_to: e.target.value })} placeholder="Assigned to" className="h-8 text-xs" />
+                              <select value={editingTask.priority} onChange={e => setEditingTask({ ...editingTask, priority: e.target.value })} className="h-8 rounded-md border border-input bg-background px-2 text-xs">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                              </select>
+                              <Input type="date" value={editingTask.deadline} onChange={e => setEditingTask({ ...editingTask, deadline: e.target.value })} className="h-8 text-xs" />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-3 p-2.5">
+                            <button
+                              onClick={() => {
+                                const next = task.status === "not_started" ? "in_progress" : task.status === "in_progress" ? "complete" : "not_started";
+                                updateTaskStatus(task.id, next);
+                              }}
+                              className="shrink-0"
+                            >
+                              {task.status === "complete" ? (
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              ) : task.status === "in_progress" ? (
+                                <Clock className="h-4 w-4 text-blue-500" />
+                              ) : (
+                                <div className="h-4 w-4 rounded-full border-2 border-muted-foreground/30" />
+                              )}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-sm font-medium ${task.status === "complete" ? "line-through text-muted-foreground" : ""}`}>{task.title}</p>
+                              {task.description && <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {task.assigned_to && (
+                                <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded flex items-center gap-1">
+                                  <Users className="h-2.5 w-2.5" />{task.assigned_to}
+                                </span>
+                              )}
+                              {task.priority && <span className={`text-[10px] font-medium uppercase ${priorityColors[task.priority] || ""}`}>{task.priority}</span>}
+                              {task.deadline && (
+                                <span className={`text-[10px] ${isPast(new Date(task.deadline)) && task.status !== "complete" ? "text-destructive" : "text-muted-foreground"}`}>
+                                  {format(new Date(task.deadline), "MMM d")}
+                                </span>
+                              )}
+                              <Badge variant="outline" className={`text-[10px] px-1.5 ${statusColors[task.status] || ""}`}>
+                                {task.status.replace("_", " ")}
+                              </Badge>
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => startEditTask(task)}>
+                                <Pencil className="h-3 w-3 text-muted-foreground" />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
