@@ -30,7 +30,7 @@ const WorkspaceDashboard = () => {
   const { isElite } = useEliteAccess();
   const location = useLocation();
   const isEliteRoute = location.pathname.startsWith("/elite");
-  const displayTier = isEliteRoute && isElite ? "elite" : isPro ? "pro" : "free";
+  const displayTier = isElite ? "elite" : isPro ? "pro" : "free";
   const { getVisibleTools, loading: focusLoading } = useFocusAreas();
   const visibleTools = getVisibleTools();
 

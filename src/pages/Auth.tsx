@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com"];
 const PRO_PRODUCT_ID = "prod_Twj36mQhOR4juQ";
 
 const Auth = () => {
@@ -29,15 +30,21 @@ const Auth = () => {
     if (!user) return;
 
     const redirectUser = async () => {
+      // Elite users always go to /elite
+      if (ELITE_EMAILS.includes(user.email ?? "")) {
+        navigate("/elite", { replace: true });
+        return;
+      }
+
       try {
         const { data } = await supabase.functions.invoke("check-subscription");
         if (data?.subscribed && data?.product_id === PRO_PRODUCT_ID) {
-          navigate("/pro-dashboard", { replace: true });
+          navigate("/dashboard", { replace: true });
         } else {
-          navigate("/free-dashboard", { replace: true });
+          navigate("/dashboard", { replace: true });
         }
       } catch {
-        navigate("/free-dashboard", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
     };
 
