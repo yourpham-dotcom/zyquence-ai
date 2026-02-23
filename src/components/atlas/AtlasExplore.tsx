@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Search, MapPin, Filter, MapIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,14 @@ interface AtlasExploreProps {
 const AtlasExplore = ({ mode }: AtlasExploreProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("food");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
   const [showMap, setShowMap] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 600);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const categories = [
     { id: "food", label: "Food" },
@@ -100,7 +106,7 @@ const AtlasExplore = ({ mode }: AtlasExploreProps) => {
           <AtlasMap
             center={[34.0522, -118.2437]}
             places={getFilteredPlaces().map(p => ({ name: p.name, type: p.type, lat: p.lat, lng: p.lng }))}
-            searchQuery={searchQuery}
+            searchQuery={debouncedSearch}
           />
         </Suspense>
       )}
