@@ -13,8 +13,11 @@ import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, ChevronLeft, Trash2, BarChart3,
   Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
-  BookOpen, Package, MessageSquare, DollarSign, Globe, Building2, PartyPopper
+  BookOpen, Package, MessageSquare, DollarSign, Globe, Building2, PartyPopper, LayoutGrid
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
 import { WorkflowMap, type WorkflowNode, type WorkflowEdge } from "@/components/ops/WorkflowMap";
@@ -480,30 +483,37 @@ export default function ZyquenceOps() {
           </Card>
         )}
 
-        {/* Quick access buttons */}
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <BookOpen className="h-4 w-4" /> Journal
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("inventory")}>
-            <Package className="h-4 w-4" /> Inventory Management
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("sync")}>
-            <Users className="h-4 w-4" /> Sync
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("vault")}>
-            <DollarSign className="h-4 w-4" /> Vault
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("atlas")}>
-            <Globe className="h-4 w-4" /> Atlas
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("orgos")}>
-            <Building2 className="h-4 w-4" /> OrgOS
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("lifeos")}>
-            <PartyPopper className="h-4 w-4" /> LifeOS
-          </Button>
-        </div>
+        {/* Quick access dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <LayoutGrid className="h-4 w-4" /> Modules <ChevronDown className="h-3 w-3 ml-1" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-52">
+            <DropdownMenuItem onClick={() => {}} className="gap-2">
+              <BookOpen className="h-4 w-4" /> Journal
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setView("inventory")} className="gap-2">
+              <Package className="h-4 w-4" /> Inventory Management
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setView("sync")} className="gap-2">
+              <Users className="h-4 w-4" /> Sync
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setView("vault")} className="gap-2">
+              <DollarSign className="h-4 w-4" /> Vault
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setView("atlas")} className="gap-2">
+              <Globe className="h-4 w-4" /> Atlas
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setView("orgos")} className="gap-2">
+              <Building2 className="h-4 w-4" /> OrgOS
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setView("lifeos")} className="gap-2">
+              <PartyPopper className="h-4 w-4" /> LifeOS
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Projects list */}
         <div className="space-y-3">
