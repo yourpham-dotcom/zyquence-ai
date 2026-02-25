@@ -11,9 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
-  Clock, Users, Zap, ChevronDown, ChevronRight, Trash2, BarChart3,
+  Clock, Users, Zap, ChevronDown, ChevronRight, ChevronLeft, Trash2, BarChart3,
   Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
-  BookOpen, Package, MessageSquare, DollarSign
+  BookOpen, Package, MessageSquare, DollarSign, Globe
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
@@ -21,6 +21,7 @@ import { WorkflowMap, type WorkflowNode, type WorkflowEdge } from "@/components/
 import InventoryManagement from "@/components/ops/InventoryManagement";
 import Vault from "@/components/ops/Vault";
 import Sync from "@/components/ops/Sync";
+import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
 
 type OpsProject = {
   id: string;
@@ -70,7 +71,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync" | "atlas";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -489,6 +490,9 @@ export default function ZyquenceOps() {
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("vault")}>
             <DollarSign className="h-4 w-4" /> Vault
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("atlas")}>
+            <Globe className="h-4 w-4" /> Atlas
           </Button>
         </div>
 
@@ -1165,6 +1169,18 @@ export default function ZyquenceOps() {
   // ─── SYNC VIEW ───
   if (view === "sync") {
     return <Sync onBack={() => setView("dashboard")} />;
+  }
+
+  // ─── ATLAS VIEW ───
+  if (view === "atlas") {
+    return (
+      <div className="max-w-6xl mx-auto space-y-4">
+        <Button variant="ghost" size="sm" onClick={() => setView("dashboard")} className="gap-1.5 text-muted-foreground">
+          <ChevronLeft className="h-4 w-4" /> Back to Ops
+        </Button>
+        <ZyquenceAtlas />
+      </div>
+    );
   }
 
   return null;
