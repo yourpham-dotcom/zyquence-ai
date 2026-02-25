@@ -200,7 +200,7 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" /> Org Scanner
@@ -210,7 +210,7 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-2">
+        <ScrollArea className="flex-1 min-h-0 max-h-[60vh] pr-2">
           {step === "upload" && (
             <div className="space-y-4">
               <div
@@ -249,7 +249,7 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
           )}
 
           {step === "confirm" && (
-            <div className="space-y-4">
+            <div className="space-y-4 pb-2">
               {lowConfidence && (
                 <Card className="border-amber-500/30 bg-amber-500/5">
                   <CardContent className="p-3 flex items-center gap-2">
@@ -299,14 +299,6 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
                   </CardContent>
                 </Card>
               ))}
-
-              <div className="flex gap-2">
-                <Button variant="outline" className="flex-1" onClick={reset}>Cancel</Button>
-                <Button className="flex-1" onClick={saveMembers} disabled={saving || members.every(m => !m.name.trim())}>
-                  {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
-                  Add to Organization
-                </Button>
-              </div>
             </div>
           )}
 
@@ -320,6 +312,16 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
             </div>
           )}
         </ScrollArea>
+
+        {step === "confirm" && (
+          <div className="flex gap-2 pt-3 border-t border-border shrink-0">
+            <Button variant="outline" className="flex-1" onClick={reset}>Cancel</Button>
+            <Button className="flex-1" onClick={saveMembers} disabled={saving || members.every(m => !m.name.trim())}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Check className="h-4 w-4 mr-1" />}
+              Save to Team & Org Chart
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
