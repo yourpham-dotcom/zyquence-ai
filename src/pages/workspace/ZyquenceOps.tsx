@@ -13,7 +13,7 @@ import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, ChevronLeft, Trash2, BarChart3,
   Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
-  BookOpen, Package, MessageSquare, DollarSign, Globe, Mic
+  BookOpen, Package, MessageSquare, DollarSign, Globe
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
@@ -494,9 +494,6 @@ export default function ZyquenceOps() {
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("atlas")}>
             <Globe className="h-4 w-4" /> Atlas
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("pulse")}>
-            <Mic className="h-4 w-4" /> Pulse
           </Button>
         </div>
 
@@ -1172,7 +1169,7 @@ export default function ZyquenceOps() {
 
   // ─── SYNC VIEW ───
   if (view === "sync") {
-    return <Sync onBack={() => setView("dashboard")} />;
+    return <Sync onBack={() => setView("dashboard")} onOpenPulse={() => setView("pulse")} />;
   }
 
   // ─── ATLAS VIEW ───
