@@ -158,3 +158,77 @@ export function CoastalBackground() {
   if (reduced) return null;
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" aria-hidden="true" />;
 }
+
+// ─── Snowfall Canvas Animation ───
+export function SnowfallBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number>(0);
+  const reduced = useReducedMotion();
+
+  useEffect(() => {
+    if (reduced) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let w = 0, h = 0;
+    const resize = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; };
+    resize();
+    window.addEventListener("resize", resize);
+
+    let paused = false;
+    const onVis = () => { paused = document.hidden; };
+    document.addEventListener("visibilitychange", onVis);
+
+    const getCount = () => (w < 768 ? 40 : w < 1200 ? 70 : 110);
+    type Flake = { x: number; y: number; r: number; s: number; o: number; wx: number };
+    let flakes: Flake[] = [];
+
+    const init = () => {
+      flakes = Array.from({ length: getCount() }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 1 + Math.random() * 3,
+        s: 0.3 + Math.random() * 0.8,
+        o: 0.15 + Math.random() * 0.35,
+        wx: (Math.random() - 0.5) * 0.4,
+      }));
+    };
+    init();
+
+    let time = 0;
+
+    const draw = () => {
+      if (paused) { animRef.current = requestAnimationFrame(draw); return; }
+      ctx.clearRect(0, 0, w, h);
+      time += 0.008;
+
+      for (const f of flakes) {
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        // Soft white with subtle glow
+        ctx.shadowColor = `rgba(200, 220, 255, ${f.o * 0.4})`;
+        ctx.shadowBlur = f.r * 2;
+        ctx.fillStyle = `rgba(230, 240, 255, ${f.o})`;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        f.y += f.s;
+        f.x += f.wx + Math.sin(time + f.y * 0.01) * 0.15;
+
+        if (f.y > h + 10) { f.y = -10; f.x = Math.random() * w; }
+        if (f.x < -10) f.x = w + 10;
+        if (f.x > w + 10) f.x = -10;
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => { cancelAnimationFrame(animRef.current); window.removeEventListener("resize", resize); document.removeEventListener("visibilitychange", onVis); };
+  }, [reduced]);
+
+  if (reduced) return null;
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" aria-hidden="true" />;
+}
