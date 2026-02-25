@@ -56,3 +56,9 @@ verify_jwt = false
 
 [functions.ops-generate-workflow]
 verify_jwt = false
+
+[functions.vault-generate-plan]
+verify_jwt = false
+
+[functions.sync-detect-task]
+verify_jwt = false

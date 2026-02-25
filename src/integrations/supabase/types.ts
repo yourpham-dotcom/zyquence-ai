@@ -1819,6 +1819,114 @@ export type Database = {
         }
         Relationships: []
       }
+      sync_chat_members: {
+        Row: {
+          chat_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_chat_members_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "sync_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sync_chats: {
+        Row: {
+          chat_type: string
+          created_at: string
+          id: string
+          project_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chat_type?: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chat_type?: string
+          created_at?: string
+          id?: string
+          project_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_chats_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ops_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sync_messages: {
+        Row: {
+          chat_id: string
+          content: string
+          created_at: string
+          id: string
+          message_type: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          content: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "sync_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trading_journal_entries: {
         Row: {
           ai_feedback: string | null
