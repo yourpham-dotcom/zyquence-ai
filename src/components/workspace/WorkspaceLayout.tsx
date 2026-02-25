@@ -1,16 +1,30 @@
+import { useState, useEffect } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import { WorkspaceSearchBar } from "./WorkspaceSearchBar";
 import { AIAssistantFAB } from "./AIAssistantFAB";
 import { BottomBar } from "./BottomBar";
 import { StocksSidebar } from "./StocksSidebar";
+import { RainfallBackground } from "./ThemeBackgrounds";
 import { Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
 
 const WorkspaceLayout = () => {
+  const [theme, setTheme] = useState("");
+
+  useEffect(() => {
+    const check = () => setTheme(localStorage.getItem("zyquence-theme") || "dark");
+    check();
+    window.addEventListener("storage", check);
+    // Poll for theme changes from same tab
+    const interval = setInterval(check, 500);
+    return () => { window.removeEventListener("storage", check); clearInterval(interval); };
+  }, []);
+
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
+      {theme === "rainfall" && <RainfallBackground />}
+      <div className="min-h-screen flex w-full relative z-10">
         <WorkspaceSidebar />
         <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
           <div className="flex items-center md:hidden px-4 pt-3 pb-1">
