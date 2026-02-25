@@ -164,6 +164,42 @@ All colors MUST be HSL.
     --sidebar-border: 260 15% 18%;
     --sidebar-ring: 280 60% 65%;
   }
+
+  .rainfall {
+    --background: 215 30% 6%;
+    --foreground: 210 30% 92%;
+    --card: 215 25% 10%;
+    --card-foreground: 210 30% 92%;
+    --popover: 215 25% 8%;
+    --popover-foreground: 210 30% 92%;
+    --primary: 210 60% 65%;
+    --primary-foreground: 215 30% 5%;
+    --secondary: 215 20% 14%;
+    --secondary-foreground: 210 30% 92%;
+    --muted: 215 15% 16%;
+    --muted-foreground: 215 10% 55%;
+    --accent: 210 40% 18%;
+    --accent-foreground: 210 30% 80%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 85% 97%;
+    --border: 215 15% 16%;
+    --input: 215 15% 16%;
+    --ring: 210 50% 60%;
+    --chart-1: 210 60% 65%;
+    --chart-2: 200 50% 55%;
+    --chart-3: 220 50% 60%;
+    --chart-4: 190 45% 50%;
+    --chart-5: 230 40% 60%;
+    --sidebar: 215 30% 5%;
+    --sidebar-background: 215 30% 5%;
+    --sidebar-foreground: 210 30% 92%;
+    --sidebar-primary: 210 60% 65%;
+    --sidebar-primary-foreground: 215 30% 5%;
+    --sidebar-accent: 215 20% 12%;
+    --sidebar-accent-foreground: 210 30% 80%;
+    --sidebar-border: 215 15% 16%;
+    --sidebar-ring: 210 50% 60%;
+  }
 }
 
 @layer base {
@@ -195,6 +231,10 @@ All colors MUST be HSL.
 
   .aurora .text-gradient {
     @apply from-[hsl(280_80%_70%)] to-[hsl(200_80%_60%)];
+  }
+
+  .rainfall .text-gradient {
+    @apply from-[hsl(210_60%_75%)] to-[hsl(220_40%_55%)];
   }
 
   .glow-text {
@@ -237,6 +277,11 @@ All colors MUST be HSL.
       radial-gradient(ellipse 70% 70% at 50% 50%, hsl(340 70% 45% / 0.25), transparent),
       radial-gradient(ellipse 50% 40% at 70% 70%, hsl(160 60% 40% / 0.2), transparent),
       linear-gradient(135deg, hsl(260 30% 8%) 0%, hsl(240 25% 6%) 50%, hsl(280 20% 10%) 100%);
+    background-attachment: fixed;
+  }
+
+  .rainfall-bg {
+    background: linear-gradient(180deg, hsl(215 30% 6%) 0%, hsl(220 25% 10%) 50%, hsl(210 20% 8%) 100%);
     background-attachment: fixed;
   }
 }
