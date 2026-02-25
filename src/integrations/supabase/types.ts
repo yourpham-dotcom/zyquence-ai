@@ -258,6 +258,51 @@ export type Database = {
         }
         Relationships: []
       }
+      client_assignments: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          responsibilities: string | null
+          role: string
+          staff_id: string
+          user_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          responsibilities?: string | null
+          role?: string
+          staff_id: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          responsibilities?: string | null
+          role?: string
+          staff_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_assignments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_assignments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       code_files: {
         Row: {
           content: string | null
@@ -1998,9 +2043,12 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           department: string | null
+          entity_type: string
+          goals: string | null
           id: string
           manager_id: string | null
           name: string
+          notes: string | null
           responsibilities: string | null
           tier_level: string
           title: string
@@ -2011,9 +2059,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           department?: string | null
+          entity_type?: string
+          goals?: string | null
           id?: string
           manager_id?: string | null
           name: string
+          notes?: string | null
           responsibilities?: string | null
           tier_level?: string
           title?: string
@@ -2024,9 +2075,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           department?: string | null
+          entity_type?: string
+          goals?: string | null
           id?: string
           manager_id?: string | null
           name?: string
+          notes?: string | null
           responsibilities?: string | null
           tier_level?: string
           title?: string

@@ -19,6 +19,7 @@ type DetectedMember = {
   department: string;
   manager_name: string | null;
   confidence: number;
+  entity_type: string;
 };
 
 const TIER_MAP: Record<string, string> = {
@@ -35,6 +36,13 @@ function classifyTier(title: string): string {
   if (/\b(vp|vice president|director|head of)\b/i.test(lower)) return "leadership";
   if (/\b(manager|lead|supervisor)\b/i.test(lower)) return "manager";
   if (/\b(contractor|freelancer)\b/i.test(lower)) return "contractor";
+  return "employee";
+}
+
+function classifyEntityType(title: string): string {
+  const lower = title.toLowerCase();
+  if (/\b(player|athlete|prospect|nba|nfl|mlb)\b/.test(lower)) return "athlete";
+  if (/\b(client|customer|account)\b/.test(lower)) return "client";
   return "employee";
 }
 
@@ -99,11 +107,12 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
         department: m.department || "General",
         manager_name: m.manager_name || null,
         confidence: m.confidence || 0,
+        entity_type: m.entity_type || classifyEntityType(m.title || ""),
       }));
 
       if (detected.length === 0) {
         setLowConfidence(true);
-        setMembers([{ name: "", title: "", department: "", manager_name: null, confidence: 0 }]);
+        setMembers([{ name: "", title: "", department: "", manager_name: null, confidence: 0, entity_type: "employee" }]);
       } else {
         setLowConfidence(detected.some(m => m.confidence < 0.5));
         setMembers(detected);
@@ -146,6 +155,7 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
         title: m.title || "Employee",
         department: m.department || "General",
         tier_level: classifyTier(m.title || "Employee"),
+        entity_type: m.entity_type || "employee",
       }));
 
       const insertRes = await fetch(`${supabaseUrl}/rest/v1/team_members`, {
@@ -286,9 +296,20 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
                         <label className="text-[10px] text-muted-foreground mb-1 block">Department</label>
                         <Input className="h-8 text-xs" value={m.department} onChange={e => updateMember(idx, "department", e.target.value)} placeholder="Department" />
                       </div>
-                      <div className="col-span-2">
+                      <div>
                         <label className="text-[10px] text-muted-foreground mb-1 block">Reports To</label>
                         <Input className="h-8 text-xs" value={m.manager_name || ""} onChange={e => updateMember(idx, "manager_name", e.target.value || null)} placeholder="Manager name (optional)" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-muted-foreground mb-1 block">Type</label>
+                        <select className="w-full h-8 text-xs rounded-md border border-input bg-background px-2" value={m.entity_type} onChange={e => updateMember(idx, "entity_type", e.target.value)}>
+                          <option value="employee">Employee</option>
+                          <option value="leadership">Leadership</option>
+                          <option value="contractor">Contractor</option>
+                          <option value="client">Client</option>
+                          <option value="athlete">Athlete</option>
+                          <option value="customer">Customer</option>
+                        </select>
                       </div>
                     </div>
                     {members.length > 1 && (

@@ -6,27 +6,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const TIER_MAP: Record<string, string> = {
-  ceo: "c_suite", coo: "c_suite", cfo: "c_suite", cto: "c_suite",
-  cmo: "c_suite", cro: "c_suite", cio: "c_suite", cpo: "c_suite",
-  "chief executive officer": "c_suite", "chief operating officer": "c_suite",
-  "chief financial officer": "c_suite", "chief technology officer": "c_suite",
-  "chief marketing officer": "c_suite", "chief revenue officer": "c_suite",
-  vp: "leadership", "vice president": "leadership", director: "leadership",
-  "head of": "leadership", "senior director": "leadership",
-  manager: "manager", lead: "manager", supervisor: "manager",
-  "team lead": "manager", contractor: "contractor", freelancer: "contractor",
-  intern: "employee", associate: "employee", analyst: "employee",
-  engineer: "employee", designer: "employee", specialist: "employee",
-};
-
 function classifyTier(title: string): string {
   const lower = title.toLowerCase();
-  // Check C-Suite first (starts with "C" pattern or exact matches)
   if (/^c[a-z]o$/i.test(lower) || /^chief\s/i.test(lower)) return "c_suite";
-  for (const [key, tier] of Object.entries(TIER_MAP)) {
-    if (lower.includes(key)) return tier;
-  }
+  if (/\b(ceo|coo|cfo|cto|cmo|cro|cio|cpo)\b/i.test(lower)) return "c_suite";
+  if (/\b(vp|vice president|director|head of|senior director)\b/i.test(lower)) return "leadership";
+  if (/\b(manager|lead|supervisor|team lead)\b/i.test(lower)) return "manager";
+  if (/\b(contractor|freelancer)\b/i.test(lower)) return "contractor";
+  return "employee";
+}
+
+function classifyEntityType(title: string, context: string): string {
+  const lower = (title + " " + context).toLowerCase();
+  if (/\b(player|athlete|prospect|draft|nba|nfl|mlb|mls|soccer player|basketball player|football player)\b/.test(lower)) return "athlete";
+  if (/\b(client|customer|account)\b/.test(lower)) return "client";
   return "employee";
 }
 
@@ -34,32 +27,45 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { message, teamMembers } = await req.json();
+    const { message, teamMembers, assignments } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const systemPrompt = `You are OrgOS, an organization management AI. Parse natural language commands about team structure.
+    const systemPrompt = `You are OrgOS, an intelligent organization management AI that supports both traditional businesses AND performance teams (trainers, coaches, sports organizations, agencies).
 
 Current team members: ${JSON.stringify(teamMembers || [])}
+Current client assignments: ${JSON.stringify(assignments || [])}
 
 Return a JSON object with:
 {
-  "action": "add" | "update" | "delete" | "bulk_add" | "info",
-  "members": [{ "name": "...", "title": "...", "department": "...", "manager_name": "..." }],
+  "action": "add" | "update" | "delete" | "bulk_add" | "assign" | "unassign" | "info",
+  "members": [{ "name": "...", "title": "...", "department": "...", "manager_name": "...", "entity_type": "employee|leadership|contractor|client|athlete|customer", "goals": "...", "notes": "..." }],
   "update_id": "uuid if updating existing member",
   "delete_id": "uuid if deleting",
+  "assignment": { "client_name": "...", "staff_name": "...", "role": "...", "responsibilities": "..." },
   "reply": "Human-friendly confirmation message"
 }
 
+Entity types:
+- employee: Regular staff
+- leadership: Directors, VPs, C-Suite
+- contractor: Freelancers, contractors
+- client: Business clients, customers
+- athlete: Players, athletes, prospects
+- customer: End customers
+
 Rules:
-- For "John is CEO": action=add/update, title=CEO, department=Executive
+- For "John is CEO": action=add, entity_type=employee (staff), tier by title
+- For "Player A is an NBA Player": action=add, entity_type=athlete
+- For "Add client John Smith": action=add, entity_type=client
+- For "John is shooting coach for Player A": action=assign, assignment with client_name=Player A, staff_name=John, role=Shooting Coach
+- For "Create performance team for Player A": action=bulk_add with coaches/trainers, then assign
 - For "Move X to Y": action=update
-- For "Promote X to Y": action=update with new title
 - For "Remove X": action=delete
-- For "Create team of N": action=bulk_add with generated names/titles
-- If updating existing member, include their id as update_id
-- Assign logical departments based on title (e.g., CFO→Finance, CTO→Technology, Marketing Director→Marketing)
-- For info/questions: action=info with reply only
+- For role assignments like "Assign X as Y for Z": action=assign
+- For task routing: mention the assigned staff role in reply
+- Assign logical departments based on title
+- For info/questions: action=info
 
 Always respond with valid JSON only, no markdown.`;
 
@@ -97,6 +103,7 @@ Always respond with valid JSON only, no markdown.`;
       parsed.members = parsed.members.map((m: any) => ({
         ...m,
         tier_level: classifyTier(m.title || "Employee"),
+        entity_type: m.entity_type || classifyEntityType(m.title || "", m.name || ""),
       }));
     }
 
@@ -113,12 +120,11 @@ Always respond with valid JSON only, no markdown.`;
 
     if (parsed.action === "add" || parsed.action === "bulk_add") {
       for (const m of parsed.members || []) {
-        // Check if member already exists by name
         const { data: existing } = await supabase
           .from("team_members")
           .select("id")
-          .eq("name", m.name)
           .eq("user_id", user.id)
+          .ilike("name", m.name)
           .maybeSingle();
 
         if (existing) {
@@ -126,16 +132,18 @@ Always respond with valid JSON only, no markdown.`;
             title: m.title,
             department: m.department || "General",
             tier_level: m.tier_level,
+            entity_type: m.entity_type || "employee",
+            goals: m.goals || null,
+            notes: m.notes || null,
           }).eq("id", existing.id);
         } else {
-          // Resolve manager
           let managerId = null;
           if (m.manager_name) {
             const { data: mgr } = await supabase
               .from("team_members")
               .select("id")
-              .eq("name", m.manager_name)
               .eq("user_id", user.id)
+              .ilike("name", m.manager_name)
               .maybeSingle();
             if (mgr) managerId = mgr.id;
           }
@@ -146,7 +154,10 @@ Always respond with valid JSON only, no markdown.`;
             title: m.title || "Employee",
             department: m.department || "General",
             tier_level: m.tier_level || "employee",
+            entity_type: m.entity_type || "employee",
             manager_id: managerId,
+            goals: m.goals || null,
+            notes: m.notes || null,
           });
         }
       }
@@ -155,11 +166,13 @@ Always respond with valid JSON only, no markdown.`;
       const m = parsed.members?.[0];
       if (m?.title) { updates.title = m.title; updates.tier_level = classifyTier(m.title); }
       if (m?.department) updates.department = m.department;
+      if (m?.entity_type) updates.entity_type = m.entity_type;
+      if (m?.goals) updates.goals = m.goals;
+      if (m?.notes) updates.notes = m.notes;
       if (Object.keys(updates).length) {
         await supabase.from("team_members").update(updates).eq("id", parsed.update_id);
       }
     } else if (parsed.action === "update" && parsed.members?.length) {
-      // Update by name match
       for (const m of parsed.members) {
         const { data: existing } = await supabase
           .from("team_members")
@@ -171,15 +184,18 @@ Always respond with valid JSON only, no markdown.`;
           const updates: any = {};
           if (m.title) { updates.title = m.title; updates.tier_level = classifyTier(m.title); }
           if (m.department) updates.department = m.department;
+          if (m.entity_type) updates.entity_type = m.entity_type;
+          if (m.goals) updates.goals = m.goals;
+          if (m.notes) updates.notes = m.notes;
           await supabase.from("team_members").update(updates).eq("id", existing.id);
         } else {
-          // Create if doesn't exist
           await supabase.from("team_members").insert({
             user_id: user.id,
             name: m.name,
             title: m.title || "Employee",
             department: m.department || "General",
             tier_level: m.tier_level || classifyTier(m.title || "Employee"),
+            entity_type: m.entity_type || "employee",
           });
         }
       }
@@ -190,6 +206,61 @@ Always respond with valid JSON only, no markdown.`;
         await supabase.from("team_members").delete()
           .eq("user_id", user.id)
           .ilike("name", parsed.members[0].name);
+      }
+    } else if (parsed.action === "assign" && parsed.assignment) {
+      const a = parsed.assignment;
+      // Find client
+      const { data: client } = await supabase
+        .from("team_members")
+        .select("id")
+        .eq("user_id", user.id)
+        .ilike("name", a.client_name)
+        .maybeSingle();
+
+      // Find staff
+      const { data: staff } = await supabase
+        .from("team_members")
+        .select("id")
+        .eq("user_id", user.id)
+        .ilike("name", a.staff_name)
+        .maybeSingle();
+
+      if (client && staff) {
+        // Check if assignment exists
+        const { data: existing } = await supabase
+          .from("client_assignments")
+          .select("id")
+          .eq("client_id", client.id)
+          .eq("staff_id", staff.id)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase.from("client_assignments").update({
+            role: a.role || "Staff",
+            responsibilities: a.responsibilities || null,
+          }).eq("id", existing.id);
+        } else {
+          await supabase.from("client_assignments").insert({
+            user_id: user.id,
+            client_id: client.id,
+            staff_id: staff.id,
+            role: a.role || "Staff",
+            responsibilities: a.responsibilities || null,
+          });
+        }
+      } else {
+        parsed.reply = (parsed.reply || "") + (client ? "" : ` Could not find "${a.client_name}".`) + (staff ? "" : ` Could not find "${a.staff_name}".`);
+      }
+    } else if (parsed.action === "unassign" && parsed.assignment) {
+      const a = parsed.assignment;
+      const { data: client } = await supabase
+        .from("team_members").select("id").eq("user_id", user.id).ilike("name", a.client_name).maybeSingle();
+      const { data: staff } = await supabase
+        .from("team_members").select("id").eq("user_id", user.id).ilike("name", a.staff_name).maybeSingle();
+      if (client && staff) {
+        await supabase.from("client_assignments").delete()
+          .eq("client_id", client.id).eq("staff_id", staff.id).eq("user_id", user.id);
       }
     }
 
