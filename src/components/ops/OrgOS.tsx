@@ -56,7 +56,8 @@ export default function OrgOS({ onBack }: { onBack: () => void }) {
 
   const fetchMembers = async () => {
     setLoading(true);
-    const { data } = await supabase.from("team_members").select("*").order("created_at");
+    const { data, error } = await supabase.from("team_members" as any).select("*").eq("user_id", user!.id).order("created_at");
+    if (error) console.error("Fetch members error:", error);
     if (data) setMembers(data as unknown as TeamMember[]);
     setLoading(false);
   };
