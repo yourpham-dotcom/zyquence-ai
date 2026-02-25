@@ -2254,6 +2254,48 @@ export type Database = {
           },
         ]
       }
+      work_logs: {
+        Row: {
+          created_at: string
+          employee_name: string
+          end_time: string
+          hourly_rate: number
+          hours: number
+          id: string
+          notes: string | null
+          start_time: string
+          total_pay: number
+          user_id: string
+          work_date: string
+        }
+        Insert: {
+          created_at?: string
+          employee_name: string
+          end_time?: string
+          hourly_rate?: number
+          hours?: number
+          id?: string
+          notes?: string | null
+          start_time?: string
+          total_pay?: number
+          user_id: string
+          work_date?: string
+        }
+        Update: {
+          created_at?: string
+          employee_name?: string
+          end_time?: string
+          hourly_rate?: number
+          hours?: number
+          id?: string
+          notes?: string | null
+          start_time?: string
+          total_pay?: number
+          user_id?: string
+          work_date?: string
+        }
+        Relationships: []
+      }
       workflow_edges: {
         Row: {
           created_at: string
