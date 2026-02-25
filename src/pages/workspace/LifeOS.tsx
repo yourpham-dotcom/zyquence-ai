@@ -15,9 +15,10 @@ import { toast } from "@/hooks/use-toast";
 import {
   Send, Loader2, Plus, CalendarDays, Users, MapPin, Clock,
   Trash2, ScanLine, PartyPopper, CheckCircle2, HelpCircle, XCircle,
-  AlertCircle, ArrowLeft
+  AlertCircle, ArrowLeft, ImageIcon
 } from "lucide-react";
 import { format } from "date-fns";
+import LifeScanDrop from "@/components/lifeos/LifeScanDrop";
 
 type LifeEvent = {
   id: string;
@@ -73,9 +74,12 @@ const LifeOS = () => {
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([]);
   const chatRef = useRef<HTMLDivElement>(null);
 
-  // Scanner
+  // Text Scanner
   const [scanText, setScanText] = useState("");
   const [scanning, setScanning] = useState(false);
+
+  // ScanDrop
+  const [scanDropOpen, setScanDropOpen] = useState(false);
 
   useEffect(() => {
     if (user) fetchAll();
@@ -164,7 +168,7 @@ const LifeOS = () => {
     setChatLoading(false);
   };
 
-  const runScan = async () => {
+  const runTextScan = async () => {
     if (!scanText.trim() || !user) return;
     setScanning(true);
     try {
@@ -213,14 +217,19 @@ const LifeOS = () => {
           <ArrowLeft className="h-4 w-4" /> Back
         </Button>
 
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-foreground">{selectedEvent.name}</h1>
-          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" />{format(new Date(selectedEvent.event_date), "MMM d, yyyy")}</span>
-            {selectedEvent.event_time && <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{selectedEvent.event_time}</span>}
-            {selectedEvent.location && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{selectedEvent.location}</span>}
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold text-foreground">{selectedEvent.name}</h1>
+            <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1"><CalendarDays className="h-3.5 w-3.5" />{format(new Date(selectedEvent.event_date), "MMM d, yyyy")}</span>
+              {selectedEvent.event_time && <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{selectedEvent.event_time}</span>}
+              {selectedEvent.location && <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{selectedEvent.location}</span>}
+            </div>
+            {selectedEvent.notes && <p className="text-sm text-muted-foreground mt-2">{selectedEvent.notes}</p>}
           </div>
-          {selectedEvent.notes && <p className="text-sm text-muted-foreground mt-2">{selectedEvent.notes}</p>}
+          <Button variant="outline" size="sm" className="gap-1.5 shrink-0" onClick={() => setScanDropOpen(true)}>
+            <ScanLine className="h-4 w-4" /> ScanDrop
+          </Button>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
@@ -234,27 +243,27 @@ const LifeOS = () => {
             <CardContent>
               <ScrollArea className="max-h-[50vh]">
                 <div className="space-y-2">
-                  {eg.length === 0 && <p className="text-sm text-muted-foreground">No guests yet. Use chat or scanner to add.</p>}
+                  {eg.length === 0 && <p className="text-sm text-muted-foreground">No guests yet. Use chat, text scan, or ScanDrop to add.</p>}
                   {eg.map(g => {
                     const sc = STATUS_CONFIG[g.status] || STATUS_CONFIG.unknown;
                     return (
-                      <div key={g.id} className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30">
-                        <Avatar className="h-8 w-8">
+                      <div key={g.id} className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg bg-secondary/30">
+                        <Avatar className="h-8 w-8 shrink-0">
                           <AvatarFallback className="text-xs bg-muted">{g.guest_name.slice(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
-                        <span className="flex-1 text-sm font-medium text-foreground">{g.guest_name}</span>
+                        <span className="flex-1 text-sm font-medium text-foreground min-w-0 truncate">{g.guest_name}</span>
                         <select
                           value={g.status}
                           onChange={e => updateGuestStatus(g.id, e.target.value)}
-                          className="text-xs bg-background border border-border rounded px-1.5 py-1 text-foreground"
+                          className="text-xs bg-background border border-border rounded px-1.5 py-1 text-foreground shrink-0"
                         >
                           <option value="attending">Attending</option>
                           <option value="maybe">Maybe</option>
                           <option value="cancelled">Cancelled</option>
                           <option value="unknown">Unknown</option>
                         </select>
-                        <Badge className={`text-[10px] ${sc.color} gap-1`}>{sc.icon}{sc.label}</Badge>
-                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => deleteGuest(g.id)}>
+                        <Badge className={`text-[10px] ${sc.color} gap-1 shrink-0 hidden sm:inline-flex`}>{sc.icon}{sc.label}</Badge>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => deleteGuest(g.id)}>
                           <Trash2 className="h-3 w-3 text-muted-foreground" />
                         </Button>
                       </div>
@@ -276,7 +285,7 @@ const LifeOS = () => {
                 <ScrollArea className="h-48 mb-3 pr-2" ref={chatRef}>
                   <div className="space-y-2">
                     {chatHistory.length === 0 && (
-                      <p className="text-xs text-muted-foreground italic">Try: "Add Sarah and Mike to this event" or "John can't make it"</p>
+                      <p className="text-xs text-muted-foreground italic">Try: "Add Sarah and Mike" or "John can't make it"</p>
                     )}
                     {chatHistory.map((m, i) => (
                       <div key={i} className={`text-sm p-2 rounded-lg ${m.role === "user" ? "bg-primary/10 text-foreground ml-8" : "bg-secondary/50 text-foreground mr-8"}`}>
@@ -301,22 +310,22 @@ const LifeOS = () => {
               </CardContent>
             </Card>
 
-            {/* Scanner */}
+            {/* Text Scanner */}
             <Card className="border-border/50">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2"><ScanLine className="h-4 w-4" /> Scanner</CardTitle>
+                <CardTitle className="text-base flex items-center gap-2"><ScanLine className="h-4 w-4" /> Text Scanner</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
                   value={scanText}
                   onChange={e => setScanText(e.target.value)}
-                  placeholder="Paste a guest list, screenshot text, or attendee names..."
+                  placeholder="Paste a guest list or attendee names..."
                   rows={3}
                   className="text-sm mb-2"
                 />
-                <Button onClick={runScan} disabled={scanning || !scanText.trim()} size="sm" className="w-full">
+                <Button onClick={runTextScan} disabled={scanning || !scanText.trim()} size="sm" className="w-full">
                   {scanning ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : <ScanLine className="h-4 w-4 mr-1.5" />}
-                  Scan & Add Guests
+                  Scan Text & Add Guests
                 </Button>
               </CardContent>
             </Card>
@@ -341,6 +350,13 @@ const LifeOS = () => {
             </CardContent>
           </Card>
         )}
+
+        <LifeScanDrop
+          open={scanDropOpen}
+          onOpenChange={setScanDropOpen}
+          events={events.map(e => ({ id: e.id, name: e.name, event_date: e.event_date }))}
+          onGuestsAdded={fetchAll}
+        />
       </div>
     );
   }
@@ -348,57 +364,62 @@ const LifeOS = () => {
   // Main list view
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <PartyPopper className="h-6 w-6" /> LifeOS
           </h1>
           <p className="text-sm text-muted-foreground">Plan events, track guests, coordinate life.</p>
         </div>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm"><Plus className="h-4 w-4 mr-1.5" /> New Event</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
-            <div className="space-y-3">
-              <div>
-                <Label className="text-xs">Event Name *</Label>
-                <Input value={newEvent.name} onChange={e => setNewEvent(p => ({ ...p, name: e.target.value }))} placeholder="Dinner, Party, Hangout..." />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setScanDropOpen(true)}>
+            <ScanLine className="h-4 w-4" /> ScanDrop
+          </Button>
+          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm"><Plus className="h-4 w-4 mr-1.5" /> New Event</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader><DialogTitle>Create Event</DialogTitle></DialogHeader>
+              <div className="space-y-3">
                 <div>
-                  <Label className="text-xs">Date *</Label>
-                  <Input type="date" value={newEvent.event_date} onChange={e => setNewEvent(p => ({ ...p, event_date: e.target.value }))} />
+                  <Label className="text-xs">Event Name *</Label>
+                  <Input value={newEvent.name} onChange={e => setNewEvent(p => ({ ...p, name: e.target.value }))} placeholder="Dinner, Party, Hangout..." />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs">Date *</Label>
+                    <Input type="date" value={newEvent.event_date} onChange={e => setNewEvent(p => ({ ...p, event_date: e.target.value }))} />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Time</Label>
+                    <Input type="time" value={newEvent.event_time} onChange={e => setNewEvent(p => ({ ...p, event_time: e.target.value }))} />
+                  </div>
                 </div>
                 <div>
-                  <Label className="text-xs">Time</Label>
-                  <Input type="time" value={newEvent.event_time} onChange={e => setNewEvent(p => ({ ...p, event_time: e.target.value }))} />
+                  <Label className="text-xs">Location</Label>
+                  <Input value={newEvent.location} onChange={e => setNewEvent(p => ({ ...p, location: e.target.value }))} placeholder="Where?" />
                 </div>
+                <div>
+                  <Label className="text-xs">Host</Label>
+                  <Input value={newEvent.host} onChange={e => setNewEvent(p => ({ ...p, host: e.target.value }))} placeholder="Who's hosting?" />
+                </div>
+                <div>
+                  <Label className="text-xs">Notes</Label>
+                  <Textarea value={newEvent.notes} onChange={e => setNewEvent(p => ({ ...p, notes: e.target.value }))} placeholder="Any details..." rows={2} />
+                </div>
+                <Button onClick={createEvent} disabled={creating || !newEvent.name || !newEvent.event_date} className="w-full">
+                  {creating ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
+                  Create Event
+                </Button>
               </div>
-              <div>
-                <Label className="text-xs">Location</Label>
-                <Input value={newEvent.location} onChange={e => setNewEvent(p => ({ ...p, location: e.target.value }))} placeholder="Where?" />
-              </div>
-              <div>
-                <Label className="text-xs">Host</Label>
-                <Input value={newEvent.host} onChange={e => setNewEvent(p => ({ ...p, host: e.target.value }))} placeholder="Who's hosting?" />
-              </div>
-              <div>
-                <Label className="text-xs">Notes</Label>
-                <Textarea value={newEvent.notes} onChange={e => setNewEvent(p => ({ ...p, notes: e.target.value }))} placeholder="Any details..." rows={2} />
-              </div>
-              <Button onClick={createEvent} disabled={creating || !newEvent.name || !newEvent.event_date} className="w-full">
-                {creating ? <Loader2 className="h-4 w-4 animate-spin mr-1.5" /> : null}
-                Create Event
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Tabs defaultValue="events">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="events">Upcoming Events</TabsTrigger>
           <TabsTrigger value="updates">Recent Updates</TabsTrigger>
           <TabsTrigger value="chat">Life Chat</TabsTrigger>
@@ -409,7 +430,15 @@ const LifeOS = () => {
             <Card className="border-border/50">
               <CardContent className="p-8 text-center">
                 <PartyPopper className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground">No events yet. Create one to get started.</p>
+                <p className="text-sm text-muted-foreground mb-3">No events yet. Create one to get started.</p>
+                <div className="flex gap-2 justify-center">
+                  <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setScanDropOpen(true)}>
+                    <ImageIcon className="h-4 w-4" /> Scan Image
+                  </Button>
+                  <Button size="sm" onClick={() => setCreateOpen(true)}>
+                    <Plus className="h-4 w-4 mr-1" /> Create Event
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
@@ -418,6 +447,7 @@ const LifeOS = () => {
                 const total = guestCount(ev.id);
                 const attending = guestCount(ev.id, "attending");
                 const cancelled = guestCount(ev.id, "cancelled");
+                const maybe = guestCount(ev.id, "maybe");
                 return (
                   <Card
                     key={ev.id}
@@ -441,12 +471,12 @@ const LifeOS = () => {
                           <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
                         </Button>
                       </div>
-                      <div className="flex items-center gap-3 mt-3 text-xs">
-                        <span className="flex items-center gap-1 text-muted-foreground"><Users className="h-3 w-3" />{total} guests</span>
-                        {attending > 0 && <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px]">{attending} attending</Badge>}
-                        {cancelled > 0 && <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px]">{cancelled} cancelled</Badge>}
+                      <div className="flex items-center gap-2 mt-3 text-xs flex-wrap">
+                        <span className="flex items-center gap-1 text-muted-foreground"><Users className="h-3 w-3" />{total}</span>
+                        {attending > 0 && <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] gap-1"><CheckCircle2 className="h-2.5 w-2.5" />{attending}</Badge>}
+                        {maybe > 0 && <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30 text-[10px] gap-1"><HelpCircle className="h-2.5 w-2.5" />{maybe}</Badge>}
+                        {cancelled > 0 && <Badge className="bg-red-500/20 text-red-400 border-red-500/30 text-[10px] gap-1"><XCircle className="h-2.5 w-2.5" />{cancelled}</Badge>}
                       </div>
-                      {/* Guest avatars preview */}
                       {total > 0 && (
                         <div className="flex -space-x-1.5 mt-2">
                           {eventGuests(ev.id).slice(0, 6).map(g => (
@@ -531,6 +561,13 @@ const LifeOS = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <LifeScanDrop
+        open={scanDropOpen}
+        onOpenChange={setScanDropOpen}
+        events={events.map(e => ({ id: e.id, name: e.name, event_date: e.event_date }))}
+        onGuestsAdded={fetchAll}
+      />
     </div>
   );
 };
