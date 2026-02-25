@@ -41,7 +41,11 @@ Return a valid JSON object with this exact structure:
   ],
   "summary": "Brief financial plan summary",
   "estimated_monthly_savings": number,
-  "risk_level": "low" | "medium" | "high"
+  "risk_level": "low" | "medium" | "high",
+  "assumptions": {
+    "monthlyIncome": number or null,
+    "monthlySavingsTarget": number or null
+  }
 }
 
 Rules:

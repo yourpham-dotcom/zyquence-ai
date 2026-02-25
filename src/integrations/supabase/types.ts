@@ -2062,6 +2062,30 @@ export type Database = {
         }
         Relationships: []
       }
+      vault_profiles: {
+        Row: {
+          id: string
+          monthly_savings: number
+          total_income_monthly: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          monthly_savings?: number
+          total_income_monthly?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          monthly_savings?: number
+          total_income_monthly?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workflow_edges: {
         Row: {
           created_at: string
