@@ -64,6 +64,11 @@ const savingsData = [
   { name: "Saved", value: 12400 }, { name: "Remaining", value: 7600 },
 ];
 
+type VaultProfile = {
+  total_income_monthly: number;
+  monthly_savings: number;
+};
+
 export default function Vault({ onBack }: { onBack: () => void }) {
   const { user } = useAuth();
   const [projects, setProjects] = useState<FinancialProject[]>([]);
@@ -71,6 +76,7 @@ export default function Vault({ onBack }: { onBack: () => void }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<FinancialProject | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [vaultProfile, setVaultProfile] = useState<VaultProfile>({ total_income_monthly: 0, monthly_savings: 0 });
 
   // Form state
   const [goalDesc, setGoalDesc] = useState("");
@@ -79,7 +85,21 @@ export default function Vault({ onBack }: { onBack: () => void }) {
   const [currentIncome, setCurrentIncome] = useState("");
   const [notes, setNotes] = useState("");
 
-  useEffect(() => { if (user) fetchProjects(); }, [user]);
+  useEffect(() => {
+    if (user) {
+      fetchProjects();
+      fetchVaultProfile();
+    }
+  }, [user]);
+
+  const fetchVaultProfile = async () => {
+    const { data } = await supabase
+      .from("vault_profiles")
+      .select("total_income_monthly, monthly_savings")
+      .eq("user_id", user!.id)
+      .maybeSingle();
+    if (data) setVaultProfile(data as unknown as VaultProfile);
+  };
 
   const fetchProjects = async () => {
     setLoading(true);
@@ -141,10 +161,40 @@ export default function Vault({ onBack }: { onBack: () => void }) {
 
       if (insertErr) throw insertErr;
 
+      // Upsert vault_profiles with income/savings data
+      const incomeVal = currentIncome ? parseFloat(currentIncome) : (plan.assumptions?.monthlyIncome || null);
+      const savingsVal = plan.estimated_monthly_savings || plan.assumptions?.monthlySavingsTarget || null;
+
+      if (incomeVal || savingsVal) {
+        const updates: any = { user_id: user!.id, updated_at: new Date().toISOString() };
+        if (incomeVal) updates.total_income_monthly = incomeVal;
+        if (savingsVal) updates.monthly_savings = savingsVal;
+
+        // Check if profile exists
+        const { data: existing } = await supabase
+          .from("vault_profiles")
+          .select("user_id")
+          .eq("user_id", user!.id)
+          .maybeSingle();
+
+        if (existing) {
+          const updateFields: any = { updated_at: new Date().toISOString() };
+          if (incomeVal) updateFields.total_income_monthly = incomeVal;
+          if (savingsVal) updateFields.monthly_savings = savingsVal;
+          await supabase.from("vault_profiles").update(updateFields).eq("user_id", user!.id);
+        } else {
+          await supabase.from("vault_profiles").insert({
+            user_id: user!.id,
+            total_income_monthly: incomeVal || 0,
+            monthly_savings: savingsVal || 0,
+          });
+        }
+      }
+
       toast({ title: "Financial plan created!", description: `${plan.phases?.length || 0} phases generated.` });
       setGoalDesc(""); setTargetAmount(""); setDeadline(""); setCurrentIncome(""); setNotes("");
       setShowCreateModal(false);
-      await fetchProjects();
+      await Promise.all([fetchProjects(), fetchVaultProfile()]);
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
     } finally {
@@ -252,8 +302,8 @@ export default function Vault({ onBack }: { onBack: () => void }) {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Total Income", value: "$4,900", icon: DollarSign, color: "text-green-500" },
-          { label: "Monthly Savings", value: "$1,200", icon: PiggyBank, color: "text-blue-500" },
+          { label: "Total Income", value: vaultProfile.total_income_monthly ? `$${vaultProfile.total_income_monthly.toLocaleString()}` : "$0", icon: DollarSign, color: "text-green-500" },
+          { label: "Monthly Savings", value: vaultProfile.monthly_savings ? `$${vaultProfile.monthly_savings.toLocaleString()}` : "$0", icon: PiggyBank, color: "text-blue-500" },
           { label: "Active Plans", value: activePlans.length, icon: Target, color: "text-primary" },
           { label: "Financial Tasks", value: totalTasks, icon: BarChart3, color: "text-amber-500" },
         ].map(s => (
