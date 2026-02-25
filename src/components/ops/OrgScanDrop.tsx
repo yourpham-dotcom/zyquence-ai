@@ -120,52 +120,67 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
   };
 
   const saveMembers = async () => {
-    if (!user) return;
+    if (!user) {
+      toast({ title: "Not logged in", description: "Please sign in first.", variant: "destructive" });
+      return;
+    }
     setSaving(true);
     try {
       const validMembers = members.filter(m => m.name.trim());
+      if (validMembers.length === 0) {
+        toast({ title: "No members", description: "Add at least one member with a name.", variant: "destructive" });
+        setSaving(false);
+        return;
+      }
 
-      // Insert all members first (without manager_id)
-      const inserts = validMembers.map(m => ({
-        user_id: user.id,
-        name: m.name,
-        title: m.title || "Employee",
-        department: m.department || "General",
-        tier_level: classifyTier(m.title || "Employee"),
-      }));
+      // Insert all members one by one to avoid type issues
+      const insertedMembers: any[] = [];
+      for (const m of validMembers) {
+        const row = {
+          user_id: user.id,
+          name: m.name.trim(),
+          title: m.title || "Employee",
+          department: m.department || "General",
+          tier_level: classifyTier(m.title || "Employee"),
+        };
+        const { data, error } = await supabase
+          .from("team_members" as any)
+          .insert(row)
+          .select()
+          .single();
+        if (error) {
+          console.error("Insert error for", m.name, error);
+          throw error;
+        }
+        if (data) insertedMembers.push(data);
+      }
 
-      const { data: inserted, error } = await supabase.from("team_members").insert(inserts as any).select();
-      if (error) throw error;
-
-      // Now resolve manager relationships
-      if (inserted) {
-        const allMembers = inserted as any[];
-        for (let i = 0; i < validMembers.length; i++) {
-          const mgrName = validMembers[i].manager_name;
-          if (mgrName) {
-            const mgr = allMembers.find(m => m.name.toLowerCase() === mgrName.toLowerCase());
-            if (mgr) {
-              await supabase.from("team_members").update({ manager_id: mgr.id }).eq("id", allMembers[i].id);
-            } else {
-              // Try existing members
-              const { data: existingMgr } = await supabase
-                .from("team_members")
-                .select("id")
-                .eq("user_id", user.id)
-                .ilike("name", mgrName)
-                .maybeSingle();
-              if (existingMgr) {
-                await supabase.from("team_members").update({ manager_id: existingMgr.id }).eq("id", allMembers[i].id);
-              }
+      // Resolve manager relationships
+      for (let i = 0; i < validMembers.length; i++) {
+        const mgrName = validMembers[i].manager_name;
+        if (mgrName && insertedMembers[i]) {
+          const mgr = insertedMembers.find((im: any) => im.name.toLowerCase() === mgrName.toLowerCase());
+          if (mgr) {
+            await supabase.from("team_members" as any).update({ manager_id: mgr.id } as any).eq("id", insertedMembers[i].id);
+          } else {
+            const { data: existingMgr } = await supabase
+              .from("team_members" as any)
+              .select("id")
+              .eq("user_id", user.id)
+              .ilike("name", mgrName)
+              .maybeSingle();
+            if (existingMgr) {
+              await supabase.from("team_members" as any).update({ manager_id: (existingMgr as any).id } as any).eq("id", insertedMembers[i].id);
             }
           }
         }
       }
 
-      toast({ title: "Team updated!", description: `${validMembers.length} member(s) added to your organization.` });
+      toast({ title: "Team updated!", description: `${insertedMembers.length} member(s) added to your organization.` });
       setStep("done");
       onMembersAdded();
     } catch (e: any) {
+      console.error("Save members error:", e);
       toast({ title: "Error saving", description: e.message, variant: "destructive" });
     } finally {
       setSaving(false);
