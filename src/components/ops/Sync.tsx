@@ -13,7 +13,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, MessageSquare, Plus, Send, Users, Hash, User,
-  Loader2, ListTodo, Trash2, CheckCircle2, Clock
+  Loader2, ListTodo, Trash2, CheckCircle2, Clock, Radio
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -51,7 +51,7 @@ type TaskSuggestion = {
   messageId?: string;
 };
 
-export default function Sync({ onBack }: { onBack: () => void }) {
+export default function Sync({ onBack, onOpenPulse }: { onBack: () => void; onOpenPulse?: () => void }) {
   const { user } = useAuth();
   const [chats, setChats] = useState<SyncChat[]>([]);
   const [selectedChat, setSelectedChat] = useState<SyncChat | null>(null);
@@ -239,10 +239,15 @@ export default function Sync({ onBack }: { onBack: () => void }) {
         <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <div>
+        <div className="flex-1">
           <h1 className="text-xl font-bold tracking-tight">Sync</h1>
           <p className="text-xs text-muted-foreground">Team collaboration & execution hub</p>
         </div>
+        {onOpenPulse && (
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={onOpenPulse}>
+            <Radio className="h-4 w-4" /> Pulse
+          </Button>
+        )}
       </div>
 
       <div className="flex gap-0 border rounded-lg overflow-hidden h-[calc(100%-3.5rem)] bg-card">
