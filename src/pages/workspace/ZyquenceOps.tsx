@@ -13,7 +13,7 @@ import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, ChevronLeft, Trash2, BarChart3,
   Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
-  BookOpen, Package, MessageSquare, DollarSign, Globe, Building2
+  BookOpen, Package, MessageSquare, DollarSign, Globe, Building2, PartyPopper
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
@@ -24,6 +24,7 @@ import Sync from "@/components/ops/Sync";
 import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
 import Pulse from "@/components/ops/Pulse";
 import OrgOS from "@/components/ops/OrgOS";
+import LifeOS from "@/pages/workspace/LifeOS";
 
 type OpsProject = {
   id: string;
@@ -73,7 +74,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync" | "atlas" | "pulse" | "orgos";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync" | "atlas" | "pulse" | "orgos" | "lifeos";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -498,6 +499,9 @@ export default function ZyquenceOps() {
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("orgos")}>
             <Building2 className="h-4 w-4" /> OrgOS
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("lifeos")}>
+            <PartyPopper className="h-4 w-4" /> LifeOS
           </Button>
         </div>
 
@@ -1197,6 +1201,18 @@ export default function ZyquenceOps() {
   // ─── ORGOS VIEW ───
   if (view === "orgos") {
     return <OrgOS onBack={() => setView("dashboard")} />;
+  }
+
+  // ─── LIFEOS VIEW ───
+  if (view === "lifeos") {
+    return (
+      <div>
+        <Button variant="ghost" size="sm" className="gap-1.5 mb-4 text-muted-foreground" onClick={() => setView("dashboard")}>
+          <ChevronLeft className="h-4 w-4" /> Back to Ops
+        </Button>
+        <LifeOS />
+      </div>
+    );
   }
 
   return null;

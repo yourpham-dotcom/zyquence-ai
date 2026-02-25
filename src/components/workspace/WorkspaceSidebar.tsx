@@ -30,7 +30,6 @@ import {
   Code2,
   Home,
   Workflow,
-  PartyPopper,
 } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -70,7 +69,6 @@ const tradingNav = [
 
 const opsNav = [
   { title: "Workflow Engine", path: "/dashboard/ops", icon: Workflow },
-  { title: "LifeOS", path: "/dashboard/lifeos", icon: PartyPopper },
 ];
 
 const toolsNav = [
