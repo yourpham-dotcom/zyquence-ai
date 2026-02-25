@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ScanDrop from "./ScanDrop";
-import WorkLogSpreadsheet from "./WorkLogSpreadsheet";
+import WorkLogSpreadsheet, { type WorkLogSpreadsheetHandle } from "./WorkLogSpreadsheet";
 import WorkLogScanDrop from "./WorkLogScanDrop";
 
 type InventoryItem = {
@@ -58,6 +58,16 @@ export default function InventoryManagement({ onBack }: Props) {
   const [activeTab, setActiveTab] = useState("inventory");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
+  // WorkLog chat state
+  const [wlChatMessages, setWlChatMessages] = useState<ChatMessage[]>([
+    { role: "assistant", content: "Hey! I'm your WorkLog assistant. Try \"Add John 9am-5pm at $20/hr\" or \"Delete Sarah's entry from today\"." }
+  ]);
+  const [wlChatInput, setWlChatInput] = useState("");
+  const [wlChatLoading, setWlChatLoading] = useState(false);
+  const wlChatEndRef = useRef<HTMLDivElement>(null);
+  const workLogRef = useRef<WorkLogSpreadsheetHandle>(null);
+  const workLogsRef = useRef<any[]>([]);
+
   useEffect(() => {
     if (user) fetchInventory();
   }, [user]);
@@ -65,6 +75,10 @@ export default function InventoryManagement({ onBack }: Props) {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
+
+  useEffect(() => {
+    wlChatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [wlChatMessages]);
 
   const fetchInventory = async () => {
     setLoading(true);
@@ -141,7 +155,6 @@ export default function InventoryManagement({ onBack }: Props) {
 
       setChatMessages(prev => [...prev, { role: "assistant", content: response.message }]);
 
-      // Refresh inventory after mutation
       if (response.action === "add" || response.action === "update" || response.action === "delete") {
         await fetchInventory();
       }
@@ -152,8 +165,99 @@ export default function InventoryManagement({ onBack }: Props) {
     }
   };
 
+  const sendWlChat = async () => {
+    if (!wlChatInput.trim() || wlChatLoading) return;
+    const userMsg = wlChatInput.trim();
+    setWlChatInput("");
+    setWlChatMessages(prev => [...prev, { role: "user", content: userMsg }]);
+    setWlChatLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("worklog-chat", {
+        body: { message: userMsg, workLogs: workLogsRef.current },
+      });
+
+      if (error) throw error;
+
+      const response = data as { action: string; message: string; results?: any[]; error?: string };
+      if (response.error) throw new Error(response.error);
+
+      setWlChatMessages(prev => [...prev, { role: "assistant", content: response.message }]);
+
+      if (response.action === "add" || response.action === "update" || response.action === "delete") {
+        // Refresh the spreadsheet
+        workLogRef.current?.refresh();
+      }
+    } catch (e: any) {
+      setWlChatMessages(prev => [...prev, { role: "assistant", content: `Error: ${e.message}` }]);
+    } finally {
+      setWlChatLoading(false);
+    }
+  };
+
+  const handleLogsChange = useCallback((logs: any[]) => {
+    workLogsRef.current = logs;
+  }, []);
+
   const lowStockItems = items.filter(i => i.quantity <= i.min_stock && i.min_stock > 0);
   const totalValue = items.reduce((sum, i) => sum + (i.quantity * (i.unit_price || 0)), 0);
+
+  const renderChatPanel = (
+    messages: ChatMessage[],
+    input: string,
+    setInput: (v: string) => void,
+    isLoading: boolean,
+    onSend: () => void,
+    endRef: React.RefObject<HTMLDivElement>,
+    title: string,
+    placeholder: string
+  ) => (
+    <Card className="h-[500px] flex flex-col">
+      <CardHeader className="p-3 pb-2 border-b border-border">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Bot className="h-4 w-4 text-primary" /> {title}
+        </CardTitle>
+      </CardHeader>
+      <ScrollArea className="flex-1 p-3">
+        <div className="space-y-3">
+          {messages.map((msg, i) => (
+            <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+              {msg.role === "assistant" && <Bot className="h-5 w-5 mt-0.5 text-primary shrink-0" />}
+              <div className={`rounded-lg px-3 py-2 text-xs max-w-[85%] ${
+                msg.role === "user" 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted text-foreground"
+              }`}>
+                {msg.content}
+              </div>
+              {msg.role === "user" && <User className="h-5 w-5 mt-0.5 text-muted-foreground shrink-0" />}
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex gap-2">
+              <Bot className="h-5 w-5 mt-0.5 text-primary shrink-0" />
+              <div className="bg-muted rounded-lg px-3 py-2 text-xs"><Loader2 className="h-3 w-3 animate-spin" /></div>
+            </div>
+          )}
+          <div ref={endRef} />
+        </div>
+      </ScrollArea>
+      <div className="p-3 border-t border-border">
+        <form onSubmit={e => { e.preventDefault(); onSend(); }} className="flex gap-2">
+          <Input
+            className="h-8 text-xs"
+            placeholder={placeholder}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            disabled={isLoading}
+          />
+          <Button size="icon" className="h-8 w-8 shrink-0" type="submit" disabled={isLoading || !input.trim()}>
+            <Send className="h-3 w-3" />
+          </Button>
+        </form>
+      </div>
+    </Card>
+  );
 
   return (
     <div className="max-w-7xl mx-auto space-y-4">
@@ -262,59 +366,30 @@ export default function InventoryManagement({ onBack }: Props) {
               </Card>
             </div>
 
-            {/* Chat Panel */}
+            {/* Inventory Chat Panel */}
             <div className="lg:col-span-1">
-              <Card className="h-[500px] flex flex-col">
-                <CardHeader className="p-3 pb-2 border-b border-border">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Bot className="h-4 w-4 text-primary" /> Inventory Assistant
-                  </CardTitle>
-                </CardHeader>
-                <ScrollArea className="flex-1 p-3">
-                  <div className="space-y-3">
-                    {chatMessages.map((msg, i) => (
-                      <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                        {msg.role === "assistant" && <Bot className="h-5 w-5 mt-0.5 text-primary shrink-0" />}
-                        <div className={`rounded-lg px-3 py-2 text-xs max-w-[85%] ${
-                          msg.role === "user" 
-                            ? "bg-primary text-primary-foreground" 
-                            : "bg-muted text-foreground"
-                        }`}>
-                          {msg.content}
-                        </div>
-                        {msg.role === "user" && <User className="h-5 w-5 mt-0.5 text-muted-foreground shrink-0" />}
-                      </div>
-                    ))}
-                    {chatLoading && (
-                      <div className="flex gap-2">
-                        <Bot className="h-5 w-5 mt-0.5 text-primary shrink-0" />
-                        <div className="bg-muted rounded-lg px-3 py-2 text-xs"><Loader2 className="h-3 w-3 animate-spin" /></div>
-                      </div>
-                    )}
-                    <div ref={chatEndRef} />
-                  </div>
-                </ScrollArea>
-                <div className="p-3 border-t border-border">
-                  <form onSubmit={e => { e.preventDefault(); sendChat(); }} className="flex gap-2">
-                    <Input
-                      className="h-8 text-xs"
-                      placeholder="e.g. Add 100 widgets at $5 each..."
-                      value={chatInput}
-                      onChange={e => setChatInput(e.target.value)}
-                      disabled={chatLoading}
-                    />
-                    <Button size="icon" className="h-8 w-8 shrink-0" type="submit" disabled={chatLoading || !chatInput.trim()}>
-                      <Send className="h-3 w-3" />
-                    </Button>
-                  </form>
-                </div>
-              </Card>
+              {renderChatPanel(
+                chatMessages, chatInput, setChatInput, chatLoading, sendChat, chatEndRef,
+                "Inventory Assistant",
+                "e.g. Add 100 widgets at $5 each..."
+              )}
             </div>
           </div>
         </TabsContent>
 
         <TabsContent value="worklog" className="mt-4">
-          <WorkLogSpreadsheet refreshKey={workLogRefreshKey} />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2">
+              <WorkLogSpreadsheet ref={workLogRef} refreshKey={workLogRefreshKey} onLogsChange={handleLogsChange} />
+            </div>
+            <div className="lg:col-span-1">
+              {renderChatPanel(
+                wlChatMessages, wlChatInput, setWlChatInput, wlChatLoading, sendWlChat, wlChatEndRef,
+                "WorkLog Assistant",
+                'e.g. Add John 9am-5pm at $20/hr...'
+              )}
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 

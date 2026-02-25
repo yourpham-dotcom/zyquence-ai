@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import {
   Plus, Trash2, Loader2, Save, X, Pencil,
@@ -24,11 +23,17 @@ type WorkLog = {
   created_at: string;
 };
 
-type Props = {
-  refreshKey?: number;
+export type WorkLogSpreadsheetHandle = {
+  refresh: () => void;
+  getLogs: () => WorkLog[];
 };
 
-export default function WorkLogSpreadsheet({ refreshKey }: Props) {
+type Props = {
+  refreshKey?: number;
+  onLogsChange?: (logs: WorkLog[]) => void;
+};
+
+const WorkLogSpreadsheet = forwardRef<WorkLogSpreadsheetHandle, Props>(({ refreshKey, onLogsChange }, ref) => {
   const { user } = useAuth();
   const [logs, setLogs] = useState<WorkLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,11 +48,20 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
       .select("*")
       .order("work_date", { ascending: false })
       .order("created_at", { ascending: false });
-    if (data) setLogs(data as unknown as WorkLog[]);
+    if (data) {
+      const typed = data as unknown as WorkLog[];
+      setLogs(typed);
+      onLogsChange?.(typed);
+    }
     setLoading(false);
-  }, [user]);
+  }, [user, onLogsChange]);
 
   useEffect(() => { fetchLogs(); }, [fetchLogs, refreshKey]);
+
+  useImperativeHandle(ref, () => ({
+    refresh: fetchLogs,
+    getLogs: () => logs,
+  }), [fetchLogs, logs]);
 
   const calcHours = (start: string, end: string): number => {
     const [sh, sm] = start.split(":").map(Number);
@@ -70,7 +84,9 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
     } as any).select().single();
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
     const newLog = data as unknown as WorkLog;
-    setLogs(prev => [newLog, ...prev]);
+    const updated = [newLog, ...logs];
+    setLogs(updated);
+    onLogsChange?.(updated);
     setEditingId(newLog.id);
     setEditValues(newLog);
   };
@@ -83,7 +99,6 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
   const updateEditField = (field: keyof WorkLog, value: any) => {
     setEditValues(prev => {
       const next = { ...prev, [field]: value };
-      // Auto-calc hours and total_pay
       if (field === "start_time" || field === "end_time") {
         const s = field === "start_time" ? value : (prev.start_time || "09:00");
         const e = field === "end_time" ? value : (prev.end_time || "17:00");
@@ -114,22 +129,24 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
       notes: editValues.notes,
     } as any).eq("id", editingId);
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
-    setLogs(prev => prev.map(l => l.id === editingId ? { ...l, ...editValues } as WorkLog : l));
+    const updated = logs.map(l => l.id === editingId ? { ...l, ...editValues } as WorkLog : l);
+    setLogs(updated);
+    onLogsChange?.(updated);
     setEditingId(null);
     setEditValues({});
   };
 
   const deleteLog = async (id: string) => {
     await supabase.from("work_logs").delete().eq("id", id);
-    setLogs(prev => prev.filter(l => l.id !== id));
+    const updated = logs.filter(l => l.id !== id);
+    setLogs(updated);
+    onLogsChange?.(updated);
   };
 
-  // Totals
   const totalHours = logs.reduce((s, l) => s + (l.hours || 0), 0);
   const totalPayroll = logs.reduce((s, l) => s + (l.total_pay || 0), 0);
   const uniqueEmployees = new Set(logs.map(l => l.employee_name).filter(Boolean)).size;
 
-  // Export CSV
   const exportCSV = () => {
     const headers = ["Employee Name", "Date", "Start Time", "End Time", "Hours Worked", "Hourly Rate", "Total Pay", "Notes"];
     const rows = logs.map(l => [l.employee_name, l.work_date, l.start_time, l.end_time, l.hours, l.hourly_rate, l.total_pay, l.notes || ""]);
@@ -142,7 +159,6 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
     toast({ title: "Exported CSV" });
   };
 
-  // Export XLSX via JSZip (simple XML spreadsheet)
   const exportXLSX = async () => {
     try {
       const JSZip = (await import("jszip")).default;
@@ -153,29 +169,17 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
       });
       const headerRow = `<row>${headers.map(h => `<c t="inlineStr"><is><t>${h}</t></is></c>`).join("")}</row>`;
       const sheetData = `${headerRow}${rowsXml.join("")}`;
-      const sheet = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${sheetData}</sheetData></worksheet>`;
-      const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Default Extension="xml" ContentType="application/xml"/>
-<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
-</Types>`;
-      const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="WorkLog" sheetId="1" r:id="rId1"/></sheets></workbook>`;
-      const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`;
-      const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
-
+      const sheet = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${sheetData}</sheetData></worksheet>`;
+      const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`;
+      const workbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="WorkLog" sheetId="1" r:id="rId1"/></sheets></workbook>`;
+      const wbRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`;
+      const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
       const zip = new JSZip();
       zip.file("[Content_Types].xml", contentTypes);
       zip.file("_rels/.rels", rootRels);
       zip.file("xl/workbook.xml", workbook);
       zip.file("xl/_rels/workbook.xml.rels", wbRels);
       zip.file("xl/worksheets/sheet1.xml", sheet);
-
       const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -239,7 +243,7 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
                 {loading ? (
                   <tr><td colSpan={9} className="text-center p-8 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin mx-auto" /></td></tr>
                 ) : logs.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center p-8 text-muted-foreground">No work logs yet. Add a row or scan a work log image.</td></tr>
+                  <tr><td colSpan={9} className="text-center p-8 text-muted-foreground">No work logs yet. Add a row or use the assistant!</td></tr>
                 ) : logs.map(log => (
                   <tr key={log.id} className="border-b border-border/50 hover:bg-muted/30">
                     {editingId === log.id ? (
@@ -286,7 +290,10 @@ export default function WorkLogSpreadsheet({ refreshKey }: Props) {
       </Card>
     </div>
   );
-}
+});
+
+WorkLogSpreadsheet.displayName = "WorkLogSpreadsheet";
+export default WorkLogSpreadsheet;
 
 function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
