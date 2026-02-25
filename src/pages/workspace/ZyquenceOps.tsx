@@ -28,6 +28,7 @@ import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
 import Pulse from "@/components/ops/Pulse";
 import OrgOS from "@/components/ops/OrgOS";
 import LifeOS from "@/pages/workspace/LifeOS";
+import { ProjectChatbot } from "@/components/ops/ProjectChatbot";
 
 type OpsProject = {
   id: string;
@@ -956,6 +957,110 @@ export default function ZyquenceOps() {
             </Card>
           )}
         </div>
+
+        {/* AI Chatbot */}
+        <ProjectChatbot
+          project={selectedProject}
+          tasks={projectTasks}
+          milestones={projectMilestones}
+          workflowNodes={workflowNodes.filter(n => n.project_id === selectedProject.id)}
+          workflowEdges={workflowEdges.filter(e => e.project_id === selectedProject.id)}
+          onUpdatesApplied={async (result) => {
+            // Apply task updates
+            for (const upd of result.task_updates || []) {
+              if (upd.action === "update" && upd.id) {
+                const changes: any = {};
+                if (upd.title) changes.title = upd.title;
+                if (upd.description) changes.description = upd.description;
+                if (upd.assigned_to) changes.assigned_to = upd.assigned_to;
+                if (upd.status) changes.status = upd.status;
+                if (upd.priority) changes.priority = upd.priority;
+                if (upd.deadline) changes.deadline = new Date(upd.deadline).toISOString();
+                if (upd.phase) changes.phase = upd.phase;
+                await supabase.from("ops_tasks").update(changes).eq("id", upd.id);
+                setTasks(prev => prev.map(t => t.id === upd.id ? { ...t, ...changes } : t));
+              } else if (upd.action === "create") {
+                const maxOrder = tasks.filter(t => t.project_id === selectedProject.id).reduce((m, t) => Math.max(m, t.sort_order), 0);
+                const { data } = await supabase.from("ops_tasks").insert({
+                  project_id: selectedProject.id,
+                  user_id: user!.id,
+                  title: upd.title || "New Task",
+                  description: upd.description || null,
+                  assigned_to: upd.assigned_to || null,
+                  status: upd.status || "not_started",
+                  priority: upd.priority || "medium",
+                  deadline: upd.deadline ? new Date(upd.deadline).toISOString() : null,
+                  phase: upd.phase || null,
+                  sort_order: maxOrder + 1,
+                }).select().single();
+                if (data) setTasks(prev => [...prev, data as unknown as OpsTask]);
+              } else if (upd.action === "delete" && upd.id) {
+                await supabase.from("ops_tasks").delete().eq("id", upd.id);
+                setTasks(prev => prev.filter(t => t.id !== upd.id));
+              }
+            }
+            // Apply milestone updates
+            for (const upd of result.milestone_updates || []) {
+              if (upd.action === "update" && upd.id) {
+                const changes: any = {};
+                if (upd.title) changes.title = upd.title;
+                if (upd.target_date) changes.target_date = new Date(upd.target_date).toISOString();
+                if (upd.is_completed !== undefined) changes.is_completed = upd.is_completed;
+                await supabase.from("ops_milestones").update(changes).eq("id", upd.id);
+                setMilestones(prev => prev.map(m => m.id === upd.id ? { ...m, ...changes } : m));
+              } else if (upd.action === "create") {
+                const { data } = await supabase.from("ops_milestones").insert({
+                  project_id: selectedProject.id,
+                  user_id: user!.id,
+                  title: upd.title || "New Milestone",
+                  target_date: upd.target_date ? new Date(upd.target_date).toISOString() : null,
+                }).select().single();
+                if (data) setMilestones(prev => [...prev, data as unknown as OpsMilestone]);
+              } else if (upd.action === "delete" && upd.id) {
+                await supabase.from("ops_milestones").delete().eq("id", upd.id);
+                setMilestones(prev => prev.filter(m => m.id !== upd.id));
+              }
+            }
+            // Apply workflow updates
+            for (const upd of result.workflow_updates || []) {
+              if (upd.action === "update" && upd.id) {
+                const changes: any = {};
+                if (upd.label) changes.label = upd.label;
+                if (upd.description) changes.description = upd.description;
+                if (upd.owner) changes.owner = upd.owner;
+                if (upd.status) changes.status = upd.status;
+                await supabase.from("workflow_nodes").update(changes).eq("id", upd.id);
+                setWorkflowNodes(prev => prev.map(n => n.id === upd.id ? { ...n, ...changes } : n));
+              } else if (upd.action === "create") {
+                const maxOrder = workflowNodes.filter(n => n.project_id === selectedProject.id).reduce((m, n) => Math.max(m, n.sort_order), 0);
+                const { data } = await supabase.from("workflow_nodes").insert({
+                  project_id: selectedProject.id,
+                  user_id: user!.id,
+                  label: upd.label || "New Step",
+                  description: upd.description || null,
+                  owner: upd.owner || null,
+                  status: upd.status || "pending",
+                  node_type: upd.node_type || "step",
+                  position_x: 0,
+                  position_y: 0,
+                  sort_order: maxOrder + 1,
+                }).select().single();
+                if (data) setWorkflowNodes(prev => [...prev, data as unknown as WorkflowNode]);
+              } else if (upd.action === "delete" && upd.id) {
+                await supabase.from("workflow_nodes").delete().eq("id", upd.id);
+                setWorkflowNodes(prev => prev.filter(n => n.id !== upd.id));
+                setWorkflowEdges(prev => prev.filter(e => e.source_node_id !== upd.id && e.target_node_id !== upd.id));
+              }
+            }
+            // Recalculate progress
+            const updatedTasks = tasks.filter(t => t.project_id === selectedProject.id);
+            const done = updatedTasks.filter(t => t.status === "complete").length;
+            const progress = updatedTasks.length ? Math.round((done / updatedTasks.length) * 100) : 0;
+            await supabase.from("ops_projects").update({ progress }).eq("id", selectedProject.id);
+            setProjects(prev => prev.map(p => p.id === selectedProject.id ? { ...p, progress } : p));
+            setSelectedProject(prev => prev ? { ...prev, progress } : null);
+          }}
+        />
       </div>
     );
   }

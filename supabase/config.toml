@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.lifesync-ai]
 verify_jwt = false
+
+[functions.ops-project-chat]
+verify_jwt = false
