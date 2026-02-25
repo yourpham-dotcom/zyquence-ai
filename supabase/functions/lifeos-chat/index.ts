@@ -41,6 +41,25 @@ Always be helpful and confirm what you did.`;
       {
         type: "function",
         function: {
+          name: "create_event",
+          description: "Create a new life event",
+          parameters: {
+            type: "object",
+            properties: {
+              name: { type: "string", description: "Event name" },
+              event_date: { type: "string", description: "Date in YYYY-MM-DD format" },
+              event_time: { type: "string", description: "Time like 7:00 PM" },
+              location: { type: "string" },
+              host: { type: "string" },
+              notes: { type: "string" },
+            },
+            required: ["name", "event_date"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "add_guests",
           description: "Add one or more guests to an event",
           parameters: {
@@ -148,6 +167,28 @@ Always be helpful and confirm what you did.`;
     for (const tc of toolCalls) {
       const fn = tc.function.name;
       const args = JSON.parse(tc.function.arguments);
+
+      if (fn === "create_event") {
+        const { data: newEvent, error: evErr } = await sb.from("life_events").insert({
+          user_id: userId,
+          name: args.name,
+          event_date: args.event_date,
+          event_time: args.event_time || null,
+          location: args.location || null,
+          host: args.host || null,
+          notes: args.notes || null,
+        }).select("id").single();
+        if (!evErr && newEvent) {
+          actions.push(`Created event "${args.name}" on ${args.event_date}`);
+          await sb.from("event_updates").insert({
+            event_id: newEvent.id,
+            user_id: userId,
+            change_description: `Event "${args.name}" created via chat`,
+          });
+        } else {
+          actions.push(`Failed to create event: ${evErr?.message}`);
+        }
+      }
 
       if (fn === "add_guests") {
         for (const g of args.guests) {
