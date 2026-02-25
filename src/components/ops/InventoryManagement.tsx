@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import {
   ArrowLeft, Plus, Trash2, Loader2, Send, Bot, User, Package,
-  Pencil, Save, X, AlertTriangle
+  Pencil, Save, X, AlertTriangle, ScanLine
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ScanDrop from "./ScanDrop";
 
 type InventoryItem = {
   id: string;
@@ -48,6 +49,7 @@ export default function InventoryManagement({ onBack }: Props) {
   const [chatLoading, setChatLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<Partial<InventoryItem>>({});
+  const [scanDropOpen, setScanDropOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -156,6 +158,7 @@ export default function InventoryManagement({ onBack }: Props) {
           <h1 className="text-xl font-bold">Inventory Management</h1>
           <p className="text-xs text-muted-foreground">{items.length} items · ${totalValue.toLocaleString()} total value</p>
         </div>
+        <Button size="sm" variant="outline" onClick={() => setScanDropOpen(true)}><ScanLine className="h-4 w-4 mr-1" /> ScanDrop</Button>
         <Button size="sm" onClick={addBlankItem}><Plus className="h-4 w-4 mr-1" /> Add Item</Button>
       </div>
 
@@ -288,6 +291,8 @@ export default function InventoryManagement({ onBack }: Props) {
           </Card>
         </div>
       </div>
+
+      <ScanDrop open={scanDropOpen} onOpenChange={setScanDropOpen} onItemsAdded={fetchInventory} />
     </div>
   );
 }
