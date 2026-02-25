@@ -97,11 +97,42 @@ export default function ScanDrop({ open, onOpenChange, onItemsAdded }: Props) {
       if (detected.length === 0) {
         setLowConfidence(true);
         setProducts([{ name: "", size: "", price: 0, cost: 0, quantity: 1, notes: "", status: "Available", confidence: 0 }]);
+        setStep("confirm");
       } else {
+        const allHighConfidence = detected.every(p => p.confidence >= 0.7 && p.name.trim());
         setLowConfidence(detected.some(p => p.confidence < 0.5));
         setProducts(detected);
+
+        if (allHighConfidence && user) {
+          // Auto-save when AI is confident
+          setSaving(true);
+          try {
+            const inserts = detected.map(p => ({
+              user_id: user.id,
+              name: p.name || "Unnamed Product",
+              size: p.size || null,
+              unit_price: p.price || 0,
+              cost: p.cost || 0,
+              quantity: p.quantity || 1,
+              notes: p.notes || null,
+              status: p.status === "Sold" ? "sold" : "in_stock",
+              category: "ScanDrop",
+            }));
+            const { error: insertErr } = await supabase.from("inventory_items").insert(inserts as any);
+            if (insertErr) throw insertErr;
+            toast({ title: "Auto-detected & saved!", description: `${detected.length} item(s) added to inventory.` });
+            setStep("done");
+            onItemsAdded();
+          } catch (saveErr: any) {
+            toast({ title: "Auto-save failed", description: saveErr.message, variant: "destructive" });
+            setStep("confirm");
+          } finally {
+            setSaving(false);
+          }
+        } else {
+          setStep("confirm");
+        }
       }
-      setStep("confirm");
     } catch (e: any) {
       toast({ title: "Scan failed", description: e.message, variant: "destructive" });
       setStep("upload");
