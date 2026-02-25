@@ -13,12 +13,13 @@ import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, Trash2, BarChart3,
   Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
-  BookOpen, Package, MessageSquare
+  BookOpen, Package, MessageSquare, DollarSign
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
 import { WorkflowMap, type WorkflowNode, type WorkflowEdge } from "@/components/ops/WorkflowMap";
 import InventoryManagement from "@/components/ops/InventoryManagement";
+import Vault from "@/components/ops/Vault";
 
 type OpsProject = {
   id: string;
@@ -68,7 +69,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -484,6 +485,9 @@ export default function ZyquenceOps() {
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5">
             <MessageSquare className="h-4 w-4" /> Chat
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("vault")}>
+            <DollarSign className="h-4 w-4" /> Vault
           </Button>
         </div>
 
@@ -1150,6 +1154,11 @@ export default function ZyquenceOps() {
   // ─── INVENTORY VIEW ───
   if (view === "inventory") {
     return <InventoryManagement onBack={() => setView("dashboard")} />;
+  }
+
+  // ─── VAULT VIEW ───
+  if (view === "vault") {
+    return <Vault onBack={() => setView("dashboard")} />;
   }
 
   return null;

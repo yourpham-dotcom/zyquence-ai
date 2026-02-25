@@ -904,6 +904,63 @@ export type Database = {
           },
         ]
       }
+      financial_projects: {
+        Row: {
+          created_at: string
+          current_income: number | null
+          deadline: string | null
+          goal_description: string
+          id: string
+          milestones: Json | null
+          notes: string | null
+          phases: Json | null
+          progress: number
+          recommendations: Json | null
+          status: string
+          target_amount: number | null
+          tasks: Json | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_income?: number | null
+          deadline?: string | null
+          goal_description: string
+          id?: string
+          milestones?: Json | null
+          notes?: string | null
+          phases?: Json | null
+          progress?: number
+          recommendations?: Json | null
+          status?: string
+          target_amount?: number | null
+          tasks?: Json | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_income?: number | null
+          deadline?: string | null
+          goal_description?: string
+          id?: string
+          milestones?: Json | null
+          notes?: string | null
+          phases?: Json | null
+          progress?: number
+          recommendations?: Json | null
+          status?: string
+          target_amount?: number | null
+          tasks?: Json | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           color: string
