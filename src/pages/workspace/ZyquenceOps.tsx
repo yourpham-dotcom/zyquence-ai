@@ -20,6 +20,7 @@ import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
 import { WorkflowMap, type WorkflowNode, type WorkflowEdge } from "@/components/ops/WorkflowMap";
 import InventoryManagement from "@/components/ops/InventoryManagement";
 import Vault from "@/components/ops/Vault";
+import Sync from "@/components/ops/Sync";
 
 type OpsProject = {
   id: string;
@@ -69,7 +70,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -483,8 +484,8 @@ export default function ZyquenceOps() {
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("inventory")}>
             <Package className="h-4 w-4" /> Inventory Management
           </Button>
-          <Button variant="outline" size="sm" className="gap-1.5">
-            <MessageSquare className="h-4 w-4" /> Chat
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("sync")}>
+            <Users className="h-4 w-4" /> Sync
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("vault")}>
             <DollarSign className="h-4 w-4" /> Vault
@@ -1159,6 +1160,11 @@ export default function ZyquenceOps() {
   // ─── VAULT VIEW ───
   if (view === "vault") {
     return <Vault onBack={() => setView("dashboard")} />;
+  }
+
+  // ─── SYNC VIEW ───
+  if (view === "sync") {
+    return <Sync onBack={() => setView("dashboard")} />;
   }
 
   return null;
