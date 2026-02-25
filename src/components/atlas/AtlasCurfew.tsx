@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 
 interface AtlasCurfewProps {
   mode: string;
+  city: string;
+  country: string;
+  onCityChange: (val: string) => void;
+  onCountryChange: (val: string) => void;
 }
 
-const AtlasCurfew = ({ mode }: AtlasCurfewProps) => {
-  const [city, setCity] = useState("Los Angeles");
-  const [country, setCountry] = useState("USA");
+const AtlasCurfew = ({ mode, city, country, onCityChange, onCountryChange }: AtlasCurfewProps) => {
   const [stayLength, setStayLength] = useState("7");
   const [arrivalDate, setArrivalDate] = useState(() => {
     const d = new Date();
@@ -93,11 +95,11 @@ const AtlasCurfew = ({ mode }: AtlasCurfewProps) => {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
           <label className="text-[11px] text-muted-foreground">City</label>
-          <Input value={city} onChange={(e) => setCity(e.target.value)} className="h-8 text-sm" />
+          <Input value={city} onChange={(e) => onCityChange(e.target.value)} className="h-8 text-sm" />
         </div>
         <div className="space-y-1">
           <label className="text-[11px] text-muted-foreground">Country / Region</label>
-          <Input value={country} onChange={(e) => setCountry(e.target.value)} className="h-8 text-sm" />
+          <Input value={country} onChange={(e) => onCountryChange(e.target.value)} className="h-8 text-sm" />
         </div>
         <div className="space-y-1">
           <label className="text-[11px] text-muted-foreground">Stay (days)</label>

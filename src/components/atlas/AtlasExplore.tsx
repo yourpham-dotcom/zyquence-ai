@@ -7,9 +7,10 @@ const AtlasMap = lazy(() => import("./AtlasMap"));
 
 interface AtlasExploreProps {
   mode: string;
+  city: string;
 }
 
-const AtlasExplore = ({ mode }: AtlasExploreProps) => {
+const AtlasExplore = ({ mode, city }: AtlasExploreProps) => {
   const [activeCategory, setActiveCategory] = useState<string>("food");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -106,7 +107,7 @@ const AtlasExplore = ({ mode }: AtlasExploreProps) => {
           <AtlasMap
             center={[34.0522, -118.2437]}
             places={getFilteredPlaces().map(p => ({ name: p.name, type: p.type, lat: p.lat, lng: p.lng }))}
-            searchQuery={debouncedSearch}
+            searchQuery={debouncedSearch || city}
           />
         </Suspense>
       )}

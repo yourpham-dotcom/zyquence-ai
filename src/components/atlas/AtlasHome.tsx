@@ -7,11 +7,13 @@ type AtlasTab = "dashboard" | "planner" | "city" | "reset" | "adjust";
 interface AtlasHomeProps {
   onNavigate: (tab: AtlasTab) => void;
   mode: string;
+  city: string;
+  country: string;
+  onCityChange: (val: string) => void;
+  onCountryChange: (val: string) => void;
 }
 
-const AtlasHome = ({ onNavigate, mode }: AtlasHomeProps) => {
-  const [city, setCity] = useState("Los Angeles");
-  const [country, setCountry] = useState("USA");
+const AtlasHome = ({ onNavigate, mode, city, country, onCityChange, onCountryChange }: AtlasHomeProps) => {
   const [dayStatus, setDayStatus] = useState<"game" | "travel" | "off">("off");
   const [curfewTime, setCurfewTime] = useState("23:00");
 
@@ -59,14 +61,14 @@ const AtlasHome = ({ onNavigate, mode }: AtlasHomeProps) => {
         <input
           type="text"
           value={city}
-          onChange={(e) => setCity(e.target.value)}
+          onChange={(e) => onCityChange(e.target.value)}
           className="bg-transparent outline-none text-foreground font-medium w-28"
         />
         <span>,</span>
         <input
           type="text"
           value={country}
-          onChange={(e) => setCountry(e.target.value)}
+          onChange={(e) => onCountryChange(e.target.value)}
           className="bg-transparent outline-none text-foreground font-medium w-16"
         />
       </div>

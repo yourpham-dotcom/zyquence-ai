@@ -13,6 +13,8 @@ type AtlasTab = "dashboard" | "planner" | "city" | "reset" | "adjust";
 const ZyquenceAtlas = () => {
   const [activeTab, setActiveTab] = useState<AtlasTab>("dashboard");
   const [mode, setMode] = useState<"recovery" | "exploration" | "low-energy" | "travel">("recovery");
+  const [city, setCity] = useState("Los Angeles");
+  const [country, setCountry] = useState("USA");
 
   const tabs = [
     { id: "dashboard" as AtlasTab, label: "Dashboard", icon: LayoutGrid },
@@ -32,17 +34,17 @@ const ZyquenceAtlas = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <AtlasHome onNavigate={setActiveTab} mode={mode} />;
+        return <AtlasHome onNavigate={setActiveTab} mode={mode} city={city} country={country} onCityChange={setCity} onCountryChange={setCountry} />;
       case "planner":
-        return <AtlasCurfew mode={mode} />;
+        return <AtlasCurfew mode={mode} city={city} country={country} onCityChange={setCity} onCountryChange={setCountry} />;
       case "city":
-        return <AtlasExplore mode={mode} />;
+        return <AtlasExplore mode={mode} city={city} />;
       case "reset":
         return <AtlasReset />;
       case "adjust":
         return <AtlasTransition />;
       default:
-        return <AtlasHome onNavigate={setActiveTab} mode={mode} />;
+        return <AtlasHome onNavigate={setActiveTab} mode={mode} city={city} country={country} onCityChange={setCity} onCountryChange={setCountry} />;
     }
   };
 
