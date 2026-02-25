@@ -1,23 +1,24 @@
 import { useState, useEffect, useRef } from "react";
-import { Sparkles, Sun, Moon, Palette, CloudRain, ChevronDown } from "lucide-react";
+import { Sparkles, Sun, Moon, Palette, CloudRain, Waves, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-export type Theme = "dark" | "light" | "aurora" | "rainfall";
+export type Theme = "dark" | "light" | "aurora" | "rainfall" | "coastal";
 
 const THEMES: { value: Theme; label: string; icon: typeof Sun; emoji?: string }[] = [
   { value: "dark", label: "Dark", icon: Moon },
   { value: "light", label: "Light", icon: Sun },
   { value: "aurora", label: "Aurora", icon: Palette },
   { value: "rainfall", label: "Rainfall", icon: CloudRain, emoji: "🌧" },
+  { value: "coastal", label: "Coastal", icon: Waves, emoji: "🏖" },
 ];
 
 export const applyTheme = (theme: Theme) => {
   const root = document.documentElement;
-  root.classList.remove("light", "aurora", "rainfall");
-  document.body.classList.remove("aurora-bg", "rainfall-bg");
+  root.classList.remove("light", "aurora", "rainfall", "coastal");
+  document.body.classList.remove("aurora-bg", "rainfall-bg", "coastal-bg");
   if (theme === "light") root.classList.add("light");
   if (theme === "aurora") {
     root.classList.add("aurora");
@@ -26,6 +27,10 @@ export const applyTheme = (theme: Theme) => {
   if (theme === "rainfall") {
     root.classList.add("rainfall");
     document.body.classList.add("rainfall-bg");
+  }
+  if (theme === "coastal") {
+    root.classList.add("coastal");
+    document.body.classList.add("coastal-bg");
   }
 };
 
