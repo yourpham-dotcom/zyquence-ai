@@ -5,7 +5,7 @@ import { WorkspaceSearchBar } from "./WorkspaceSearchBar";
 import { AIAssistantFAB } from "./AIAssistantFAB";
 import { BottomBar } from "./BottomBar";
 import { StocksSidebar } from "./StocksSidebar";
-import { RainfallBackground, CoastalBackground } from "./ThemeBackgrounds";
+import { RainfallBackground, CoastalBackground, SnowfallBackground } from "./ThemeBackgrounds";
 import { Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
 
@@ -25,6 +25,7 @@ const WorkspaceLayout = () => {
     <SidebarProvider>
       {theme === "rainfall" && <RainfallBackground />}
       {theme === "coastal" && <CoastalBackground />}
+      {theme === "snowfall" && <SnowfallBackground />}
       <div className="min-h-screen flex w-full relative z-10">
         <WorkspaceSidebar />
         <main className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">

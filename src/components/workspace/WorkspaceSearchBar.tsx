@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Sparkles, Sun, Moon, Palette, CloudRain, Waves, ChevronDown } from "lucide-react";
+import { Sparkles, Sun, Moon, Palette, CloudRain, Waves, Snowflake, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-export type Theme = "dark" | "light" | "aurora" | "rainfall" | "coastal";
+export type Theme = "dark" | "light" | "aurora" | "rainfall" | "coastal" | "snowfall";
 
 const THEMES: { value: Theme; label: string; icon: typeof Sun; emoji?: string }[] = [
   { value: "dark", label: "Dark", icon: Moon },
@@ -13,25 +13,18 @@ const THEMES: { value: Theme; label: string; icon: typeof Sun; emoji?: string }[
   { value: "aurora", label: "Aurora", icon: Palette },
   { value: "rainfall", label: "Rainfall", icon: CloudRain, emoji: "🌧" },
   { value: "coastal", label: "Coastal", icon: Waves, emoji: "🏖" },
+  { value: "snowfall", label: "Snowfall", icon: Snowflake, emoji: "❄️" },
 ];
 
 export const applyTheme = (theme: Theme) => {
   const root = document.documentElement;
-  root.classList.remove("light", "aurora", "rainfall", "coastal");
-  document.body.classList.remove("aurora-bg", "rainfall-bg", "coastal-bg");
+  root.classList.remove("light", "aurora", "rainfall", "coastal", "snowfall");
+  document.body.classList.remove("aurora-bg", "rainfall-bg", "coastal-bg", "snowfall-bg");
   if (theme === "light") root.classList.add("light");
-  if (theme === "aurora") {
-    root.classList.add("aurora");
-    document.body.classList.add("aurora-bg");
-  }
-  if (theme === "rainfall") {
-    root.classList.add("rainfall");
-    document.body.classList.add("rainfall-bg");
-  }
-  if (theme === "coastal") {
-    root.classList.add("coastal");
-    document.body.classList.add("coastal-bg");
-  }
+  if (theme === "aurora") { root.classList.add("aurora"); document.body.classList.add("aurora-bg"); }
+  if (theme === "rainfall") { root.classList.add("rainfall"); document.body.classList.add("rainfall-bg"); }
+  if (theme === "coastal") { root.classList.add("coastal"); document.body.classList.add("coastal-bg"); }
+  if (theme === "snowfall") { root.classList.add("snowfall"); document.body.classList.add("snowfall-bg"); }
 };
 
 export function WorkspaceSearchBar() {

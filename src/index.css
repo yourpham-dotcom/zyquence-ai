@@ -236,6 +236,42 @@ All colors MUST be HSL.
     --sidebar-border: 200 15% 20%;
     --sidebar-ring: 195 45% 50%;
   }
+
+  .snowfall {
+    --background: 225 30% 8%;
+    --foreground: 220 20% 93%;
+    --card: 225 25% 12%;
+    --card-foreground: 220 20% 93%;
+    --popover: 225 25% 10%;
+    --popover-foreground: 220 20% 93%;
+    --primary: 220 50% 65%;
+    --primary-foreground: 225 30% 5%;
+    --secondary: 225 18% 16%;
+    --secondary-foreground: 220 20% 93%;
+    --muted: 225 14% 18%;
+    --muted-foreground: 225 10% 55%;
+    --accent: 225 20% 20%;
+    --accent-foreground: 220 20% 80%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 85% 97%;
+    --border: 225 14% 18%;
+    --input: 225 14% 18%;
+    --ring: 220 40% 60%;
+    --chart-1: 220 50% 65%;
+    --chart-2: 210 45% 55%;
+    --chart-3: 230 45% 60%;
+    --chart-4: 200 40% 50%;
+    --chart-5: 240 35% 55%;
+    --sidebar: 225 30% 6%;
+    --sidebar-background: 225 30% 6%;
+    --sidebar-foreground: 220 20% 93%;
+    --sidebar-primary: 220 50% 65%;
+    --sidebar-primary-foreground: 225 30% 5%;
+    --sidebar-accent: 225 18% 14%;
+    --sidebar-accent-foreground: 220 20% 80%;
+    --sidebar-border: 225 14% 18%;
+    --sidebar-ring: 220 40% 60%;
+  }
 }
 
 @layer base {
@@ -275,6 +311,10 @@ All colors MUST be HSL.
 
   .coastal .text-gradient {
     @apply from-[hsl(195_60%_40%)] to-[hsl(35_70%_55%)];
+  }
+
+  .snowfall .text-gradient {
+    @apply from-[hsl(220_50%_80%)] to-[hsl(230_30%_60%)];
   }
 
   .glow-text {
@@ -327,6 +367,11 @@ All colors MUST be HSL.
 
   .coastal-bg {
     background: linear-gradient(180deg, hsl(200 40% 12%) 0%, hsl(195 35% 16%) 40%, hsl(190 30% 14%) 70%, hsl(25 20% 12%) 100%);
+    background-attachment: fixed;
+  }
+
+  .snowfall-bg {
+    background: linear-gradient(180deg, hsl(225 30% 8%) 0%, hsl(230 25% 12%) 50%, hsl(220 20% 10%) 100%);
     background-attachment: fixed;
   }
 }
