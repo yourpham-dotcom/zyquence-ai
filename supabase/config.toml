@@ -65,3 +65,6 @@ verify_jwt = false
 
 [functions.scandrop]
 verify_jwt = false
+
+[functions.pulse-summarize]
+verify_jwt = false
