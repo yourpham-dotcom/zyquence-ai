@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.lifeos-chat]
 verify_jwt = false
+
+[functions.lifeos-scan]
+verify_jwt = false
