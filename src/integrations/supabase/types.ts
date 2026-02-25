@@ -896,6 +896,79 @@ export type Database = {
         }
         Relationships: []
       }
+      event_guests: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          event_id: string
+          guest_name: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          event_id: string
+          guest_name: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          event_id?: string
+          guest_name?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_guests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "life_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_updates: {
+        Row: {
+          change_description: string
+          created_at: string
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          change_description: string
+          created_at?: string
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          change_description?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_updates_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "life_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feedback_sessions: {
         Row: {
           authenticity_score: number | null
@@ -1214,6 +1287,48 @@ export type Database = {
           status?: string
           unit?: string | null
           unit_price?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      life_events: {
+        Row: {
+          created_at: string
+          event_date: string
+          event_time: string | null
+          host: string | null
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_date?: string
+          event_time?: string | null
+          host?: string | null
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_date?: string
+          event_time?: string | null
+          host?: string | null
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          status?: string
           updated_at?: string
           user_id?: string
         }

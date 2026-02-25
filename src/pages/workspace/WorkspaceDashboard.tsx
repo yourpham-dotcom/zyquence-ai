@@ -21,6 +21,7 @@ import {
   ArrowRight,
   Lock,
   Crown,
+  PartyPopper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,6 +46,7 @@ const WorkspaceDashboard = () => {
     { icon: Palette, title: "Studio", description: "Music, photo, video, code & creative tools", path: "/studio", color: "from-orange-500 to-red-500" },
     
     { icon: Wand2, title: "Creator Productivity", description: "AI productivity coach for creators", path: "/dashboard/creator-productivity", color: "from-violet-500 to-fuchsia-500" },
+    { icon: PartyPopper, title: "LifeOS", description: "Plan events, track guests, coordinate life", path: "/dashboard/lifeos", color: "from-pink-500 to-rose-500" },
   ].filter((t) => !visibleTools || visibleTools.has(t.title));
 
   const proModules = [
