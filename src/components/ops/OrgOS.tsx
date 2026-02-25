@@ -11,8 +11,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import {
   Send, Loader2, Crown, Shield, Users, UserCheck, Briefcase,
-  ChevronLeft, Building2, Trash2, Pencil, Save, X, Network
+  ChevronLeft, Building2, Trash2, Pencil, Save, X, Network, ScanLine
 } from "lucide-react";
+import OrgScanDrop from "./OrgScanDrop";
 
 type TeamMember = {
   id: string;
@@ -47,6 +48,7 @@ export default function OrgOS({ onBack }: { onBack: () => void }) {
   const [sending, setSending] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ name: "", title: "", department: "", tier_level: "" });
+  const [scanOpen, setScanOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { if (user) fetchMembers(); }, [user]);
@@ -179,7 +181,12 @@ export default function OrgOS({ onBack }: { onBack: () => void }) {
           <p className="text-xs text-muted-foreground">Organization Operating System — manage your team with natural language</p>
         </div>
         <Badge variant="outline" className="ml-auto text-xs">{members.length} members</Badge>
+        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setScanOpen(true)}>
+          <ScanLine className="h-4 w-4" /> Scan Org
+        </Button>
       </div>
+
+      <OrgScanDrop open={scanOpen} onOpenChange={setScanOpen} onMembersAdded={fetchMembers} />
 
       <Tabs defaultValue="team" className="w-full">
         <TabsList className="w-full justify-start">
