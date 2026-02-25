@@ -1174,6 +1174,42 @@ export type Database = {
         }
         Relationships: []
       }
+      linked_tasks: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+          task_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+          task_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "linked_tasks_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "voice_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "linked_tasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "ops_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_projects: {
         Row: {
           bpm: number | null
@@ -2091,6 +2127,132 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      voice_participants: {
+        Row: {
+          id: string
+          is_muted: boolean
+          joined_at: string
+          left_at: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          left_at?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          left_at?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "voice_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      voice_rooms: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          name: string
+          project_id: string | null
+          room_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          name: string
+          project_id?: string | null
+          room_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          project_id?: string | null
+          room_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_rooms_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ops_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      voice_sessions: {
+        Row: {
+          action_items: Json | null
+          created_at: string
+          end_time: string | null
+          id: string
+          key_decisions: Json | null
+          room_id: string
+          start_time: string
+          status: string
+          summary: string | null
+          transcript: string | null
+          user_id: string
+        }
+        Insert: {
+          action_items?: Json | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          key_decisions?: Json | null
+          room_id: string
+          start_time?: string
+          status?: string
+          summary?: string | null
+          transcript?: string | null
+          user_id: string
+        }
+        Update: {
+          action_items?: Json | null
+          created_at?: string
+          end_time?: string | null
+          id?: string
+          key_decisions?: Json | null
+          room_id?: string
+          start_time?: string
+          status?: string
+          summary?: string | null
+          transcript?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_sessions_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "voice_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       workflow_edges: {
         Row: {
