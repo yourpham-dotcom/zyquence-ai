@@ -15,8 +15,9 @@ import { toast } from "@/hooks/use-toast";
 import {
   Send, Loader2, Plus, CalendarDays, Users, MapPin, Clock,
   Trash2, ScanLine, PartyPopper, CheckCircle2, HelpCircle, XCircle,
-  AlertCircle, ArrowLeft, ImageIcon
+  AlertCircle, ArrowLeft, ImageIcon, Sparkles
 } from "lucide-react";
+import LifePlanner from "@/components/lifeos/LifePlanner";
 import { format } from "date-fns";
 import LifeScanDrop from "@/components/lifeos/LifeScanDrop";
 
@@ -371,7 +372,7 @@ const LifeOS = () => {
           </h1>
           <p className="text-sm text-muted-foreground">Plan events, track guests, coordinate life.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setScanDropOpen(true)}>
             <ScanLine className="h-4 w-4" /> ScanDrop
           </Button>
@@ -421,6 +422,7 @@ const LifeOS = () => {
       <Tabs defaultValue="events">
         <TabsList className="flex-wrap">
           <TabsTrigger value="events">Upcoming Events</TabsTrigger>
+          <TabsTrigger value="planner" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Life Planner</TabsTrigger>
           <TabsTrigger value="updates">Recent Updates</TabsTrigger>
           <TabsTrigger value="chat">Life Chat</TabsTrigger>
         </TabsList>
@@ -493,6 +495,10 @@ const LifeOS = () => {
               })}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="planner" className="mt-4">
+          <LifePlanner />
         </TabsContent>
 
         <TabsContent value="updates" className="mt-4">

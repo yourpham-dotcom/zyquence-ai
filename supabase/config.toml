@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.lifeos-scan]
 verify_jwt = false
+
+[functions.life-planner]
+verify_jwt = false
