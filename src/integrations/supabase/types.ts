@@ -1438,6 +1438,30 @@ export type Database = {
           },
         ]
       }
+      org_departments: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_comments: {
         Row: {
           content: string
@@ -1965,6 +1989,56 @@ export type Database = {
             columns: ["chat_id"]
             isOneToOne: false
             referencedRelation: "sync_chats"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          department: string | null
+          id: string
+          manager_id: string | null
+          name: string
+          responsibilities: string | null
+          tier_level: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          department?: string | null
+          id?: string
+          manager_id?: string | null
+          name: string
+          responsibilities?: string | null
+          tier_level?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          department?: string | null
+          id?: string
+          manager_id?: string | null
+          name?: string
+          responsibilities?: string | null
+          tier_level?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
             referencedColumns: ["id"]
           },
         ]
