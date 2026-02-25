@@ -18,6 +18,7 @@ import {
   AlertCircle, ArrowLeft, ImageIcon, Sparkles
 } from "lucide-react";
 import LifePlanner from "@/components/lifeos/LifePlanner";
+import LifeSync from "@/components/lifeos/LifeSync";
 import { format } from "date-fns";
 import LifeScanDrop from "@/components/lifeos/LifeScanDrop";
 
@@ -422,6 +423,7 @@ const LifeOS = () => {
       <Tabs defaultValue="events">
         <TabsList className="flex-wrap">
           <TabsTrigger value="events">Upcoming Events</TabsTrigger>
+          <TabsTrigger value="lifesync" className="gap-1.5"><Users className="h-3.5 w-3.5" /> LifeSync</TabsTrigger>
           <TabsTrigger value="planner" className="gap-1.5"><Sparkles className="h-3.5 w-3.5" /> Life Planner</TabsTrigger>
           <TabsTrigger value="updates">Recent Updates</TabsTrigger>
           <TabsTrigger value="chat">Life Chat</TabsTrigger>
@@ -495,6 +497,10 @@ const LifeOS = () => {
               })}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="lifesync" className="mt-4">
+          <LifeSync />
         </TabsContent>
 
         <TabsContent value="planner" className="mt-4">

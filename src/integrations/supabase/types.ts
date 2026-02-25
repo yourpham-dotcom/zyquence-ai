@@ -1334,6 +1334,121 @@ export type Database = {
         }
         Relationships: []
       }
+      lifesync_events: {
+        Row: {
+          created_at: string
+          event_date: string
+          event_time: string | null
+          host_id: string
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_date?: string
+          event_time?: string | null
+          host_id: string
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_date?: string
+          event_time?: string | null
+          host_id?: string
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      lifesync_messages: {
+        Row: {
+          content: string
+          created_at: string
+          event_id: string
+          id: string
+          message_type: string
+          metadata: Json | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          event_id: string
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lifesync_messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "lifesync_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lifesync_participants: {
+        Row: {
+          event_id: string
+          id: string
+          joined_at: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lifesync_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "lifesync_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       linked_tasks: {
         Row: {
           created_at: string
@@ -2649,7 +2764,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_lifesync_participant: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       chart_type: "bar" | "line" | "scatter" | "pie" | "heatmap" | "correlation"
