@@ -56,9 +56,27 @@ export default function OrgOS({ onBack }: { onBack: () => void }) {
 
   const fetchMembers = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("team_members" as any).select("*").eq("user_id", user!.id).order("created_at");
-    if (error) console.error("Fetch members error:", error);
-    if (data) setMembers(data as unknown as TeamMember[]);
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) { setLoading(false); return; }
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/team_members?select=*&user_id=eq.${user!.id}&order=created_at.asc`,
+        {
+          headers: {
+            "apikey": supabaseKey,
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setMembers(data as TeamMember[]);
+      }
+    } catch (e) {
+      console.error("Fetch members error:", e);
+    }
     setLoading(false);
   };
 
@@ -91,8 +109,20 @@ export default function OrgOS({ onBack }: { onBack: () => void }) {
     }
   };
 
+  const getRestHeaders = async () => {
+    const session = (await supabase.auth.getSession()).data.session;
+    return {
+      "Content-Type": "application/json",
+      "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      "Authorization": `Bearer ${session?.access_token}`,
+    };
+  };
+
   const deleteMember = async (id: string) => {
-    await supabase.from("team_members").delete().eq("id", id);
+    const headers = await getRestHeaders();
+    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/team_members?id=eq.${id}`, {
+      method: "DELETE", headers,
+    });
     setMembers(prev => prev.filter(m => m.id !== id));
     toast({ title: "Member removed" });
   };
@@ -104,12 +134,17 @@ export default function OrgOS({ onBack }: { onBack: () => void }) {
 
   const saveEdit = async () => {
     if (!editingId) return;
-    await supabase.from("team_members").update({
-      name: editForm.name,
-      title: editForm.title,
-      department: editForm.department,
-      tier_level: editForm.tier_level,
-    }).eq("id", editingId);
+    const headers = await getRestHeaders();
+    await fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/team_members?id=eq.${editingId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        name: editForm.name,
+        title: editForm.title,
+        department: editForm.department,
+        tier_level: editForm.tier_level,
+      }),
+    });
     setMembers(prev => prev.map(m => m.id === editingId ? { ...m, ...editForm } : m));
     setEditingId(null);
     toast({ title: "Member updated" });

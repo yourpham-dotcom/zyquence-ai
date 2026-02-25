@@ -133,45 +133,56 @@ export default function OrgScanDrop({ open, onOpenChange, onMembersAdded }: Prop
         return;
       }
 
-      // Insert all members one by one to avoid type issues
-      const insertedMembers: any[] = [];
-      for (const m of validMembers) {
-        const row = {
-          user_id: user.id,
-          name: m.name.trim(),
-          title: m.title || "Employee",
-          department: m.department || "General",
-          tier_level: classifyTier(m.title || "Employee"),
-        };
-        const { data, error } = await supabase
-          .from("team_members" as any)
-          .insert(row)
-          .select()
-          .single();
-        if (error) {
-          console.error("Insert error for", m.name, error);
-          throw error;
-        }
-        if (data) insertedMembers.push(data);
+      const session = (await supabase.auth.getSession()).data.session;
+      if (!session) throw new Error("Not authenticated");
+
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+      // Insert all members via direct REST to bypass typed client issues
+      const rows = validMembers.map(m => ({
+        user_id: user.id,
+        name: m.name.trim(),
+        title: m.title || "Employee",
+        department: m.department || "General",
+        tier_level: classifyTier(m.title || "Employee"),
+      }));
+
+      const insertRes = await fetch(`${supabaseUrl}/rest/v1/team_members`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": supabaseKey,
+          "Authorization": `Bearer ${session.access_token}`,
+          "Prefer": "return=representation",
+        },
+        body: JSON.stringify(rows),
+      });
+
+      if (!insertRes.ok) {
+        const errText = await insertRes.text();
+        throw new Error(`Insert failed: ${errText}`);
       }
+
+      const insertedMembers = await insertRes.json();
 
       // Resolve manager relationships
       for (let i = 0; i < validMembers.length; i++) {
         const mgrName = validMembers[i].manager_name;
         if (mgrName && insertedMembers[i]) {
-          const mgr = insertedMembers.find((im: any) => im.name.toLowerCase() === mgrName.toLowerCase());
+          const mgr = insertedMembers.find((im: any) => 
+            im.name.toLowerCase() === mgrName.toLowerCase()
+          );
           if (mgr) {
-            await supabase.from("team_members" as any).update({ manager_id: mgr.id } as any).eq("id", insertedMembers[i].id);
-          } else {
-            const { data: existingMgr } = await supabase
-              .from("team_members" as any)
-              .select("id")
-              .eq("user_id", user.id)
-              .ilike("name", mgrName)
-              .maybeSingle();
-            if (existingMgr) {
-              await supabase.from("team_members" as any).update({ manager_id: (existingMgr as any).id } as any).eq("id", insertedMembers[i].id);
-            }
+            await fetch(`${supabaseUrl}/rest/v1/team_members?id=eq.${insertedMembers[i].id}`, {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+                "apikey": supabaseKey,
+                "Authorization": `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({ manager_id: mgr.id }),
+            });
           }
         }
       }
