@@ -13,7 +13,7 @@ import {
   Plus, Loader2, Target, Calendar, AlertTriangle, CheckCircle2,
   Clock, Users, Zap, ChevronDown, ChevronRight, ChevronLeft, Trash2, BarChart3,
   Milestone, ListTodo, Pencil, X, Save, Map as MapIcon, Send, Sparkles, GitBranch,
-  BookOpen, Package, MessageSquare, DollarSign, Globe
+  BookOpen, Package, MessageSquare, DollarSign, Globe, Mic
 } from "lucide-react";
 import { format, isPast, isToday, addDays } from "date-fns";
 import { RoadmapTimeline } from "@/components/ops/RoadmapTimeline";
@@ -22,6 +22,7 @@ import InventoryManagement from "@/components/ops/InventoryManagement";
 import Vault from "@/components/ops/Vault";
 import Sync from "@/components/ops/Sync";
 import ZyquenceAtlas from "@/components/atlas/ZyquenceAtlas";
+import Pulse from "@/components/ops/Pulse";
 
 type OpsProject = {
   id: string;
@@ -71,7 +72,7 @@ type OpsMilestone = {
   is_completed: boolean;
 };
 
-type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync" | "atlas";
+type View = "dashboard" | "create" | "project" | "roadmap" | "workflow" | "create-workflow" | "inventory" | "vault" | "sync" | "atlas" | "pulse";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -493,6 +494,9 @@ export default function ZyquenceOps() {
           </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("atlas")}>
             <Globe className="h-4 w-4" /> Atlas
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setView("pulse")}>
+            <Mic className="h-4 w-4" /> Pulse
           </Button>
         </div>
 
@@ -1181,6 +1185,11 @@ export default function ZyquenceOps() {
         <ZyquenceAtlas />
       </div>
     );
+  }
+
+  // ─── PULSE VIEW ───
+  if (view === "pulse") {
+    return <Pulse onBack={() => setView("dashboard")} />;
   }
 
   return null;
