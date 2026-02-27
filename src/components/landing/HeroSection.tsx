@@ -34,12 +34,6 @@ const HeroSection = () => {
             >
               Start Free
             </a>
-            <a
-              href="/mission"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-foreground/20 text-foreground text-sm font-medium hover:bg-foreground/5 transition-colors"
-            >
-              Read Documentation
-            </a>
           </div>
         </motion.div>
 

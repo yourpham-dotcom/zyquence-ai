@@ -1,6 +1,5 @@
 import LandingNav from "@/components/landing/LandingNav";
 import HeroSection from "@/components/landing/HeroSection";
-import PhilosophySection from "@/components/landing/PhilosophySection";
 import CTASection from "@/components/landing/CTASection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,7 +27,6 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <LandingNav />
       <HeroSection />
-      <PhilosophySection />
       <CTASection />
       <LandingFooter />
     </div>
