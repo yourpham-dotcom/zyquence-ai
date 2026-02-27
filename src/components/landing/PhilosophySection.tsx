@@ -6,27 +6,7 @@ const PhilosophySection = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="relative bg-background overflow-hidden py-12">
-      {/* Marquee band */}
-      <div className="border-y border-foreground/10 py-6 overflow-hidden">
-        <motion.div
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="flex whitespace-nowrap gap-16"
-        >
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span
-              key={i}
-              className="text-6xl md:text-8xl font-bold tracking-tighter text-foreground/[0.04]"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              Zyquence
-            </span>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Philosophy text */}
+    <section ref={ref} className="relative bg-background overflow-hidden">
       <div className="px-6 md:px-12 py-32 md:py-48">
         <div className="max-w-4xl mx-auto md:ml-[15%]">
           <motion.p
@@ -42,25 +22,6 @@ const PhilosophySection = () => {
             <span className="text-foreground/20">from tools to intelligence.</span>
           </motion.p>
         </div>
-      </div>
-
-      {/* Second marquee */}
-      <div className="border-y border-foreground/10 py-6 overflow-hidden">
-        <motion.div
-          animate={{ x: ["-50%", "0%"] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="flex whitespace-nowrap gap-16"
-        >
-          {Array.from({ length: 8 }).map((_, i) => (
-            <span
-              key={i}
-              className="text-6xl md:text-8xl font-bold tracking-tighter text-foreground/[0.04]"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              Zyquence
-            </span>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
