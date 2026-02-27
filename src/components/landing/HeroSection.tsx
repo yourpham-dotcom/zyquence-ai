@@ -11,11 +11,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[clamp(3.5rem,12vw,12rem)] font-bold leading-[0.85] tracking-tighter text-foreground text-right"
+            className="text-[clamp(3.5rem,12vw,12rem)] font-bold leading-[0.85] tracking-tighter text-foreground text-center"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Zyquence
-            <span className="block text-foreground/20">OS</span>
           </motion.h1>
         </div>
       </div>
