@@ -1,6 +1,11 @@
-import Navigation from "@/components/Navigation";
-import Hero from "@/components/Hero";
-import Mission from "@/components/Mission";
+import LandingNav from "@/components/landing/LandingNav";
+import HeroSection from "@/components/landing/HeroSection";
+import EcosystemSection from "@/components/landing/EcosystemSection";
+import PhilosophySection from "@/components/landing/PhilosophySection";
+import FloatingPanels from "@/components/landing/FloatingPanels";
+import ArchitectureSection from "@/components/landing/ArchitectureSection";
+import UseCasesSection from "@/components/landing/UseCasesSection";
+import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -11,7 +16,6 @@ const Index = () => {
   const { user, loading: authLoading } = useAuth();
   const { isPro, loading: subLoading } = useSubscription();
 
-  // Show loading while checking auth
   if (authLoading || (user && subLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -20,16 +24,20 @@ const Index = () => {
     );
   }
 
-  // Redirect logged-in users to unified workspace
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
-      <Hero />
-      <Mission />
+      <LandingNav />
+      <HeroSection />
+      <EcosystemSection />
+      <PhilosophySection />
+      <FloatingPanels />
+      <ArchitectureSection />
+      <UseCasesSection />
+      <CTASection />
       <Footer />
     </div>
   );
