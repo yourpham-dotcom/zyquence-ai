@@ -6,7 +6,7 @@ import FloatingPanels from "@/components/landing/FloatingPanels";
 import ArchitectureSection from "@/components/landing/ArchitectureSection";
 import UseCasesSection from "@/components/landing/UseCasesSection";
 import CTASection from "@/components/landing/CTASection";
-import Footer from "@/components/Footer";
+import LandingFooter from "@/components/landing/LandingFooter";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Navigate } from "react-router-dom";
@@ -38,7 +38,7 @@ const Index = () => {
       <ArchitectureSection />
       <UseCasesSection />
       <CTASection />
-      <Footer />
+      <LandingFooter />
     </div>
   );
 };
