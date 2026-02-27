@@ -20,7 +20,7 @@ const PhilosophySection = () => {
               className="text-6xl md:text-8xl font-bold tracking-tighter text-foreground/[0.04]"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              Zyquence OS
+              Zyquence
             </span>
           ))}
         </motion.div>
@@ -57,7 +57,7 @@ const PhilosophySection = () => {
               className="text-6xl md:text-8xl font-bold tracking-tighter text-foreground/[0.04]"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              Zyquence OS
+              Zyquence
             </span>
           ))}
         </motion.div>
