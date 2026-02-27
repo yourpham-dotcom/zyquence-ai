@@ -1,10 +1,7 @@
 import LandingNav from "@/components/landing/LandingNav";
 import HeroSection from "@/components/landing/HeroSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
-import ShowcaseSection from "@/components/landing/ShowcaseSection";
 import CTASection from "@/components/landing/CTASection";
 import LandingFooter from "@/components/landing/LandingFooter";
-import ParticleGrid from "@/components/landing/ParticleGrid";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Navigate } from "react-router-dom";
@@ -27,16 +24,11 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <ParticleGrid />
+    <div className="min-h-screen bg-background">
       <LandingNav />
-      <div className="relative z-10">
-        <HeroSection />
-        <FeaturesSection />
-        <ShowcaseSection />
-        <CTASection />
-        <LandingFooter />
-      </div>
+      <HeroSection />
+      <CTASection />
+      <LandingFooter />
     </div>
   );
 };
