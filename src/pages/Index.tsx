@@ -2,9 +2,6 @@ import LandingNav from "@/components/landing/LandingNav";
 import HeroSection from "@/components/landing/HeroSection";
 import EcosystemSection from "@/components/landing/EcosystemSection";
 import PhilosophySection from "@/components/landing/PhilosophySection";
-import FloatingPanels from "@/components/landing/FloatingPanels";
-import ArchitectureSection from "@/components/landing/ArchitectureSection";
-import UseCasesSection from "@/components/landing/UseCasesSection";
 import CTASection from "@/components/landing/CTASection";
 import LandingFooter from "@/components/landing/LandingFooter";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,9 +31,6 @@ const Index = () => {
       <HeroSection />
       <EcosystemSection />
       <PhilosophySection />
-      <FloatingPanels />
-      <ArchitectureSection />
-      <UseCasesSection />
       <CTASection />
       <LandingFooter />
     </div>
