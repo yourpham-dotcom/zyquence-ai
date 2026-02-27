@@ -28,9 +28,6 @@ const LandingNav = () => {
           <Link to="/pricing" className="text-xs text-foreground/40 hover:text-foreground transition-colors">
             Pricing
           </Link>
-          <a href="#" className="text-xs text-foreground/40 hover:text-foreground transition-colors">
-            Documentation↗
-          </a>
         </div>
 
         <div className="flex items-center gap-4">
