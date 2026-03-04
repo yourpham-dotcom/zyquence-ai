@@ -1,7 +1,7 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Lightbulb, BarChart3, Zap, GitBranch,
-  Activity, Brain, Radar, Settings, Sparkles, ChevronLeft
+  Activity, Brain, Radar, Settings, Sparkles, ChevronLeft, ArrowLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -22,6 +22,7 @@ const navItems = [
 export const CISidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <aside
@@ -30,7 +31,16 @@ export const CISidebar = () => {
         collapsed ? "w-16" : "w-60"
       )}
     >
-      <div className="h-14 flex items-center px-4 gap-2 border-b border-border/50 shrink-0">
+      <div className="h-14 flex items-center px-3 gap-2 border-b border-border/50 shrink-0">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 shrink-0 text-muted-foreground hover:text-foreground"
+          onClick={() => navigate("/dashboard")}
+          title="Back to Dashboard"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shrink-0">
           <Sparkles className="w-4 h-4 text-white" />
         </div>
