@@ -56,6 +56,17 @@ import EliteDashboard from "./pages/EliteDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
 import CreativeIntelligence from "./pages/CreativeIntelligence";
 import MusicIntelligence from "./pages/MusicIntelligence";
+
+// Creative Intelligence sub-pages
+import CIDashboard from "./pages/creative-intelligence/CIDashboard";
+import CIIdeaCapture from "./pages/creative-intelligence/CIIdeaCapture";
+import CIIdeaAnalysis from "./pages/creative-intelligence/CIIdeaAnalysis";
+import CIStrategyGenerator from "./pages/creative-intelligence/CIStrategyGenerator";
+import CIWorkflowBuilder from "./pages/creative-intelligence/CIWorkflowBuilder";
+import CIExecutionMonitor from "./pages/creative-intelligence/CIExecutionMonitor";
+import CIInsights from "./pages/creative-intelligence/CIInsights";
+import CIOpportunityScanner from "./pages/creative-intelligence/CIOpportunityScanner";
+import CISettings from "./pages/creative-intelligence/CISettings";
 import ConnectLayout from "./pages/community/ConnectLayout";
 import CodeStudio from "./pages/CodeStudio";
 
@@ -148,7 +159,17 @@ const App = () => (
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
-          <Route path="/creative-intelligence" element={<CreativeIntelligence />} />
+          <Route path="/creative-intelligence" element={<CreativeIntelligence />}>
+            <Route index element={<CIDashboard />} />
+            <Route path="capture" element={<CIIdeaCapture />} />
+            <Route path="analysis" element={<CIIdeaAnalysis />} />
+            <Route path="strategy" element={<CIStrategyGenerator />} />
+            <Route path="workflow" element={<CIWorkflowBuilder />} />
+            <Route path="monitor" element={<CIExecutionMonitor />} />
+            <Route path="insights" element={<CIInsights />} />
+            <Route path="opportunities" element={<CIOpportunityScanner />} />
+            <Route path="settings" element={<CISettings />} />
+          </Route>
           <Route path="/music-intelligence" element={<MusicIntelligence />} />
           <Route path="/code-studio" element={<CodeStudio />} />
           <Route path="/connect" element={<ConnectLayout />} />
