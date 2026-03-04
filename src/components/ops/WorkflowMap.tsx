@@ -130,11 +130,15 @@ export function WorkflowMap({ nodes, edges, onNodeUpdate, onNodeDelete, onNodeAd
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target === svgRef.current || (e.target as SVGElement).tagName === "svg") {
-      setIsPanning(true);
-      setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
-      setSelectedNode(null);
-    }
+    if (draggingNode) return;
+    setIsPanning(true);
+    setPanStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.08 : 0.08;
+    setZoom(z => Math.min(Math.max(z + delta, 0.3), 2));
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -240,6 +244,7 @@ export function WorkflowMap({ nodes, edges, onNodeUpdate, onNodeDelete, onNodeAd
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
       >
         <svg
           ref={svgRef}
