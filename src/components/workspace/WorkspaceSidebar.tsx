@@ -69,6 +69,7 @@ const tradingNav = [
 
 const opsNav = [
   { title: "Workflow Engine", path: "/dashboard/ops", icon: Workflow },
+  { title: "Creative Intelligence", path: "/creative-intelligence", icon: Sparkles },
 ];
 
 const toolsNav = [
