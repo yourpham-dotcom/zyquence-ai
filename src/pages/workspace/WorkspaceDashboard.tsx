@@ -52,6 +52,7 @@ const WorkspaceDashboard = () => {
     { icon: Gamepad2, title: "Gaming Engine", description: "Wellness, code practice, sports", path: "/gaming-intelligence", color: "from-purple-500 to-pink-500" },
     { icon: Cpu, title: "AI Builder", description: "Build custom AI tools", path: "/ai-builder", color: "from-indigo-500 to-violet-500" },
     { icon: Music, title: "Artist Intelligence", description: "AI music identity & branding", path: "/artist-intelligence", color: "from-fuchsia-500 to-rose-500" },
+    { icon: Sparkles, title: "Creative Intelligence", description: "AI creative tools & content generation", path: "/creative-intelligence", color: "from-emerald-500 to-teal-500" },
   ].filter((m) => !visibleTools || visibleTools.has(m.title));
 
   return (

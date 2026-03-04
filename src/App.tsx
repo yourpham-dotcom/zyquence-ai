@@ -54,6 +54,7 @@ import FreeDashboard from "./pages/FreeDashboard";
 import ProDashboard from "./pages/ProDashboard";
 import EliteDashboard from "./pages/EliteDashboard";
 import ArtistIntelligence from "./pages/ArtistIntelligence";
+import CreativeIntelligence from "./pages/CreativeIntelligence";
 import MusicIntelligence from "./pages/MusicIntelligence";
 import ConnectLayout from "./pages/community/ConnectLayout";
 import CodeStudio from "./pages/CodeStudio";
@@ -147,6 +148,7 @@ const App = () => (
           <Route path="/gaming-intelligence/projects" element={<ProjectManager />} />
           <Route path="/ai-builder" element={<AIBuilderHub />} />
           <Route path="/artist-intelligence" element={<ArtistIntelligence />} />
+          <Route path="/creative-intelligence" element={<CreativeIntelligence />} />
           <Route path="/music-intelligence" element={<MusicIntelligence />} />
           <Route path="/code-studio" element={<CodeStudio />} />
           <Route path="/connect" element={<ConnectLayout />} />
