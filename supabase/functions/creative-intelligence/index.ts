@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { action, title, description, idea } = await req.json();
+    const { action, title, description, idea, audio, image, mimeType } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -49,6 +49,80 @@ Return ONLY valid JSON, no markdown, no code blocks.`;
 
 Return ONLY valid JSON, no markdown, no code blocks.`;
       userMessage = idea ? `Ideas context: ${JSON.stringify(idea)}` : "Generate general creative intelligence insights for a startup founder.";
+    } else if (action === "transcribe") {
+      // Use Gemini's multimodal capability to transcribe audio
+      systemPrompt = "You are a transcription assistant. Transcribe the audio content accurately. Return a JSON object with a single field: text (the transcribed text). Return ONLY valid JSON.";
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: [
+              { type: "text", text: "Transcribe this audio recording into text. Return JSON with a 'text' field." },
+              { type: "input_audio", input_audio: { data: audio, format: "wav" } }
+            ]},
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const t = await response.text();
+        console.error("Transcription error:", response.status, t);
+        // Fallback: return a message asking user to type instead
+        return new Response(JSON.stringify({ result: { text: "" }, fallback: true, error: "Audio transcription not available. Please type your idea instead." }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const data = await response.json();
+      let content = data.choices?.[0]?.message?.content || "{}";
+      content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      let parsed;
+      try { parsed = JSON.parse(content); } catch { parsed = { text: content }; }
+      return new Response(JSON.stringify({ result: parsed }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } else if (action === "analyze_image") {
+      systemPrompt = "You are a creative idea extraction assistant. Look at this image and describe what you see in a way that could be used as the basis for a creative idea or project. Include observations about themes, concepts, mood, and potential applications. Return a JSON object with a single field: text (the description). Return ONLY valid JSON.";
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: [
+              { type: "text", text: "Analyze this image and extract creative idea potential from it." },
+              { type: "image_url", image_url: { url: `data:${mimeType || "image/png"};base64,${image}` } }
+            ]},
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const t = await response.text();
+        console.error("Image analysis error:", response.status, t);
+        throw new Error(`Image analysis failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      let content = data.choices?.[0]?.message?.content || "{}";
+      content = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      let parsed;
+      try { parsed = JSON.parse(content); } catch { parsed = { text: content }; }
+      return new Response(JSON.stringify({ result: parsed }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
