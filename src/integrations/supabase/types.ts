@@ -258,6 +258,57 @@ export type Database = {
         }
         Relationships: []
       }
+      ci_ideas: {
+        Row: {
+          ai_analysis: Json | null
+          ai_strategy: Json | null
+          created_at: string
+          description: string
+          execution_complexity: number | null
+          id: string
+          idea_score: number | null
+          market_potential: number | null
+          risk_level: number | null
+          status: string
+          title: string
+          trend_alignment: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          ai_strategy?: Json | null
+          created_at?: string
+          description?: string
+          execution_complexity?: number | null
+          id?: string
+          idea_score?: number | null
+          market_potential?: number | null
+          risk_level?: number | null
+          status?: string
+          title?: string
+          trend_alignment?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          ai_strategy?: Json | null
+          created_at?: string
+          description?: string
+          execution_complexity?: number | null
+          id?: string
+          idea_score?: number | null
+          market_potential?: number | null
+          risk_level?: number | null
+          status?: string
+          title?: string
+          trend_alignment?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       client_assignments: {
         Row: {
           client_id: string
