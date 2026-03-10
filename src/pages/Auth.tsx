@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com"];
+const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com", "asantimokwala48@gmail.com"];
 const PRO_PRODUCT_ID = "prod_Twj36mQhOR4juQ";
 
 const Auth = () => {
