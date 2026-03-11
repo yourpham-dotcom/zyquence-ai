@@ -235,7 +235,7 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
     <div className="flex flex-col items-center justify-center h-full gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
       <p className="text-sm text-muted-foreground">
-        {analysisMode === "audio" ? "Analyzing your music..." : "Analyzing your sound profile..."}
+        {analysisMode === "audio" ? "Analyzing your uploaded music..." : analysisMode === "url" ? "Fetching & analyzing your track..." : "Analyzing your sound profile..."}
       </p>
     </div>
   );
