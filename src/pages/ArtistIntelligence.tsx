@@ -67,6 +67,7 @@ const ArtistIntelligence = () => {
       case "profile": return <CreatorProfile onComplete={handleProfileComplete} existingProfile={profile} />;
       case "identity": return <IdentityAnalyzer profile={profile} />;
       case "sound": return <SoundDirection profile={profile} />;
+      case "branding": return <Branding profile={profile} />;
       case "translator": return <ArtistTranslator profile={profile} />;
       case "readiness": return <ReadinessScore profile={profile} />;
       case "strategy": return <StrategyDashboard profile={profile} />;
