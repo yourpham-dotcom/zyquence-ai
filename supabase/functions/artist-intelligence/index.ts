@@ -139,21 +139,82 @@ async function getSpotifyToken(): Promise<string> {
   return data.access_token;
 }
 
-// Helper: Extract Spotify track ID from URL
-function extractSpotifyTrackId(url: string): string | null {
-  const match = url.match(/track\/([a-zA-Z0-9]+)/);
-  return match ? match[1] : null;
+// Helper: Extract Spotify ID and type from URL
+function extractSpotifyInfo(url: string): { type: string; id: string } | null {
+  const trackMatch = url.match(/track\/([a-zA-Z0-9]+)/);
+  if (trackMatch) return { type: "track", id: trackMatch[1] };
+  const artistMatch = url.match(/artist\/([a-zA-Z0-9]+)/);
+  if (artistMatch) return { type: "artist", id: artistMatch[1] };
+  const albumMatch = url.match(/album\/([a-zA-Z0-9]+)/);
+  if (albumMatch) return { type: "album", id: albumMatch[1] };
+  return null;
 }
 
-// Helper: Fetch Spotify track data + audio features
+// Helper: Fetch Spotify data (supports track, artist, album URLs)
 async function fetchSpotifyTrackData(url: string): Promise<string | null> {
-  const trackId = extractSpotifyTrackId(url);
-  if (!trackId) throw new Error("Could not extract Spotify track ID from URL");
+  const info = extractSpotifyInfo(url);
+  if (!info) throw new Error("Could not parse Spotify URL. Please paste a track, artist, or album link.");
 
   const token = await getSpotifyToken();
   const headers = { Authorization: `Bearer ${token}` };
 
-  // Fetch track info and audio features in parallel
+  if (info.type === "artist") {
+    // Fetch artist info + top tracks
+    const [artistResp, topTracksResp] = await Promise.all([
+      fetch(`https://api.spotify.com/v1/artists/${info.id}`, { headers }),
+      fetch(`https://api.spotify.com/v1/artists/${info.id}/top-tracks?market=US`, { headers }),
+    ]);
+    if (!artistResp.ok) throw new Error("Failed to fetch Spotify artist info");
+    const artist = await artistResp.json();
+    const topTracks = topTracksResp.ok ? await topTracksResp.json() : null;
+
+    const result: any = {
+      platform: "spotify",
+      type: "artist",
+      artist_name: artist.name,
+      genres: artist.genres,
+      popularity: artist.popularity,
+      followers: artist.followers?.total,
+      top_tracks: topTracks?.tracks?.slice(0, 5).map((t: any) => ({
+        name: t.name,
+        popularity: t.popularity,
+        duration_ms: t.duration_ms,
+        explicit: t.explicit,
+        album: t.album?.name,
+      })),
+    };
+
+    // Fetch audio features for top tracks
+    if (topTracks?.tracks?.length) {
+      const trackIds = topTracks.tracks.slice(0, 5).map((t: any) => t.id).join(",");
+      try {
+        const featResp = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds}`, { headers });
+        if (featResp.ok) {
+          const featData = await featResp.json();
+          const features = featData.audio_features?.filter(Boolean);
+          if (features?.length) {
+            const avg = (key: string) => +(features.reduce((s: number, f: any) => s + (f[key] || 0), 0) / features.length).toFixed(3);
+            result.average_audio_features = {
+              tempo: avg("tempo"),
+              danceability: avg("danceability"),
+              energy: avg("energy"),
+              valence: avg("valence"),
+              acousticness: avg("acousticness"),
+              instrumentalness: avg("instrumentalness"),
+              speechiness: avg("speechiness"),
+              liveness: avg("liveness"),
+              loudness: avg("loudness"),
+            };
+          }
+        }
+      } catch {}
+    }
+
+    return JSON.stringify(result);
+  }
+
+  // Default: track
+  const trackId = info.id;
   const [trackResp, featuresResp] = await Promise.all([
     fetch(`https://api.spotify.com/v1/tracks/${trackId}`, { headers }),
     fetch(`https://api.spotify.com/v1/audio-features/${trackId}`, { headers }),
@@ -166,6 +227,7 @@ async function fetchSpotifyTrackData(url: string): Promise<string | null> {
 
   const result: any = {
     platform: "spotify",
+    type: "track",
     track_name: track.name,
     artists: track.artists?.map((a: any) => a.name),
     album: track.album?.name,
@@ -177,22 +239,14 @@ async function fetchSpotifyTrackData(url: string): Promise<string | null> {
 
   if (features && !features.error) {
     result.audio_features = {
-      tempo: features.tempo,
-      key: features.key,
-      mode: features.mode,
-      time_signature: features.time_signature,
-      danceability: features.danceability,
-      energy: features.energy,
-      valence: features.valence,
-      acousticness: features.acousticness,
-      instrumentalness: features.instrumentalness,
-      liveness: features.liveness,
-      speechiness: features.speechiness,
-      loudness: features.loudness,
+      tempo: features.tempo, key: features.key, mode: features.mode,
+      time_signature: features.time_signature, danceability: features.danceability,
+      energy: features.energy, valence: features.valence, acousticness: features.acousticness,
+      instrumentalness: features.instrumentalness, liveness: features.liveness,
+      speechiness: features.speechiness, loudness: features.loudness,
     };
   }
 
-  // Try to get artist genres
   if (track.artists?.[0]?.id) {
     try {
       const artistResp = await fetch(`https://api.spotify.com/v1/artists/${track.artists[0].id}`, { headers });
