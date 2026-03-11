@@ -21,6 +21,7 @@ const MusicVideo = ({ profile }: MusicVideoProps) => {
   const [generatedClips, setGeneratedClips] = useState<Record<number, string>>({});
   const [songTitle, setSongTitle] = useState("");
   const [songMood, setSongMood] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
