@@ -69,6 +69,7 @@ const ArtistIntelligence = () => {
       case "identity": return <IdentityAnalyzer profile={profile} />;
       case "sound": return <SoundDirection profile={profile} />;
       case "branding": return <Branding profile={profile} />;
+      case "music_video": return <MusicVideo profile={profile} />;
       case "translator": return <ArtistTranslator profile={profile} />;
       case "readiness": return <ReadinessScore profile={profile} />;
       case "strategy": return <StrategyDashboard profile={profile} />;
