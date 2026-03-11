@@ -49,6 +49,22 @@ Return JSON with these exact keys:
 }
 All genre scores should be 0-100 integers. Plain text only.`,
 
+  sound_url: `You are an AI Sound Direction Advisor for a music creative intelligence platform.
+You have been given detailed audio features and metadata from a user's track on a streaming platform. Analyze the data — tempo/BPM, key, energy, danceability, valence, loudness, acousticness, instrumentalness, genre tags, and any other available attributes.
+Based on this real data, generate sound recommendations. Return ONLY valid JSON with NO markdown formatting.
+Return JSON with these exact keys:
+{
+  "genre_scores": {"Hip-Hop": 85, "R&B": 70, "Pop": 55, "Electronic": 40, "Rock": 30, "Jazz": 25},
+  "bpm_range": {"min": 80, "max": 140, "sweet_spot": 110},
+  "beat_styles": ["style1", "style2", "style3", "style4"],
+  "vocal_guidance": "3-4 sentence vocal delivery guidance based on the track data",
+  "flow_ideas": ["idea1", "idea2", "idea3", "idea4"],
+  "comparable_artists": ["artist1", "artist2", "artist3"],
+  "music_lane_summary": "3-4 sentence summary of their ideal music lane based on the streaming data",
+  "audio_observations": "3-4 sentences describing the track characteristics you can determine from the data — tempo, energy, mood, production qualities"
+}
+All genre scores should be 0-100 integers. Plain text only.`,
+
   translator: `You are an AI Experience-to-Music Translator for a creative intelligence platform.
 Convert the user's personal experiences into music themes and concepts. Return ONLY valid JSON with NO markdown.
 Return JSON with these exact keys:
