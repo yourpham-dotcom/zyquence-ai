@@ -11,6 +11,7 @@ import CreatorProfile from "@/components/artist-intelligence/CreatorProfile";
 import IdentityAnalyzer from "@/components/artist-intelligence/IdentityAnalyzer";
 import SoundDirection from "@/components/artist-intelligence/SoundDirection";
 import Branding from "@/components/artist-intelligence/Branding";
+import MusicVideo from "@/components/artist-intelligence/MusicVideo";
 import ArtistTranslator from "@/components/artist-intelligence/ArtistTranslator";
 import ReadinessScore from "@/components/artist-intelligence/ReadinessScore";
 import StrategyDashboard from "@/components/artist-intelligence/StrategyDashboard";
@@ -68,6 +69,7 @@ const ArtistIntelligence = () => {
       case "identity": return <IdentityAnalyzer profile={profile} />;
       case "sound": return <SoundDirection profile={profile} />;
       case "branding": return <Branding profile={profile} />;
+      case "music_video": return <MusicVideo profile={profile} />;
       case "translator": return <ArtistTranslator profile={profile} />;
       case "readiness": return <ReadinessScore profile={profile} />;
       case "strategy": return <StrategyDashboard profile={profile} />;
@@ -95,7 +97,7 @@ const ArtistIntelligence = () => {
 
         {/* Mobile nav */}
         <div className="md:hidden border-b border-border overflow-x-auto flex shrink-0 absolute top-12 left-0 right-0 bg-background z-10">
-          {(["overview", "profile", "identity", "sound", "branding", "translator", "readiness", "strategy", "feedback"] as AIModule[]).map(m => (
+          {(["overview", "profile", "identity", "sound", "branding", "music_video", "translator", "readiness", "strategy", "feedback"] as AIModule[]).map(m => (
             <button key={m} onClick={() => setActiveModule(m)}
               className={`px-3 py-2 text-xs whitespace-nowrap ${activeModule === m ? "text-foreground border-b-2 border-primary" : "text-muted-foreground"}`}>
               {m.charAt(0).toUpperCase() + m.slice(1)}
