@@ -248,7 +248,7 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           <p className="text-sm text-muted-foreground">Your personalized music lane</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => { setResult(null); setAudioFile(null); setAnalysisMode("profile"); }}>
+          <Button variant="outline" onClick={() => { setResult(null); setAudioFile(null); setMusicUrl(""); setAnalysisMode("profile"); }}>
             New Analysis
           </Button>
           <Button onClick={save} disabled={saving}>
