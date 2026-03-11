@@ -116,12 +116,10 @@ serve(async (req) => {
     if (!systemPrompt) throw new Error(`Unknown module: ${module}`);
 
     // Handle audio analysis for sound_audio module
-    let effectiveModule = module;
     let audioBase64: string | null = null;
     
     if (module === "sound_audio" && input?.audio_url) {
       // Download audio from Supabase storage
-      const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
       const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
       
       const audioResponse = await fetch(input.audio_url, {
@@ -138,8 +136,6 @@ serve(async (req) => {
       }
       audioBase64 = btoa(binary);
     }
-
-    const systemPrompt = PROMPTS[effectiveModule];
 
     const userContent = module === "feedback"
       ? `Lyrics to analyze:\n${input}`
