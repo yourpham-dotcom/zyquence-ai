@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
-import ProGate from "@/components/ProGate";
 import AISidebar, { type AIModule } from "@/components/artist-intelligence/AISidebar";
 import Overview from "@/components/artist-intelligence/Overview";
 import CreatorProfile from "@/components/artist-intelligence/CreatorProfile";
@@ -19,7 +17,6 @@ import FeedbackCoach from "@/components/artist-intelligence/FeedbackCoach";
 
 const ArtistIntelligence = () => {
   const navigate = useNavigate();
-  const { isPro, loading: subLoading } = useSubscription();
   const [activeModule, setActiveModule] = useState<AIModule>("overview");
   const [profile, setProfile] = useState<any>(null);
   const [identity, setIdentity] = useState<any>(null);
@@ -54,13 +51,11 @@ const ArtistIntelligence = () => {
     setActiveModule("overview");
   };
 
-  if (subLoading || loading) {
+  if (loading) {
     return <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
     </div>;
   }
-
-  if (!isPro) return <ProGate />;
 
   const renderModule = () => {
     switch (activeModule) {
