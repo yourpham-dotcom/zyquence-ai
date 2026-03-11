@@ -115,11 +115,54 @@ serve(async (req) => {
     const systemPrompt = PROMPTS[module];
     if (!systemPrompt) throw new Error(`Unknown module: ${module}`);
 
+    // Handle audio analysis for sound_audio module
+    let effectiveModule = module;
+    let audioBase64: string | null = null;
+    
+    if (module === "sound_audio" && input?.audio_url) {
+      // Download audio from Supabase storage
+      const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+      const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      
+      const audioResponse = await fetch(input.audio_url, {
+        headers: { Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+      });
+      
+      if (!audioResponse.ok) throw new Error("Failed to download audio file");
+      
+      const audioBuffer = await audioResponse.arrayBuffer();
+      const bytes = new Uint8Array(audioBuffer);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      audioBase64 = btoa(binary);
+    }
+
+    const systemPrompt = PROMPTS[effectiveModule];
+
     const userContent = module === "feedback"
       ? `Lyrics to analyze:\n${input}`
       : module === "translator"
       ? `Personal experiences to translate:\n${JSON.stringify(input)}`
       : `Creator Profile:\n${JSON.stringify(profile)}`;
+
+    // Build messages based on whether we have audio
+    let messages: any[];
+    if (module === "sound_audio" && audioBase64) {
+      messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: [
+          { type: "text", text: profile ? `Creator Profile:\n${JSON.stringify(profile)}\n\nAnalyze the attached audio file:` : "Analyze the attached audio file:" },
+          { type: "input_audio", input_audio: { data: audioBase64, format: "mp3" } },
+        ]},
+      ];
+    } else {
+      messages = [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ];
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -128,11 +171,8 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userContent },
-        ],
+        model: "google/gemini-2.5-flash",
+        messages,
       }),
     });
 
