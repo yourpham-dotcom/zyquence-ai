@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { 
   Loader2, Save, Video, Upload, X, FileVideo, FileAudio, Film,
-  Camera, Sparkles, Clapperboard, Palette, MapPin, Scissors, Play, Download
+  Camera, Sparkles, Clapperboard, Palette, MapPin, Scissors, Play, Download, Link
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
