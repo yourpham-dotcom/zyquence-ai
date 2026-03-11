@@ -211,7 +211,7 @@ const MusicVideo = ({ profile }: MusicVideoProps) => {
           <p className="text-sm text-muted-foreground">Your AI-directed music video blueprint</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => { setResult(null); setFiles([]); setGeneratedClips({}); setSongTitle(""); setSongMood(""); }}>
+          <Button variant="outline" onClick={() => { setResult(null); setFiles([]); setGeneratedClips({}); setSongTitle(""); setSongMood(""); setYoutubeUrl(""); }}>
             New Concept
           </Button>
         </div>
