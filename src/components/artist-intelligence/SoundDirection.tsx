@@ -49,11 +49,33 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const detectPlatform = (url: string): "spotify" | "soundcloud" | null => {
+    if (url.includes("spotify.com") || url.includes("open.spotify")) return "spotify";
+    if (url.includes("soundcloud.com")) return "soundcloud";
+    return null;
+  };
+
+  const handleUrlChange = (url: string) => {
+    setMusicUrl(url);
+    if (url.trim() && detectPlatform(url)) {
+      setAnalysisMode("url");
+    } else if (!audioFile) {
+      setAnalysisMode("profile");
+    }
+  };
+
   const analyze = async () => {
     setLoading(true);
     try {
-      if (analysisMode === "audio" && audioFile) {
-        // Upload audio to storage
+      if (analysisMode === "url" && musicUrl.trim()) {
+        const platform = detectPlatform(musicUrl);
+        if (!platform) { toast.error("Please enter a valid Spotify or SoundCloud URL"); setLoading(false); return; }
+        const { data, error } = await supabase.functions.invoke("artist-intelligence", {
+          body: { module: "sound_url", profile, input: { url: musicUrl, platform } },
+        });
+        if (error) throw error;
+        setResult(data);
+      } else if (analysisMode === "audio" && audioFile) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("Not authenticated");
 
@@ -63,15 +85,9 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           .upload(filePath, audioFile);
         if (uploadError) throw uploadError;
 
-        // Get the download URL
-        const { data: urlData } = supabase.storage
-          .from("artist-audio")
-          .getPublicUrl(filePath);
-
-        // For private buckets, we need a signed URL
         const { data: signedData, error: signedError } = await supabase.storage
           .from("artist-audio")
-          .createSignedUrl(filePath, 300); // 5 min expiry
+          .createSignedUrl(filePath, 300);
         if (signedError) throw signedError;
 
         const { data, error } = await supabase.functions.invoke("artist-intelligence", {
