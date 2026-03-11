@@ -4,6 +4,12 @@ import { useEffect } from "react";
 const NotFound = () => {
   const location = useLocation();
 
+  // Let Lovable Cloud OAuth routes pass through to the server
+  if (location.pathname.startsWith("/~oauth")) {
+    window.location.href = location.pathname + location.search;
+    return null;
+  }
+
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
   }, [location.pathname]);
