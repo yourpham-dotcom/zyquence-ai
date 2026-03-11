@@ -132,6 +132,47 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           <p className="text-sm text-muted-foreground max-w-md">AI analyzes your profile or your actual music to recommend genres, BPM, vocal styles, and comparable artists</p>
         </div>
 
+        {/* Streaming URL input */}
+        <Card className="w-full max-w-md border border-border">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Link2 className="h-4 w-4 text-primary" />
+              Paste a Spotify or SoundCloud link
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="https://open.spotify.com/track/... or soundcloud.com/..."
+                value={musicUrl}
+                onChange={(e) => handleUrlChange(e.target.value)}
+                className="text-sm"
+              />
+              {musicUrl && (
+                <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => { setMusicUrl(""); if (!audioFile) setAnalysisMode("profile"); }}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            {musicUrl && detectPlatform(musicUrl) && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  {detectPlatform(musicUrl) === "spotify" ? "Spotify" : "SoundCloud"} detected
+                </Badge>
+              </div>
+            )}
+            {musicUrl && !detectPlatform(musicUrl) && musicUrl.length > 5 && (
+              <p className="text-xs text-destructive">Enter a valid Spotify or SoundCloud URL</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 w-full max-w-md">
+          <div className="h-px bg-border flex-1" />
+          <span className="text-xs text-muted-foreground">or</span>
+          <div className="h-px bg-border flex-1" />
+        </div>
+
         {/* Audio upload area */}
         <Card className="w-full max-w-md border-dashed border-2 border-border hover:border-primary/50 transition-colors">
           <CardContent className="p-6">
@@ -149,8 +190,8 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
               >
                 <Upload className="h-8 w-8" />
                 <div className="text-center">
-                  <p className="text-sm font-medium">Upload your music</p>
-                  <p className="text-xs text-muted-foreground mt-1">Drop an .mp3, .wav, or .m4a file (max 20MB)</p>
+                  <p className="text-sm font-medium">Upload your music file</p>
+                  <p className="text-xs text-muted-foreground mt-1">.mp3, .wav, or .m4a (max 20MB)</p>
                 </div>
               </button>
             ) : (
@@ -170,13 +211,18 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           </CardContent>
         </Card>
 
-        <div className="flex gap-3">
-          <Button onClick={analyze} size="lg" variant={audioFile ? "outline" : "default"} disabled={!profile}>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Button onClick={() => { setAnalysisMode("profile"); analyze(); }} size="lg" variant={audioFile || (musicUrl && detectPlatform(musicUrl)) ? "outline" : "default"} disabled={!profile}>
             <Sparkles className="h-4 w-4 mr-2" /> Analyze from Profile
           </Button>
+          {musicUrl && detectPlatform(musicUrl) && (
+            <Button onClick={() => { setAnalysisMode("url"); analyze(); }} size="lg">
+              <Link2 className="h-4 w-4 mr-2" /> Analyze from {detectPlatform(musicUrl) === "spotify" ? "Spotify" : "SoundCloud"}
+            </Button>
+          )}
           {audioFile && (
-            <Button onClick={analyze} size="lg">
-              <Music2 className="h-4 w-4 mr-2" /> Analyze My Music
+            <Button onClick={() => { setAnalysisMode("audio"); analyze(); }} size="lg" variant={musicUrl && detectPlatform(musicUrl) ? "outline" : "default"}>
+              <Music2 className="h-4 w-4 mr-2" /> Analyze Uploaded File
             </Button>
           )}
         </div>
