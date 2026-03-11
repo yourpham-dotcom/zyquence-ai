@@ -380,6 +380,8 @@ serve(async (req) => {
       ? `Personal experiences to translate:\n${JSON.stringify(input)}`
       : module === "sound_url"
       ? `Creator Profile:\n${JSON.stringify(profile)}\n\nStreaming Platform Track Data:\n${streamingData}`
+      : module === "music_video"
+      ? `Creator Profile:\n${JSON.stringify(profile)}\n\nSong Details:\nTitle: ${input?.song_title || "Untitled"}\nMood: ${input?.song_mood || "Not specified"}\nUploaded Files: ${JSON.stringify(input?.uploaded_files || [])}`
       : `Creator Profile:\n${JSON.stringify(profile)}`;
 
     // Build messages based on whether we have audio
