@@ -1,14 +1,14 @@
 import { 
   LayoutDashboard, Fingerprint, Music2, ArrowRightLeft, 
   Gauge, Map, MessageSquare, ChevronLeft, ChevronRight,
-  Mic2, Users, Calendar, Cpu, Palette
+  Mic2, Users, Calendar, Cpu, Palette, Film
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 export type AIModule = 
-  | "overview" | "profile" | "identity" | "sound" | "branding"
+  | "overview" | "profile" | "identity" | "sound" | "branding" | "music_video"
   | "translator" | "readiness" | "strategy" | "feedback";
 
 const navItems: { id: AIModule; label: string; icon: React.ElementType }[] = [
@@ -17,6 +17,7 @@ const navItems: { id: AIModule; label: string; icon: React.ElementType }[] = [
   { id: "identity", label: "Identity", icon: Fingerprint },
   { id: "sound", label: "Sound Direction", icon: Music2 },
   { id: "branding", label: "Branding", icon: Palette },
+  { id: "music_video", label: "Music Video", icon: Film },
   { id: "translator", label: "Translator", icon: ArrowRightLeft },
   { id: "readiness", label: "Readiness Score", icon: Gauge },
   { id: "strategy", label: "Strategy", icon: Map },

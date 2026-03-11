@@ -141,6 +141,37 @@ Return JSON with these exact keys:
   "overall_feedback": "3-4 sentence overall assessment"
 }
 All scores 0-100. Generate 3-5 suggestions. Plain text only.`,
+
+  music_video: `You are an AI Music Video Creative Director for a music creative intelligence platform.
+Based on the creator profile and any uploaded media context, generate a complete music video concept with a detailed storyboard. Return ONLY valid JSON with NO markdown formatting.
+Return JSON with these exact keys:
+{
+  "concept_title": "A catchy 3-5 word title for the music video concept",
+  "creative_direction": "4-5 sentences describing the overall vision, mood, color palette, and aesthetic",
+  "visual_themes": ["theme1", "theme2", "theme3", "theme4"],
+  "scenes": [
+    {
+      "scene_number": 1,
+      "timestamp": "0:00 - 0:30",
+      "description": "3-4 sentences describing exactly what happens visually",
+      "camera_work": "1-2 sentences on camera angles, movements, transitions",
+      "lighting_mood": "1 sentence on lighting and color grading",
+      "wardrobe_props": "1-2 sentences on outfit and props",
+      "ai_clip_prompt": "A detailed 1-2 sentence prompt optimized for AI video generation describing this scene visually — cinematic, specific, vivid"
+    }
+  ],
+  "locations": [{"name": "location name", "vibe": "1 sentence description"}],
+  "wardrobe_guide": [{"look": "Look 1", "description": "2 sentences describing outfit, accessories, styling"}],
+  "editing_notes": {
+    "pace": "1-2 sentences on editing rhythm and cuts",
+    "effects": "1-2 sentences on visual effects, color grading, overlays",
+    "transitions": "1 sentence on transition styles"
+  },
+  "reference_artists": ["artist1 - video name", "artist2 - video name", "artist3 - video name"],
+  "budget_tier": "low/medium/high",
+  "estimated_crew": "1-2 sentences on minimum crew needed"
+}
+Generate 6-8 scenes. Make it specific to their genre, brand, and personality. Plain text only.`,
 };
 
 // Helper: Get Spotify access token via client credentials
