@@ -127,7 +127,22 @@ const MusicVideo = ({ profile }: MusicVideoProps) => {
           </CardContent>
         </Card>
 
-        {/* File upload */}
+        {/* YouTube URL */}
+        <Card className="w-full max-w-md border border-border">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Link className="h-4 w-4 text-primary" />
+              YouTube URL (optional)
+            </div>
+            <Input
+              placeholder="https://youtube.com/watch?v=..."
+              value={youtubeUrl}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
+              className="text-sm"
+            />
+            <p className="text-xs text-muted-foreground">Paste a YouTube music video or audio link for reference</p>
+          </CardContent>
+        </Card>
         <Card className="w-full max-w-md border-dashed border-2 border-border hover:border-primary/50 transition-colors">
           <CardContent className="p-6">
             <input
