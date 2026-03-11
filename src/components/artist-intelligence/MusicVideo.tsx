@@ -60,6 +60,7 @@ const MusicVideo = ({ profile }: MusicVideoProps) => {
           input: {
             song_title: songTitle || "Untitled",
             song_mood: songMood || "Not specified",
+            youtube_url: youtubeUrl || null,
             uploaded_files: fileDescriptions,
           },
         },
