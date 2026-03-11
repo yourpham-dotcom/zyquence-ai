@@ -45,11 +45,11 @@ const Navigation = () => {
                 <a href="/gaming-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
                   Gaming Engine
                 </a>
-                <a href="/artist-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Artist Intelligence
-                </a>
               </>
             )}
+            <a href="/artist-intelligence" className="text-muted-foreground hover:text-foreground transition-colors">
+              Artist Intelligence
+            </a>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative">
