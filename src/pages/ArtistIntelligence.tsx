@@ -10,6 +10,7 @@ import Overview from "@/components/artist-intelligence/Overview";
 import CreatorProfile from "@/components/artist-intelligence/CreatorProfile";
 import IdentityAnalyzer from "@/components/artist-intelligence/IdentityAnalyzer";
 import SoundDirection from "@/components/artist-intelligence/SoundDirection";
+import Branding from "@/components/artist-intelligence/Branding";
 import ArtistTranslator from "@/components/artist-intelligence/ArtistTranslator";
 import ReadinessScore from "@/components/artist-intelligence/ReadinessScore";
 import StrategyDashboard from "@/components/artist-intelligence/StrategyDashboard";
