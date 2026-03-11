@@ -108,11 +108,11 @@ const Navigation = () => {
                 <a href="/gaming-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
                   Gaming Engine
                 </a>
-                <a href="/artist-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  Artist Intelligence
-                </a>
               </>
             )}
+            <a href="/artist-intelligence" className="block text-muted-foreground hover:text-foreground transition-colors">
+              Artist Intelligence
+            </a>
             {user ? (
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground truncate">{user.email}</p>
