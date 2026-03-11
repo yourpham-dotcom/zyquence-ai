@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, Save, Music2, Sparkles, Upload, X, FileAudio } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Save, Music2, Sparkles, Upload, X, FileAudio, Link2, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -14,7 +15,8 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [analysisMode, setAnalysisMode] = useState<"profile" | "audio">("profile");
+  const [musicUrl, setMusicUrl] = useState("");
+  const [analysisMode, setAnalysisMode] = useState<"profile" | "audio" | "url">("profile");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -47,11 +49,33 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const detectPlatform = (url: string): "spotify" | "soundcloud" | null => {
+    if (url.includes("spotify.com") || url.includes("open.spotify")) return "spotify";
+    if (url.includes("soundcloud.com")) return "soundcloud";
+    return null;
+  };
+
+  const handleUrlChange = (url: string) => {
+    setMusicUrl(url);
+    if (url.trim() && detectPlatform(url)) {
+      setAnalysisMode("url");
+    } else if (!audioFile) {
+      setAnalysisMode("profile");
+    }
+  };
+
   const analyze = async () => {
     setLoading(true);
     try {
-      if (analysisMode === "audio" && audioFile) {
-        // Upload audio to storage
+      if (analysisMode === "url" && musicUrl.trim()) {
+        const platform = detectPlatform(musicUrl);
+        if (!platform) { toast.error("Please enter a valid Spotify or SoundCloud URL"); setLoading(false); return; }
+        const { data, error } = await supabase.functions.invoke("artist-intelligence", {
+          body: { module: "sound_url", profile, input: { url: musicUrl, platform } },
+        });
+        if (error) throw error;
+        setResult(data);
+      } else if (analysisMode === "audio" && audioFile) {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error("Not authenticated");
 
@@ -61,15 +85,9 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           .upload(filePath, audioFile);
         if (uploadError) throw uploadError;
 
-        // Get the download URL
-        const { data: urlData } = supabase.storage
-          .from("artist-audio")
-          .getPublicUrl(filePath);
-
-        // For private buckets, we need a signed URL
         const { data: signedData, error: signedError } = await supabase.storage
           .from("artist-audio")
-          .createSignedUrl(filePath, 300); // 5 min expiry
+          .createSignedUrl(filePath, 300);
         if (signedError) throw signedError;
 
         const { data, error } = await supabase.functions.invoke("artist-intelligence", {
@@ -114,6 +132,47 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           <p className="text-sm text-muted-foreground max-w-md">AI analyzes your profile or your actual music to recommend genres, BPM, vocal styles, and comparable artists</p>
         </div>
 
+        {/* Streaming URL input */}
+        <Card className="w-full max-w-md border border-border">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <Link2 className="h-4 w-4 text-primary" />
+              Paste a Spotify or SoundCloud link
+            </div>
+            <div className="flex gap-2">
+              <Input
+                placeholder="https://open.spotify.com/track/... or soundcloud.com/..."
+                value={musicUrl}
+                onChange={(e) => handleUrlChange(e.target.value)}
+                className="text-sm"
+              />
+              {musicUrl && (
+                <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => { setMusicUrl(""); if (!audioFile) setAnalysisMode("profile"); }}>
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            {musicUrl && detectPlatform(musicUrl) && (
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-xs">
+                  <ExternalLink className="h-3 w-3 mr-1" />
+                  {detectPlatform(musicUrl) === "spotify" ? "Spotify" : "SoundCloud"} detected
+                </Badge>
+              </div>
+            )}
+            {musicUrl && !detectPlatform(musicUrl) && musicUrl.length > 5 && (
+              <p className="text-xs text-destructive">Enter a valid Spotify or SoundCloud URL</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3 w-full max-w-md">
+          <div className="h-px bg-border flex-1" />
+          <span className="text-xs text-muted-foreground">or</span>
+          <div className="h-px bg-border flex-1" />
+        </div>
+
         {/* Audio upload area */}
         <Card className="w-full max-w-md border-dashed border-2 border-border hover:border-primary/50 transition-colors">
           <CardContent className="p-6">
@@ -131,8 +190,8 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
               >
                 <Upload className="h-8 w-8" />
                 <div className="text-center">
-                  <p className="text-sm font-medium">Upload your music</p>
-                  <p className="text-xs text-muted-foreground mt-1">Drop an .mp3, .wav, or .m4a file (max 20MB)</p>
+                  <p className="text-sm font-medium">Upload your music file</p>
+                  <p className="text-xs text-muted-foreground mt-1">.mp3, .wav, or .m4a (max 20MB)</p>
                 </div>
               </button>
             ) : (
@@ -152,13 +211,18 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           </CardContent>
         </Card>
 
-        <div className="flex gap-3">
-          <Button onClick={analyze} size="lg" variant={audioFile ? "outline" : "default"} disabled={!profile}>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Button onClick={() => { setAnalysisMode("profile"); analyze(); }} size="lg" variant={audioFile || (musicUrl && detectPlatform(musicUrl)) ? "outline" : "default"} disabled={!profile}>
             <Sparkles className="h-4 w-4 mr-2" /> Analyze from Profile
           </Button>
+          {musicUrl && detectPlatform(musicUrl) && (
+            <Button onClick={() => { setAnalysisMode("url"); analyze(); }} size="lg">
+              <Link2 className="h-4 w-4 mr-2" /> Analyze from {detectPlatform(musicUrl) === "spotify" ? "Spotify" : "SoundCloud"}
+            </Button>
+          )}
           {audioFile && (
-            <Button onClick={analyze} size="lg">
-              <Music2 className="h-4 w-4 mr-2" /> Analyze My Music
+            <Button onClick={() => { setAnalysisMode("audio"); analyze(); }} size="lg" variant={musicUrl && detectPlatform(musicUrl) ? "outline" : "default"}>
+              <Music2 className="h-4 w-4 mr-2" /> Analyze Uploaded File
             </Button>
           )}
         </div>
@@ -171,7 +235,7 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
     <div className="flex flex-col items-center justify-center h-full gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
       <p className="text-sm text-muted-foreground">
-        {analysisMode === "audio" ? "Analyzing your music..." : "Analyzing your sound profile..."}
+        {analysisMode === "audio" ? "Analyzing your uploaded music..." : analysisMode === "url" ? "Fetching & analyzing your track..." : "Analyzing your sound profile..."}
       </p>
     </div>
   );
@@ -184,7 +248,7 @@ const SoundDirection = ({ profile }: SoundDirectionProps) => {
           <p className="text-sm text-muted-foreground">Your personalized music lane</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => { setResult(null); setAudioFile(null); setAnalysisMode("profile"); }}>
+          <Button variant="outline" onClick={() => { setResult(null); setAudioFile(null); setMusicUrl(""); setAnalysisMode("profile"); }}>
             New Analysis
           </Button>
           <Button onClick={save} disabled={saving}>
