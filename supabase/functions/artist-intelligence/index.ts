@@ -120,6 +120,108 @@ Return JSON with these exact keys:
 All scores 0-100. Generate 3-5 suggestions. Plain text only.`,
 };
 
+// Helper: Get Spotify access token via client credentials
+async function getSpotifyToken(): Promise<string> {
+  const clientId = Deno.env.get("SPOTIFY_CLIENT_ID");
+  const clientSecret = Deno.env.get("SPOTIFY_CLIENT_SECRET");
+  if (!clientId || !clientSecret) throw new Error("Spotify credentials not configured");
+
+  const resp = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
+  if (!resp.ok) throw new Error("Failed to get Spotify token");
+  const data = await resp.json();
+  return data.access_token;
+}
+
+// Helper: Extract Spotify track ID from URL
+function extractSpotifyTrackId(url: string): string | null {
+  const match = url.match(/track\/([a-zA-Z0-9]+)/);
+  return match ? match[1] : null;
+}
+
+// Helper: Fetch Spotify track data + audio features
+async function fetchSpotifyTrackData(url: string): Promise<string | null> {
+  const trackId = extractSpotifyTrackId(url);
+  if (!trackId) throw new Error("Could not extract Spotify track ID from URL");
+
+  const token = await getSpotifyToken();
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // Fetch track info and audio features in parallel
+  const [trackResp, featuresResp] = await Promise.all([
+    fetch(`https://api.spotify.com/v1/tracks/${trackId}`, { headers }),
+    fetch(`https://api.spotify.com/v1/audio-features/${trackId}`, { headers }),
+  ]);
+
+  if (!trackResp.ok) throw new Error("Failed to fetch Spotify track info");
+
+  const track = await trackResp.json();
+  const features = featuresResp.ok ? await featuresResp.json() : null;
+
+  const result: any = {
+    platform: "spotify",
+    track_name: track.name,
+    artists: track.artists?.map((a: any) => a.name),
+    album: track.album?.name,
+    release_date: track.album?.release_date,
+    popularity: track.popularity,
+    duration_ms: track.duration_ms,
+    explicit: track.explicit,
+  };
+
+  if (features && !features.error) {
+    result.audio_features = {
+      tempo: features.tempo,
+      key: features.key,
+      mode: features.mode,
+      time_signature: features.time_signature,
+      danceability: features.danceability,
+      energy: features.energy,
+      valence: features.valence,
+      acousticness: features.acousticness,
+      instrumentalness: features.instrumentalness,
+      liveness: features.liveness,
+      speechiness: features.speechiness,
+      loudness: features.loudness,
+    };
+  }
+
+  // Try to get artist genres
+  if (track.artists?.[0]?.id) {
+    try {
+      const artistResp = await fetch(`https://api.spotify.com/v1/artists/${track.artists[0].id}`, { headers });
+      if (artistResp.ok) {
+        const artist = await artistResp.json();
+        result.artist_genres = artist.genres;
+      }
+    } catch {}
+  }
+
+  return JSON.stringify(result);
+}
+
+// Helper: Fetch SoundCloud track data via oEmbed
+async function fetchSoundCloudTrackData(url: string): Promise<string | null> {
+  const resp = await fetch(`https://soundcloud.com/oembed?format=json&url=${encodeURIComponent(url)}`);
+  if (!resp.ok) throw new Error("Could not fetch SoundCloud track info. Make sure the URL is public.");
+  const data = await resp.json();
+
+  return JSON.stringify({
+    platform: "soundcloud",
+    title: data.title,
+    author_name: data.author_name,
+    author_url: data.author_url,
+    description: data.description || "",
+    note: "SoundCloud does not provide detailed audio features. Analysis is based on metadata and track context. The AI should infer genre, style, and characteristics from the track title, artist name, and description.",
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
