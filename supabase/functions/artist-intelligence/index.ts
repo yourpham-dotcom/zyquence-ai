@@ -135,15 +135,11 @@ serve(async (req) => {
     let audioBase64: string | null = null;
     
     if (module === "sound_audio" && input?.audio_url) {
-      // Download audio from Supabase storage
       const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-      
       const audioResponse = await fetch(input.audio_url, {
         headers: { Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
       });
-      
       if (!audioResponse.ok) throw new Error("Failed to download audio file");
-      
       const audioBuffer = await audioResponse.arrayBuffer();
       const bytes = new Uint8Array(audioBuffer);
       let binary = "";
@@ -153,10 +149,27 @@ serve(async (req) => {
       audioBase64 = btoa(binary);
     }
 
+    // Handle streaming URL analysis
+    let streamingData: string | null = null;
+
+    if (module === "sound_url" && input?.url) {
+      const { url, platform } = input;
+
+      if (platform === "spotify") {
+        streamingData = await fetchSpotifyTrackData(url);
+      } else if (platform === "soundcloud") {
+        streamingData = await fetchSoundCloudTrackData(url);
+      }
+
+      if (!streamingData) throw new Error("Could not fetch track data from the provided URL");
+    }
+
     const userContent = module === "feedback"
       ? `Lyrics to analyze:\n${input}`
       : module === "translator"
       ? `Personal experiences to translate:\n${JSON.stringify(input)}`
+      : module === "sound_url"
+      ? `Creator Profile:\n${JSON.stringify(profile)}\n\nStreaming Platform Track Data:\n${streamingData}`
       : `Creator Profile:\n${JSON.stringify(profile)}`;
 
     // Build messages based on whether we have audio
