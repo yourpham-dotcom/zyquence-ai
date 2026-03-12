@@ -64,6 +64,7 @@ const DAWStudio = () => {
   const recordStartTimeRef = useRef<number>(0);
   const channelsRef = useRef<Map<string, Tone.Channel>>(new Map());
   const playersRef = useRef<Map<string, Tone.Player>>(new Map());
+  const [globalDragOver, setGlobalDragOver] = useState(false);
   const dragCounterRef = useRef(0);
 
   // Initialize default tracks
