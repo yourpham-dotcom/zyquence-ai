@@ -203,7 +203,6 @@ export function WorkspaceSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {[...opsNav, { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music }]
-                .filter((item) => !visibleTools || visibleTools.has(item.title))
                 .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
