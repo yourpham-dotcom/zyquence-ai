@@ -4,7 +4,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { Loader2, ArrowRight, ArrowLeft, Check, RotateCcw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -21,6 +32,7 @@ interface CreatorProfileProps {
 const CreatorProfile = ({ onComplete, existingProfile }: CreatorProfileProps) => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [form, setForm] = useState({
     stage_name: existingProfile?.stage_name || "",
     background: existingProfile?.background || "",
@@ -32,6 +44,36 @@ const CreatorProfile = ({ onComplete, existingProfile }: CreatorProfileProps) =>
     voice_type: existingProfile?.voice_type || "",
     experience_level: existingProfile?.experience_level || "beginner",
   });
+
+  const handleReset = async () => {
+    if (!existingProfile?.id) return;
+    setResetting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Delete related data first, then the profile
+      await Promise.all([
+        supabase.from("identity_results").delete().eq("profile_id", existingProfile.id),
+        supabase.from("readiness_scores").delete().eq("profile_id", existingProfile.id),
+        supabase.from("feedback_sessions").delete().eq("profile_id", existingProfile.id),
+      ]);
+      await supabase.from("artist_profiles").delete().eq("id", existingProfile.id);
+
+      toast.success("Profile and all data cleared");
+      // Reset form
+      setForm({
+        stage_name: "", background: "", personality_traits: [], lifestyle: "",
+        inspirations: "", music_goals: "", preferred_genres: [], voice_type: "", experience_level: "beginner",
+      });
+      setStep(0);
+      onComplete(""); // Signal parent to reload
+    } catch (e: any) {
+      toast.error(e.message || "Failed to reset");
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const steps = [
     { title: "Identity", subtitle: "Who are you?" },
@@ -98,7 +140,34 @@ const CreatorProfile = ({ onComplete, existingProfile }: CreatorProfileProps) =>
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-foreground">Creator Profile Setup</h1>
+        <div className="flex items-center justify-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Creator Profile Setup</h1>
+          {existingProfile?.id && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                  <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                  Reset
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Reset entire profile?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your creator profile and all associated data (identity results, readiness scores, feedback sessions). This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset} disabled={resetting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    {resetting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                    Yes, reset everything
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
         <p className="text-sm text-muted-foreground">Build your artist intelligence foundation</p>
       </div>
 
