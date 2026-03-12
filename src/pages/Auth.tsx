@@ -116,16 +116,27 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
+
+    const stallTimer = window.setTimeout(() => {
+      setIsGoogleLoading(false);
+      toast.error("Google sign-in is taking longer than expected. Please try again.");
+    }, GOOGLE_OAUTH_STALL_TIMEOUT_MS);
+
     try {
       const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth`,
+        extraParams: {
+          prompt: "select_account",
+        },
       });
+
       if (error) {
         toast.error("Google sign-in failed: " + error.message);
       }
     } catch (err) {
       toast.error("An unexpected error occurred during Google sign-in.");
     } finally {
+      window.clearTimeout(stallTimer);
       setIsGoogleLoading(false);
     }
   };
