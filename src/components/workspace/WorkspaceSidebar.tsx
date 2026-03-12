@@ -197,12 +197,14 @@ export function WorkspaceSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Workflow Engine - visible for all tiers */}
+        {/* Workflow Engine & Artist Intelligence - visible for all tiers */}
         <Separator className="mx-4 bg-sidebar-border" />
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {opsNav.map((item) => (
+              {[...opsNav, { title: "Artist Intelligence", path: "/artist-intelligence", icon: Music }]
+                .filter((item) => !visibleTools || visibleTools.has(item.title))
+                .map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <NavLink
