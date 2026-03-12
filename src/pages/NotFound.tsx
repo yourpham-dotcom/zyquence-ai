@@ -7,7 +7,7 @@ const NotFound = () => {
 
   useEffect(() => {
     if (isOAuthRoute) {
-      window.location.href = location.pathname + location.search;
+      window.location.href = location.pathname + location.search + location.hash;
     } else {
       console.error("404 Error: User attempted to access non-existent route:", location.pathname);
     }
