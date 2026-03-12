@@ -655,6 +655,16 @@ const DAWStudio = () => {
           />
         </div>
 
+        {showFXPanel && (
+          <div className="w-56 border-l border-border bg-card shrink-0 overflow-hidden">
+            <DAWEffectsPanel
+              tracks={tracks}
+              selectedTrackId={selectedTrackId}
+              playersRef={playersRef}
+            />
+          </div>
+        )}
+
         {showAIPanel && (
           <DAWAITools
             tracks={tracks}
