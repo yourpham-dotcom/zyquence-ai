@@ -94,6 +94,12 @@ const DAWTransport = ({
 
     <div className="w-px h-6 bg-border mx-1" />
 
+    {/* FX toggle */}
+    <Button variant={showFXPanel ? "default" : "ghost"} size="sm" className="h-8 text-xs" onClick={onToggleFXPanel}>
+      <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+      FX
+    </Button>
+
     {/* AI toggle */}
     <Button variant={showAIPanel ? "default" : "ghost"} size="sm" className="h-8 text-xs" onClick={onToggleAIPanel}>
       {showAIPanel ? <Bot className="h-3.5 w-3.5 mr-1.5" /> : <BotOff className="h-3.5 w-3.5 mr-1.5" />}
