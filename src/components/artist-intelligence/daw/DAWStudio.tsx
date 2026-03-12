@@ -58,6 +58,7 @@ const DAWStudio = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [showAIPanel, setShowAIPanel] = useState(true);
+  const [showFXPanel, setShowFXPanel] = useState(false);
   const [masterVolume, setMasterVolume] = useState(0.8);
   const animFrameRef = useRef<number>(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
