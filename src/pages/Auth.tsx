@@ -52,6 +52,17 @@ const Auth = () => {
     redirectUser();
   }, [user, navigate]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("oauth") !== "retry") return;
+
+    toast.error("Google sign-in was interrupted. Please try again.");
+    params.delete("oauth");
+    const query = params.toString();
+    const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+    window.history.replaceState({}, "", cleanUrl);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
