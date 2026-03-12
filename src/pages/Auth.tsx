@@ -13,6 +13,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com", "asantimokwala48@gmail.com"];
+const GOOGLE_OAUTH_STALL_TIMEOUT_MS = 8000;
 const PRO_PRODUCT_ID = "prod_Twj36mQhOR4juQ";
 
 const Auth = () => {
@@ -50,6 +51,17 @@ const Auth = () => {
 
     redirectUser();
   }, [user, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("oauth") !== "retry") return;
+
+    toast.error("Google sign-in was interrupted. Please try again.");
+    params.delete("oauth");
+    const query = params.toString();
+    const cleanUrl = `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`;
+    window.history.replaceState({}, "", cleanUrl);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,16 +116,27 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
+
+    const stallTimer = window.setTimeout(() => {
+      setIsGoogleLoading(false);
+      toast.error("Google sign-in is taking longer than expected. Please try again.");
+    }, GOOGLE_OAUTH_STALL_TIMEOUT_MS);
+
     try {
       const { error } = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: `${window.location.origin}/auth`,
+        extraParams: {
+          prompt: "select_account",
+        },
       });
+
       if (error) {
         toast.error("Google sign-in failed: " + error.message);
       }
     } catch (err) {
       toast.error("An unexpected error occurred during Google sign-in.");
     } finally {
+      window.clearTimeout(stallTimer);
       setIsGoogleLoading(false);
     }
   };

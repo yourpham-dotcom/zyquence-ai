@@ -1,17 +1,31 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
+const OAUTH_RELOAD_KEY = "oauth-hard-reload-attempted";
+
 const NotFound = () => {
   const location = useLocation();
   const isOAuthRoute = location.pathname.startsWith("/~oauth");
+  const oauthUrl = `${location.pathname}${location.search}${location.hash}`;
 
   useEffect(() => {
     if (isOAuthRoute) {
-      window.location.href = location.pathname + location.search + location.hash;
-    } else {
-      console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+      const previousAttempt = sessionStorage.getItem(OAUTH_RELOAD_KEY);
+
+      if (previousAttempt !== oauthUrl) {
+        sessionStorage.setItem(OAUTH_RELOAD_KEY, oauthUrl);
+        window.location.assign(oauthUrl);
+        return;
+      }
+
+      sessionStorage.removeItem(OAUTH_RELOAD_KEY);
+      window.location.replace("/auth?oauth=retry");
+      return;
     }
-  }, [location.pathname, location.search, isOAuthRoute]);
+
+    sessionStorage.removeItem(OAUTH_RELOAD_KEY);
+    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
+  }, [isOAuthRoute, oauthUrl, location.pathname]);
 
   if (isOAuthRoute) {
     return null;
@@ -31,3 +45,4 @@ const NotFound = () => {
 };
 
 export default NotFound;
+
