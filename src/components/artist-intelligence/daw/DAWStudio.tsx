@@ -523,8 +523,96 @@ const DAWStudio = () => {
     };
   }, []);
 
+  // Global drag-and-drop handler for the entire studio
+  const handleGlobalDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounterRef.current++;
+    if (e.dataTransfer.types.includes("Files")) {
+      setGlobalDragOver(true);
+    }
+  }, []);
+
+  const handleGlobalDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounterRef.current--;
+    if (dragCounterRef.current === 0) {
+      setGlobalDragOver(false);
+    }
+  }, []);
+
+  const handleGlobalDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+  }, []);
+
+  const handleGlobalDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setGlobalDragOver(false);
+    dragCounterRef.current = 0;
+
+    if (e.dataTransfer.files.length === 0) return;
+
+    // Find target track: selected track, or first track of matching type, or first track
+    const audioFiles = Array.from(e.dataTransfer.files).filter(f => 
+      f.type.startsWith("audio/") || f.name.match(/\.(mp3|wav|ogg|flac|aac|m4a|webm|wma)$/i)
+    );
+    if (audioFiles.length === 0) {
+      toast({ title: "Not an audio file", description: "Please drop MP3, WAV, OGG, or other audio files", variant: "destructive" });
+      return;
+    }
+
+    let targetTrackId = selectedTrackId;
+    if (!targetTrackId && tracks.length > 0) {
+      // Try to pick a beat track for beat-like files, otherwise first track
+      targetTrackId = tracks.find(t => t.type === "beat")?.id || tracks[0].id;
+    }
+    if (!targetTrackId) {
+      // No tracks exist — auto-create one
+      const newTrack = {
+        id: crypto.randomUUID(),
+        name: "Imported Audio",
+        type: "beat" as const,
+        color: "hsl(210, 80%, 55%)",
+        volume: 0.8,
+        pan: 0,
+        muted: false,
+        solo: false,
+        armed: false,
+        clips: [],
+        effects: [],
+      };
+      createChannel(newTrack.id, newTrack.volume, newTrack.pan, newTrack.muted);
+      setTracks(prev => [...prev, newTrack]);
+      targetTrackId = newTrack.id;
+    }
+
+    const dt = new DataTransfer();
+    audioFiles.forEach(f => dt.items.add(f));
+    handleFileDrop(dt.files, targetTrackId);
+  }, [selectedTrackId, tracks, handleFileDrop, toast]);
+
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div
+      className="h-full flex flex-col bg-background overflow-hidden relative"
+      onDragEnter={handleGlobalDragEnter}
+      onDragLeave={handleGlobalDragLeave}
+      onDragOver={handleGlobalDragOver}
+      onDrop={handleGlobalDrop}
+    >
+      {/* Global drop overlay */}
+      {globalDragOver && (
+        <div className="absolute inset-0 z-50 bg-primary/10 backdrop-blur-sm border-2 border-dashed border-primary rounded-lg flex items-center justify-center pointer-events-none">
+          <div className="bg-card/95 border border-primary shadow-2xl rounded-xl px-8 py-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-3">
+              <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+              </svg>
+            </div>
+            <p className="text-lg font-bold text-foreground">Drop audio files here</p>
+            <p className="text-sm text-muted-foreground mt-1">MP3, WAV, OGG, FLAC, AAC supported</p>
+          </div>
+        </div>
+      )}
       <DAWTransport
         isPlaying={isPlaying}
         isRecording={isRecording}
