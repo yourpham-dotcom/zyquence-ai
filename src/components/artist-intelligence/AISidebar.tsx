@@ -1,7 +1,7 @@
 import { 
   LayoutDashboard, Fingerprint, Music2, ArrowRightLeft, 
   Gauge, Map, MessageSquare, ChevronLeft, ChevronRight,
-  Mic2, Users, Calendar, Cpu, Palette, Film
+  Mic2, Users, Calendar, Cpu, Palette, Film, Piano
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,11 +9,12 @@ import { useState } from "react";
 
 export type AIModule = 
   | "overview" | "profile" | "identity" | "sound" | "branding" | "music_video"
-  | "translator" | "readiness" | "strategy" | "feedback";
+  | "translator" | "readiness" | "strategy" | "feedback" | "studio";
 
 const navItems: { id: AIModule; label: string; icon: React.ElementType }[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "profile", label: "Creator Profile", icon: Fingerprint },
+  { id: "studio", label: "Music Studio", icon: Piano },
   { id: "identity", label: "Identity", icon: Fingerprint },
   { id: "sound", label: "Sound Direction", icon: Music2 },
   { id: "branding", label: "Branding", icon: Palette },
