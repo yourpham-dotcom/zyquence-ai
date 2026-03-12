@@ -78,6 +78,7 @@ const ArtistIntelligence = () => {
       case "readiness": return <ReadinessScore profile={profile} />;
       case "strategy": return <StrategyDashboard profile={profile} />;
       case "feedback": return <FeedbackCoach profile={profile} />;
+      case "studio": return <DAWStudio />;
       default: return null;
     }
   };
