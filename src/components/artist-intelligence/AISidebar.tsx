@@ -60,7 +60,7 @@ const AISidebar = ({ active, onNavigate, hasProfile }: AISidebarProps) => {
 
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
-          const disabled = item.id !== "overview" && item.id !== "profile" && item.id !== "branding" && item.id !== "music_video" && !hasProfile;
+          const disabled = item.id !== "overview" && item.id !== "profile" && item.id !== "branding" && item.id !== "music_video" && item.id !== "studio" && !hasProfile;
           return (
             <button
               key={item.id}
