@@ -140,7 +140,34 @@ const CreatorProfile = ({ onComplete, existingProfile }: CreatorProfileProps) =>
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold text-foreground">Creator Profile Setup</h1>
+        <div className="flex items-center justify-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Creator Profile Setup</h1>
+          {existingProfile?.id && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                  <RotateCcw className="h-3.5 w-3.5 mr-1" />
+                  Reset
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Reset entire profile?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete your creator profile and all associated data (identity results, readiness scores, feedback sessions). This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset} disabled={resetting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    {resetting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                    Yes, reset everything
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
         <p className="text-sm text-muted-foreground">Build your artist intelligence foundation</p>
       </div>
 
