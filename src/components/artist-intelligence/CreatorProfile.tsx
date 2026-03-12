@@ -32,6 +32,7 @@ interface CreatorProfileProps {
 const CreatorProfile = ({ onComplete, existingProfile }: CreatorProfileProps) => {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [form, setForm] = useState({
     stage_name: existingProfile?.stage_name || "",
     background: existingProfile?.background || "",
@@ -43,6 +44,36 @@ const CreatorProfile = ({ onComplete, existingProfile }: CreatorProfileProps) =>
     voice_type: existingProfile?.voice_type || "",
     experience_level: existingProfile?.experience_level || "beginner",
   });
+
+  const handleReset = async () => {
+    if (!existingProfile?.id) return;
+    setResetting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Delete related data first, then the profile
+      await Promise.all([
+        supabase.from("identity_results").delete().eq("profile_id", existingProfile.id),
+        supabase.from("readiness_scores").delete().eq("profile_id", existingProfile.id),
+        supabase.from("feedback_sessions").delete().eq("profile_id", existingProfile.id),
+      ]);
+      await supabase.from("artist_profiles").delete().eq("id", existingProfile.id);
+
+      toast.success("Profile and all data cleared");
+      // Reset form
+      setForm({
+        stage_name: "", background: "", personality_traits: [], lifestyle: "",
+        inspirations: "", music_goals: "", preferred_genres: [], voice_type: "", experience_level: "beginner",
+      });
+      setStep(0);
+      onComplete(""); // Signal parent to reload
+    } catch (e: any) {
+      toast.error(e.message || "Failed to reset");
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const steps = [
     { title: "Identity", subtitle: "Who are you?" },
