@@ -1,4 +1,4 @@
-import { Play, Pause, Square, Circle, SkipBack, ZoomIn, ZoomOut, Bot, BotOff } from "lucide-react";
+import { Play, Pause, Square, Circle, SkipBack, ZoomIn, ZoomOut, Bot, BotOff, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
