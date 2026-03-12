@@ -626,6 +626,8 @@ const DAWStudio = () => {
         onZoomChange={setZoom}
         showAIPanel={showAIPanel}
         onToggleAIPanel={() => setShowAIPanel(!showAIPanel)}
+        showFXPanel={showFXPanel}
+        onToggleFXPanel={() => setShowFXPanel(!showFXPanel)}
       />
 
       <div className="flex-1 flex overflow-hidden">
