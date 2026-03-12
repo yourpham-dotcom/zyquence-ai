@@ -13,6 +13,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com", "asantimokwala48@gmail.com"];
+const GOOGLE_OAUTH_STALL_TIMEOUT_MS = 8000;
 const PRO_PRODUCT_ID = "prod_Twj36mQhOR4juQ";
 
 const Auth = () => {
