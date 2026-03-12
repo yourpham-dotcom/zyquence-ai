@@ -6,6 +6,7 @@ import DAWTimeline from "./DAWTimeline";
 import DAWMixer from "./DAWMixer";
 import DAWAITools from "./DAWAITools";
 import DAWTransport from "./DAWTransport";
+import DAWEffectsPanel from "./DAWEffectsPanel";
 
 export interface DAWClip {
   id: string;
