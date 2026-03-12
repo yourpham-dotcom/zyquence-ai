@@ -16,6 +16,8 @@ interface DAWTransportProps {
   onZoomChange: (z: number) => void;
   showAIPanel: boolean;
   onToggleAIPanel: () => void;
+  showFXPanel: boolean;
+  onToggleFXPanel: () => void;
 }
 
 const formatTime = (seconds: number) => {
