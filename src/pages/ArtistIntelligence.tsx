@@ -47,6 +47,14 @@ const ArtistIntelligence = () => {
   };
 
   const handleProfileComplete = (profileId: string) => {
+    if (!profileId) {
+      // Reset — clear all local state immediately
+      setProfile(null);
+      setIdentity(null);
+      setReadiness(null);
+      setActiveModule("overview");
+      return;
+    }
     loadData();
     setActiveModule("overview");
   };
