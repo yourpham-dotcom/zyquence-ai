@@ -1,4 +1,4 @@
-import { Play, Pause, Square, Circle, SkipBack, ZoomIn, ZoomOut, Bot, BotOff } from "lucide-react";
+import { Play, Pause, Square, Circle, SkipBack, ZoomIn, ZoomOut, Bot, BotOff, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,8 @@ interface DAWTransportProps {
   onZoomChange: (z: number) => void;
   showAIPanel: boolean;
   onToggleAIPanel: () => void;
+  showFXPanel: boolean;
+  onToggleFXPanel: () => void;
 }
 
 const formatTime = (seconds: number) => {
@@ -28,7 +30,7 @@ const formatTime = (seconds: number) => {
 const DAWTransport = ({
   isPlaying, isRecording, bpm, currentTime, zoom,
   onPlayPause, onStop, onRecord, onBpmChange, onZoomChange,
-  showAIPanel, onToggleAIPanel,
+  showAIPanel, onToggleAIPanel, showFXPanel, onToggleFXPanel,
 }: DAWTransportProps) => (
   <div className="h-12 border-b border-border bg-card flex items-center px-3 gap-2 shrink-0">
     {/* Transport controls */}
@@ -91,6 +93,12 @@ const DAWTransport = ({
     </div>
 
     <div className="w-px h-6 bg-border mx-1" />
+
+    {/* FX toggle */}
+    <Button variant={showFXPanel ? "default" : "ghost"} size="sm" className="h-8 text-xs" onClick={onToggleFXPanel}>
+      <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+      FX
+    </Button>
 
     {/* AI toggle */}
     <Button variant={showAIPanel ? "default" : "ghost"} size="sm" className="h-8 text-xs" onClick={onToggleAIPanel}>

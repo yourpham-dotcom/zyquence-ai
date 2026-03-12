@@ -6,6 +6,7 @@ import DAWTimeline from "./DAWTimeline";
 import DAWMixer from "./DAWMixer";
 import DAWAITools from "./DAWAITools";
 import DAWTransport from "./DAWTransport";
+import DAWEffectsPanel from "./DAWEffectsPanel";
 
 export interface DAWClip {
   id: string;
@@ -57,6 +58,7 @@ const DAWStudio = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [zoom, setZoom] = useState(1);
   const [showAIPanel, setShowAIPanel] = useState(true);
+  const [showFXPanel, setShowFXPanel] = useState(false);
   const [masterVolume, setMasterVolume] = useState(0.8);
   const animFrameRef = useRef<number>(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -624,6 +626,8 @@ const DAWStudio = () => {
         onZoomChange={setZoom}
         showAIPanel={showAIPanel}
         onToggleAIPanel={() => setShowAIPanel(!showAIPanel)}
+        showFXPanel={showFXPanel}
+        onToggleFXPanel={() => setShowFXPanel(!showFXPanel)}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -650,6 +654,16 @@ const DAWStudio = () => {
             selectedTrackId={selectedTrackId}
           />
         </div>
+
+        {showFXPanel && (
+          <div className="w-56 border-l border-border bg-card shrink-0 overflow-hidden">
+            <DAWEffectsPanel
+              tracks={tracks}
+              selectedTrackId={selectedTrackId}
+              playersRef={playersRef}
+            />
+          </div>
+        )}
 
         {showAIPanel && (
           <DAWAITools
