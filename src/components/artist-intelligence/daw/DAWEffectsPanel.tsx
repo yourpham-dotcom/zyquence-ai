@@ -55,6 +55,19 @@ const DAWEffectsPanel = ({ tracks, selectedTrackId, playersRef }: DAWEffectsPane
 
   const selectedTrack = tracks.find(t => t.id === selectedTrackId);
   const hasClips = selectedTrack && selectedTrack.clips.length > 0;
+  const prevClipCountRef = useRef(0);
+
+  // Auto-enable slowed + reverb when new clips are added (e.g. MP3 import)
+  useEffect(() => {
+    const clipCount = selectedTrack?.clips.length ?? 0;
+    if (clipCount > prevClipCountRef.current && clipCount > 0) {
+      if (!slowedEnabled && !reverbEnabled) {
+        setSlowedEnabled(true);
+        setReverbEnabled(true);
+      }
+    }
+    prevClipCountRef.current = clipCount;
+  }, [selectedTrack?.clips.length]);
 
   const getFirstClipBuffer = useCallback(async (): Promise<AudioBuffer | null> => {
     if (!selectedTrack || selectedTrack.clips.length === 0) return null;
