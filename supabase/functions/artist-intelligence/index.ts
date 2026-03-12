@@ -172,6 +172,22 @@ Return JSON with these exact keys:
   "estimated_crew": "1-2 sentences on minimum crew needed"
 }
 Generate 6-8 scenes. Make it specific to their genre, brand, and personality. Plain text only.`,
+  studio_ai: `You are an AI Music Production Assistant for a professional web-based DAW (Digital Audio Workstation).
+You help with beat generation ideas, chord progressions, melody suggestions, arrangement advice, vocal mixing tips, EQ recommendations, and mastering guidance.
+
+The user will provide their current session info (BPM, tracks, effects) and a specific task.
+
+Based on the task type, return ONLY valid JSON with NO markdown:
+
+For "beat_generate": {"beat_ideas": [{"description": "2-3 sentence beat description", "pattern": "rhythm pattern description", "instruments": ["instrument1", "instrument2"]}], "suggestions": ["suggestion1", "suggestion2"]}
+For "chord_suggest": {"chord_progressions": [{"name": "progression name", "chords": ["C", "Am", "F", "G"], "mood": "mood description"}], "suggestions": ["tip1", "tip2"]}
+For "melody_suggest": {"melody_ideas": [{"description": "2-3 sentences describing the melody idea", "scale": "scale name", "range": "note range"}], "suggestions": ["tip1"]}
+For "arrangement_suggest": {"arrangement": ["section-by-section arrangement suggestion"], "suggestions": ["tip1", "tip2"]}
+For "vocal_mix": {"vocal_mix": ["detailed vocal mixing step"], "suggestions": ["EQ at X Hz to cut mud", "Add reverb with X decay"]}
+For "eq_suggest": {"eq_suggestions": ["frequency-specific EQ recommendation"], "suggestions": ["tip1"]}
+For "master_suggest": {"mastering": ["mastering chain step with specific settings"], "suggestions": ["tip1"]}
+
+Generate 3-5 items per array. Be specific with frequencies, dB values, ratios, and musical keys. Plain text only.`,
 };
 
 // Helper: Get Spotify access token via client credentials
@@ -382,6 +398,8 @@ serve(async (req) => {
       ? `Creator Profile:\n${JSON.stringify(profile)}\n\nStreaming Platform Track Data:\n${streamingData}`
       : module === "music_video"
       ? `Creator Profile:\n${JSON.stringify(profile)}\n\nSong Details:\nTitle: ${input?.song_title || "Untitled"}\nMood: ${input?.song_mood || "Not specified"}\nUploaded Files: ${JSON.stringify(input?.uploaded_files || [])}`
+      : module === "studio_ai"
+      ? `Task: ${input?.task}\nUser Prompt: ${input?.prompt || "No specific prompt"}\nBPM: ${input?.bpm || 120}\nCurrent Session Tracks:\n${JSON.stringify(input?.tracks || [])}`
       : `Creator Profile:\n${JSON.stringify(profile)}`;
 
     // Build messages based on whether we have audio
