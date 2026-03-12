@@ -398,6 +398,8 @@ serve(async (req) => {
       ? `Creator Profile:\n${JSON.stringify(profile)}\n\nStreaming Platform Track Data:\n${streamingData}`
       : module === "music_video"
       ? `Creator Profile:\n${JSON.stringify(profile)}\n\nSong Details:\nTitle: ${input?.song_title || "Untitled"}\nMood: ${input?.song_mood || "Not specified"}\nUploaded Files: ${JSON.stringify(input?.uploaded_files || [])}`
+      : module === "studio_ai"
+      ? `Task: ${input?.task}\nUser Prompt: ${input?.prompt || "No specific prompt"}\nBPM: ${input?.bpm || 120}\nCurrent Session Tracks:\n${JSON.stringify(input?.tracks || [])}`
       : `Creator Profile:\n${JSON.stringify(profile)}`;
 
     // Build messages based on whether we have audio
