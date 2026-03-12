@@ -14,6 +14,7 @@ import ArtistTranslator from "@/components/artist-intelligence/ArtistTranslator"
 import ReadinessScore from "@/components/artist-intelligence/ReadinessScore";
 import StrategyDashboard from "@/components/artist-intelligence/StrategyDashboard";
 import FeedbackCoach from "@/components/artist-intelligence/FeedbackCoach";
+import DAWStudio from "@/components/artist-intelligence/daw/DAWStudio";
 
 const ArtistIntelligence = () => {
   const navigate = useNavigate();
