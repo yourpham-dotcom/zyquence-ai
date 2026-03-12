@@ -30,7 +30,7 @@ const formatTime = (seconds: number) => {
 const DAWTransport = ({
   isPlaying, isRecording, bpm, currentTime, zoom,
   onPlayPause, onStop, onRecord, onBpmChange, onZoomChange,
-  showAIPanel, onToggleAIPanel,
+  showAIPanel, onToggleAIPanel, showFXPanel, onToggleFXPanel,
 }: DAWTransportProps) => (
   <div className="h-12 border-b border-border bg-card flex items-center px-3 gap-2 shrink-0">
     {/* Transport controls */}
