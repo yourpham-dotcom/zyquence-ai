@@ -357,7 +357,10 @@ const DAWStudio = () => {
       ));
       loadClipAudio(newClip);
     });
-    toast({ title: "Audio imported", description: `${files.length} file(s) added` });
+    // Auto-select the track and open FX panel so Slowed+Reverb is ready
+    setSelectedTrackId(trackId);
+    setShowFXPanel(true);
+    toast({ title: "Audio imported", description: `${files.length} file(s) added — Slowed + Reverb ready` });
   }, [tracks, toast]);
 
   const moveClip = (clipId: string, newTrackId: string, newStartTime: number) => {
