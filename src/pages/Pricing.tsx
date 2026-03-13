@@ -192,37 +192,6 @@ const Pricing = () => {
                 </ul>
               </div>
 
-              {isProSubscribed ? (
-                <div className="mt-8 space-y-2">
-                  <div className="text-center text-sm text-primary font-medium">
-                    ✓ Your current plan
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleManageSubscription}
-                  >
-                    Manage Subscription
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  className="w-full mt-8 bg-primary hover:bg-primary/90"
-                  onClick={handleCheckout}
-                  disabled={isCheckingOut || isCheckingSub}
-                >
-                  {isCheckingOut ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading...
-                    </>
-                  ) : !user ? (
-                    "Sign up to Subscribe"
-                  ) : (
-                    "Subscribe to Pro"
-                  )}
-                </Button>
-              )}
             </Card>
           </div>
         </div>
