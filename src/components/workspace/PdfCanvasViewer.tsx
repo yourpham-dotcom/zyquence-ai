@@ -94,27 +94,9 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
     <div className={`flex flex-col ${className}`}>
       {/* Controls */}
       <div className="flex items-center justify-center gap-2 py-1 shrink-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          disabled={currentPage <= 1}
-        >
-          <ChevronLeft className="h-3 w-3" />
-        </Button>
-        <span className="text-[10px] text-muted-foreground min-w-[60px] text-center">
-          {currentPage} / {totalPages}
+        <span className="text-[10px] text-muted-foreground">
+          {totalPages} pages
         </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-          disabled={currentPage >= totalPages}
-        >
-          <ChevronRight className="h-3 w-3" />
-        </Button>
         <div className="w-px h-4 bg-border mx-1" />
         <Button
           variant="ghost"
@@ -137,12 +119,18 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
         </Button>
       </div>
 
-      {/* Canvas */}
+      {/* Scrollable pages */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-auto flex justify-center bg-muted/30 rounded-lg"
+        className="flex-1 overflow-auto flex flex-col items-center gap-2 bg-muted/30 rounded-lg p-2"
       >
-        <canvas ref={canvasRef} className="block" />
+        {renderedPages.length > 0 ? (
+          renderedPages.map((src, i) => (
+            <img key={i} src={src} alt={`Page ${i + 1}`} className="block shadow-md rounded" />
+          ))
+        ) : (
+          <div className="text-xs text-muted-foreground animate-pulse py-8">Rendering pages...</div>
+        )}
       </div>
     </div>
   );
