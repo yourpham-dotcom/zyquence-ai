@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import * as pdfjsLib from "pdfjs-dist";
 
@@ -21,6 +21,7 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null);
+  const [renderedPages, setRenderedPages] = useState<string[]>([]);
 
   // Load PDF
   useEffect(() => {
@@ -48,42 +49,30 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
     return () => { cancelled = true; };
   }, [fileUrl]);
 
-  // Render page
-  const renderPage = useCallback(async () => {
-    if (!pdfDoc || !canvasRef.current) return;
-
-    // Cancel any in-progress render
-    if (renderTaskRef.current) {
-      renderTaskRef.current.cancel();
-    }
-
-    try {
-      const page = await pdfDoc.getPage(currentPage);
-      const viewport = page.getViewport({ scale });
-      const canvas = canvasRef.current;
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      const renderContext = {
-        canvasContext: context,
-        viewport,
-      };
-
-      renderTaskRef.current = page.render(renderContext);
-      await renderTaskRef.current.promise;
-    } catch (err: any) {
-      if (err?.name !== "RenderingCancelledException") {
-        console.error("PDF render error:", err);
-      }
-    }
-  }, [pdfDoc, currentPage, scale]);
-
+  // Render all pages as images for continuous scroll
   useEffect(() => {
-    renderPage();
-  }, [renderPage]);
+    if (!pdfDoc) return;
+    let cancelled = false;
+
+    const renderAllPages = async () => {
+      const pages: string[] = [];
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        if (cancelled) return;
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const context = canvas.getContext("2d")!;
+        await page.render({ canvasContext: context, viewport }).promise;
+        pages.push(canvas.toDataURL());
+      }
+      if (!cancelled) setRenderedPages(pages);
+    };
+
+    renderAllPages();
+    return () => { cancelled = true; };
+  }, [pdfDoc, scale]);
 
   if (loading) {
     return (
@@ -105,27 +94,9 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
     <div className={`flex flex-col ${className}`}>
       {/* Controls */}
       <div className="flex items-center justify-center gap-2 py-1 shrink-0">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-          disabled={currentPage <= 1}
-        >
-          <ChevronLeft className="h-3 w-3" />
-        </Button>
-        <span className="text-[10px] text-muted-foreground min-w-[60px] text-center">
-          {currentPage} / {totalPages}
+        <span className="text-[10px] text-muted-foreground">
+          {totalPages} pages
         </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-          disabled={currentPage >= totalPages}
-        >
-          <ChevronRight className="h-3 w-3" />
-        </Button>
         <div className="w-px h-4 bg-border mx-1" />
         <Button
           variant="ghost"
@@ -148,12 +119,18 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
         </Button>
       </div>
 
-      {/* Canvas */}
+      {/* Scrollable pages */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-auto flex justify-center bg-muted/30 rounded-lg"
+        className="flex-1 overflow-auto flex flex-col items-center gap-2 bg-muted/30 rounded-lg p-2"
       >
-        <canvas ref={canvasRef} className="block" />
+        {renderedPages.length > 0 ? (
+          renderedPages.map((src, i) => (
+            <img key={i} src={src} alt={`Page ${i + 1}`} className="block shadow-md rounded" />
+          ))
+        ) : (
+          <div className="text-xs text-muted-foreground animate-pulse py-8">Rendering pages...</div>
+        )}
       </div>
     </div>
   );
