@@ -1,9 +1,9 @@
 import { useState, useCallback, useRef } from "react";
-import { ExternalLink } from "lucide-react";
-import { Youtube, Globe, BookOpen, X, Upload, FileText, Trash2 } from "lucide-react";
+import { ExternalLink, Youtube, Globe, BookOpen, X, Upload, FileText, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PdfCanvasViewer } from "./PdfCanvasViewer";
 
 type PanelType = "youtube" | "learn" | null;
 
