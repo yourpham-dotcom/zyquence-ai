@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import { ExternalLink } from "lucide-react";
 import { Youtube, Globe, BookOpen, X, Upload, FileText, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -298,11 +299,25 @@ export function BottomBar() {
               onDrop={handlePdfDrop}
             >
               {activePdf?.url ? (
-                <iframe
-                  src={activePdf.url}
-                  className="w-full h-full rounded-lg border border-border"
-                  title={activePdf.name}
-                />
+                <div className="w-full h-full flex flex-col gap-2">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-xs text-muted-foreground truncate">{activePdf.name}</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 text-[10px] gap-1 shrink-0"
+                      onClick={() => window.open(activePdf.url, "_blank")}
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      Open in new tab
+                    </Button>
+                  </div>
+                  <embed
+                    src={activePdf.url + "#toolbar=1&navpanes=1"}
+                    type="application/pdf"
+                    className="w-full flex-1 rounded-lg border border-border"
+                  />
+                </div>
               ) : (
                 <div
                   className="rounded-lg bg-muted/50 flex flex-col items-center justify-center h-full gap-2 text-muted-foreground border-2 border-dashed border-border"
