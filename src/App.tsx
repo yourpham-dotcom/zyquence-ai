@@ -97,6 +97,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/spotify-callback" element={<SpotifyCallback />} />
           <Route path="/mission" element={<MissionStatement />} />

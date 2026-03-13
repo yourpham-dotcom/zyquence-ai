@@ -266,6 +266,24 @@ const Auth = () => {
                 <button
                   type="button"
                   className="text-sm text-primary hover:text-primary/80 transition-colors"
+                  onClick={async () => {
+                    if (!email) {
+                      toast.error("Please enter your email address first.");
+                      return;
+                    }
+                    try {
+                      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: `${window.location.origin}/reset-password`,
+                      });
+                      if (error) {
+                        toast.error(error.message);
+                      } else {
+                        toast.success("Password reset email sent! Check your inbox.");
+                      }
+                    } catch {
+                      toast.error("An unexpected error occurred.");
+                    }
+                  }}
                 >
                   Forgot password?
                 </button>
