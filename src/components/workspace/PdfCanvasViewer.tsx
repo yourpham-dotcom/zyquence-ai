@@ -21,6 +21,7 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null);
+  const [renderedPages, setRenderedPages] = useState<string[]>([]);
 
   // Load PDF
   useEffect(() => {
