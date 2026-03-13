@@ -7,6 +7,7 @@ import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import SpotifyCallback from "./pages/SpotifyCallback";
@@ -96,6 +97,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/spotify-callback" element={<SpotifyCallback />} />
           <Route path="/mission" element={<MissionStatement />} />
