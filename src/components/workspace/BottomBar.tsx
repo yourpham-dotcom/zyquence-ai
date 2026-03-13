@@ -299,7 +299,7 @@ export function BottomBar() {
               onDrop={handlePdfDrop}
             >
               {activePdf?.url ? (
-                <div className="w-full h-full flex flex-col gap-2">
+                <div className="w-full h-full flex flex-col gap-1">
                   <div className="flex items-center justify-between px-1">
                     <span className="text-xs text-muted-foreground truncate">{activePdf.name}</span>
                     <Button
@@ -312,11 +312,7 @@ export function BottomBar() {
                       Open in new tab
                     </Button>
                   </div>
-                  <embed
-                    src={activePdf.url + "#toolbar=1&navpanes=1"}
-                    type="application/pdf"
-                    className="w-full flex-1 rounded-lg border border-border"
-                  />
+                  <PdfCanvasViewer fileUrl={activePdf.url} className="flex-1 min-h-0" />
                 </div>
               ) : (
                 <div
