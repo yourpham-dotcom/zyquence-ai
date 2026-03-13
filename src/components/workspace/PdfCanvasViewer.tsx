@@ -49,42 +49,30 @@ export function PdfCanvasViewer({ fileUrl, className }: PdfCanvasViewerProps) {
     return () => { cancelled = true; };
   }, [fileUrl]);
 
-  // Render page
-  const renderPage = useCallback(async () => {
-    if (!pdfDoc || !canvasRef.current) return;
-
-    // Cancel any in-progress render
-    if (renderTaskRef.current) {
-      renderTaskRef.current.cancel();
-    }
-
-    try {
-      const page = await pdfDoc.getPage(currentPage);
-      const viewport = page.getViewport({ scale });
-      const canvas = canvasRef.current;
-      const context = canvas.getContext("2d");
-      if (!context) return;
-
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      const renderContext = {
-        canvasContext: context,
-        viewport,
-      };
-
-      renderTaskRef.current = page.render(renderContext);
-      await renderTaskRef.current.promise;
-    } catch (err: any) {
-      if (err?.name !== "RenderingCancelledException") {
-        console.error("PDF render error:", err);
-      }
-    }
-  }, [pdfDoc, currentPage, scale]);
-
+  // Render all pages as images for continuous scroll
   useEffect(() => {
-    renderPage();
-  }, [renderPage]);
+    if (!pdfDoc) return;
+    let cancelled = false;
+
+    const renderAllPages = async () => {
+      const pages: string[] = [];
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        if (cancelled) return;
+        const page = await pdfDoc.getPage(i);
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const context = canvas.getContext("2d")!;
+        await page.render({ canvasContext: context, viewport }).promise;
+        pages.push(canvas.toDataURL());
+      }
+      if (!cancelled) setRenderedPages(pages);
+    };
+
+    renderAllPages();
+    return () => { cancelled = true; };
+  }, [pdfDoc, scale]);
 
   if (loading) {
     return (
