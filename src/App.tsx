@@ -13,6 +13,7 @@ import Pricing from "./pages/Pricing";
 import SpotifyCallback from "./pages/SpotifyCallback";
 import MissionStatement from "./pages/MissionStatement";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import SiteLock from "./components/SiteLock";
 
 // Workspace layout & pages
 import WorkspaceLayout from "./components/workspace/WorkspaceLayout";
