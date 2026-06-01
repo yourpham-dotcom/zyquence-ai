@@ -132,19 +132,21 @@ export function useOnboarding() {
 
   useEffect(() => {
     if (!user) {
+      setProfile(null);
       setLoading(false);
       return;
     }
+    setLoading(true);
     supabase
       .from("user_profiles")
       .select("*")
       .eq("user_id", user.id)
       .maybeSingle()
-      .then(({ data }) => {
-        setProfile(data as UserProfile | null);
+      .then(({ data, error }) => {
+        if (!error) setProfile(data as UserProfile | null);
         setLoading(false);
       });
-  }, [user]);
+  }, [user?.id]);
 
   const saveProfile = async (answers: OnboardingAnswers) => {
     if (!user) return { error: "Not authenticated" };
