@@ -30,12 +30,6 @@ const CTASection = () => {
             Create Account
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
-          <a
-            href="/mission"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-foreground/15 text-foreground text-sm font-medium hover:bg-foreground/5 transition-colors"
-          >
-            Explore Zyquence
-          </a>
         </div>
       </motion.div>
     </section>
