@@ -77,7 +77,7 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -90,6 +90,9 @@ const Auth = () => {
         });
         if (error) {
           toast.error(error.message);
+        } else if (signUpData.session) {
+          toast.success("Account created! Setting up your profile...");
+          // auth state change will trigger redirect to /onboarding
         } else {
           toast.success("Check your email to confirm your account!");
           setEmail("");
