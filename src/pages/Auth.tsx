@@ -92,11 +92,17 @@ const Auth = () => {
           toast.error(error.message);
         } else if (signUpData.session) {
           toast.success("Account created! Setting up your profile...");
-          // auth state change will trigger redirect to /onboarding
         } else {
-          toast.success("Check your email to confirm your account!");
-          setEmail("");
-          setPassword("");
+          // No session returned (existing unconfirmed account or email confirmation still on).
+          // Try signing in directly so the user gets a session immediately.
+          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInError) {
+            toast.success("Check your email to confirm your account!");
+            setEmail("");
+            setPassword("");
+          } else {
+            toast.success("Account created! Setting up your profile...");
+          }
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
