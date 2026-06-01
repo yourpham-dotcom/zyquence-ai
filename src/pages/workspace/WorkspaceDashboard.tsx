@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useEliteAccess } from "@/hooks/useEliteAccess";
 import { useFocusAreas } from "@/hooks/useFocusAreas";
+import { useOnboarding, getRecommendations } from "@/hooks/useOnboarding";
 import ZyquenceNewsFeed from "@/components/workspace/ZyquenceNewsFeed";
 import {
   CalendarDays,
@@ -33,6 +34,8 @@ const WorkspaceDashboard = () => {
   const displayTier = isElite ? "elite" : isPro ? "pro" : "free";
   const { getVisibleTools, loading: focusLoading } = useFocusAreas();
   const visibleTools = getVisibleTools();
+  const { profile } = useOnboarding();
+  const recommendations = getRecommendations(profile);
 
   const quickCards = [
     { title: "Calendar", description: "3 events today", icon: CalendarDays, path: "/dashboard/calendar", iconColor: "text-blue-500" },
@@ -77,6 +80,42 @@ const WorkspaceDashboard = () => {
         </h1>
         <p className="text-sm text-muted-foreground">{user?.email}</p>
       </div>
+
+      {/* Personalized Recommendations */}
+      {recommendations.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <h2 className="text-base font-semibold text-foreground">Recommended for you</h2>
+            {profile?.industry && (
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+                Based on {profile.industry}
+              </span>
+            )}
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {recommendations.map((rec) => (
+              <Link key={rec.title} to={rec.path}>
+                <Card className="group border-border/50 hover:border-primary/30 transition-all duration-200 h-full">
+                  <CardContent className="p-4 flex items-start gap-3">
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${rec.color} flex items-center justify-center shrink-0`}>
+                      <Sparkles className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h3 className="font-semibold text-sm text-foreground">{rec.title}</h3>
+                        <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">{rec.tag}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{rec.description}</p>
+                    </div>
+                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Personalized News Feed */}
       <ZyquenceNewsFeed isPro={isPro || displayTier === "elite"} />

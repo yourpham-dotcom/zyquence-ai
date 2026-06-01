@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { useOnboarding } from "@/hooks/useOnboarding";
 import { Link } from "react-router-dom";
 
 const ELITE_EMAILS = ["yourpham@gmail.com", "illestrj.12@gmail.com", "asantimokwala48@gmail.com"];
@@ -26,11 +27,18 @@ const Auth = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { profile, loading: profileLoading } = useOnboarding();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || profileLoading) return;
 
     const redirectUser = async () => {
+      // New users who haven't completed onboarding
+      if (!profile?.onboarding_completed) {
+        navigate("/onboarding", { replace: true });
+        return;
+      }
+
       // Elite users always go to /elite
       if (ELITE_EMAILS.includes(user.email ?? "")) {
         navigate("/elite", { replace: true });
@@ -50,7 +58,7 @@ const Auth = () => {
     };
 
     redirectUser();
-  }, [user, navigate]);
+  }, [user, profile, profileLoading, navigate]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -106,7 +114,7 @@ const Auth = () => {
     }
   };
 
-  if (loading) {
+  if (loading || (user && profileLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

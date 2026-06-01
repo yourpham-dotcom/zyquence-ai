@@ -13,6 +13,7 @@ import Pricing from "./pages/Pricing";
 import SpotifyCallback from "./pages/SpotifyCallback";
 import MissionStatement from "./pages/MissionStatement";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Onboarding from "./pages/Onboarding";
 // Workspace layout & pages
 import WorkspaceLayout from "./components/workspace/WorkspaceLayout";
 import WorkspaceDashboard from "./pages/workspace/WorkspaceDashboard";
@@ -101,6 +102,7 @@ const App = () => (
           <Route path="/spotify-callback" element={<SpotifyCallback />} />
           <Route path="/mission" element={<MissionStatement />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/onboarding" element={<Onboarding />} />
 
           {/* Workspace layout with sidebar */}
           <Route path="/dashboard" element={<WorkspaceLayout />}>
