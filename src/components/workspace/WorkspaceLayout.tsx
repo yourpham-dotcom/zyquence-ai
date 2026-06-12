@@ -8,19 +8,10 @@ import { StocksSidebar } from "./StocksSidebar";
 import { RainfallBackground, CoastalBackground, SnowfallBackground } from "./ThemeBackgrounds";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
-import { useOnboarding } from "@/hooks/useOnboarding";
 
 const WorkspaceLayout = () => {
   const [theme, setTheme] = useState("");
   const navigate = useNavigate();
-  const { profile, loading: onboardingLoading } = useOnboarding();
-
-  useEffect(() => {
-    if (onboardingLoading) return;
-    if (!profile?.onboarding_completed) {
-      navigate("/onboarding", { replace: true });
-    }
-  }, [profile, onboardingLoading, navigate]);
 
   useEffect(() => {
     const check = () => setTheme(localStorage.getItem("zyquence-theme") || "dark");

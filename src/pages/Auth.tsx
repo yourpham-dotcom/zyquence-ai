@@ -25,6 +25,7 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [justSignedUp, setJustSignedUp] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { profile, loading: profileLoading } = useOnboarding();
@@ -33,8 +34,8 @@ const Auth = () => {
     if (!user || profileLoading) return;
 
     const redirectUser = async () => {
-      // New users who haven't completed onboarding
-      if (!profile?.onboarding_completed) {
+      // Only send to onboarding if the user just created an account
+      if (justSignedUp && !profile?.onboarding_completed) {
         navigate("/onboarding", { replace: true });
         return;
       }
@@ -58,7 +59,7 @@ const Auth = () => {
     };
 
     redirectUser();
-  }, [user, profile, profileLoading, navigate]);
+  }, [user, profile, profileLoading, justSignedUp, navigate]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -91,16 +92,17 @@ const Auth = () => {
         if (error) {
           toast.error(error.message);
         } else if (signUpData.session) {
+          setJustSignedUp(true);
           toast.success("Account created! Setting up your profile...");
         } else {
-          // No session returned (existing unconfirmed account or email confirmation still on).
-          // Try signing in directly so the user gets a session immediately.
+          // No session returned — try signing in directly.
           const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
           if (signInError) {
             toast.success("Check your email to confirm your account!");
             setEmail("");
             setPassword("");
           } else {
+            setJustSignedUp(true);
             toast.success("Account created! Setting up your profile...");
           }
         }
