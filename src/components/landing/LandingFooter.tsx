@@ -11,8 +11,7 @@ const LandingFooter = () => {
 
         <div className="flex flex-wrap gap-8">
           <a href="/mission" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Mission</a>
-          <a href="/pricing" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Pricing</a>
-          <a href="/privacy" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Privacy</a>
+<a href="/privacy" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Privacy</a>
           <a href="#" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Contact</a>
         </div>
 
