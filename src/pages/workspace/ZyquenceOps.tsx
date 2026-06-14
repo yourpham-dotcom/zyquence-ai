@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,7 @@ type EditingTask = {
 
 export default function ZyquenceOps() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [view, setView] = useState<View>("dashboard");
   const [projects, setProjects] = useState<OpsProject[]>([]);
   const [tasks, setTasks] = useState<OpsTask[]>([]);
@@ -492,7 +494,7 @@ export default function ZyquenceOps() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-52">
-            <DropdownMenuItem onClick={() => {}} className="gap-2">
+            <DropdownMenuItem onClick={() => navigate("/gaming-intelligence/journal")} className="gap-2">
               <BookOpen className="h-4 w-4" /> Journal
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setView("inventory")} className="gap-2">

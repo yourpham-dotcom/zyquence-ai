@@ -12,7 +12,7 @@ const LandingFooter = () => {
         <div className="flex flex-wrap gap-8">
           <a href="/mission" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Mission</a>
 <a href="/privacy" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Privacy</a>
-          <a href="#" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Contact</a>
+          <a href="mailto:zyquence.info@gmail.com" className="text-xs text-foreground/30 hover:text-foreground transition-colors">Contact</a>
         </div>
 
         <span className="text-xs text-foreground/15 font-mono">©2025</span>

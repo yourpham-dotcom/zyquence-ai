@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Send, Loader2, Plus, FileText, Search, ShoppingBag, CheckSquare, BarChart3, Mic } from "lucide-react";
+import { Send, Loader2, Plus, FileText, Search, ShoppingBag, CheckSquare, BarChart3, Mic, MicOff } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -80,8 +80,10 @@ const AssistantPage = () => {
   const [input, setInput] = useState(initialQuery);
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
+  const [isListening, setIsListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,6 +130,36 @@ const AssistantPage = () => {
       toast.error(e.message || "Failed to get response");
       setIsLoading(false);
     }
+  };
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setInput("");
+  };
+
+  const handleMic = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Voice input not supported in this browser.");
+      return;
+    }
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+    const rec = new SpeechRecognition();
+    rec.lang = "en-US";
+    rec.interimResults = false;
+    rec.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = e.results[0][0].transcript;
+      setInput((prev) => (prev ? prev + " " + transcript : transcript));
+    };
+    rec.onend = () => setIsListening(false);
+    rec.onerror = () => setIsListening(false);
+    recognitionRef.current = rec;
+    rec.start();
+    setIsListening(true);
   };
 
   const hasMessages = messages.length > 0;
@@ -196,13 +228,26 @@ const AssistantPage = () => {
 
             {/* Bottom controls row */}
             <div className="flex items-center justify-between px-3 pb-2.5 pt-1">
-              <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+              <button
+                onClick={handleNewChat}
+                title="New conversation"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+              >
                 <Plus className="h-4 w-4" />
               </button>
 
               <div className="flex items-center gap-1.5">
-                <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
-                  <Mic className="h-4 w-4" />
+                <button
+                  onClick={handleMic}
+                  title={isListening ? "Stop listening" : "Voice input"}
+                  className={cn(
+                    "p-1.5 rounded-lg transition-colors",
+                    isListening
+                      ? "text-red-500 bg-red-500/10 hover:bg-red-500/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                  )}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
                 <Button
                   size="icon"
