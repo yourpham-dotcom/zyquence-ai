@@ -293,10 +293,10 @@ All colors MUST be HSL.
    Kept separate from the app-wide theme tokens above so switching the
    in-app theme (aurora/rainfall/etc.) never affects the marketing site. */
 .zy-landing {
-  --zy-cyan: 188 100% 55%;
-  --zy-blue: 217 91% 60%;
-  --zy-violet: 262 83% 66%;
-  --zy-glow: radial-gradient(circle, hsl(var(--zy-cyan) / 0.35), transparent 70%);
+  --zy-cyan: 0 0% 100%;
+  --zy-blue: 0 0% 100%;
+  --zy-violet: 0 0% 100%;
+  --zy-glow: radial-gradient(circle, hsl(var(--zy-cyan) / 0.25), transparent 70%);
   --zy-grid-line: hsl(var(--zy-cyan) / 0.08);
 }
 

@@ -1,34 +1,26 @@
 import { Component, Suspense, useRef, type ReactNode } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial, Stars } from "@react-three/drei";
+import { Float, Stars } from "@react-three/drei";
 import * as THREE from "three";
 
 function Core() {
-  const meshRef = useRef<THREE.Mesh>(null);
   const wireRef = useRef<THREE.Mesh>(null);
+  const innerRef = useRef<THREE.Mesh>(null);
 
   useFrame((_, delta) => {
-    if (meshRef.current) meshRef.current.rotation.y += delta * 0.15;
     if (wireRef.current) wireRef.current.rotation.y -= delta * 0.08;
+    if (innerRef.current) innerRef.current.rotation.y += delta * 0.12;
   });
 
   return (
     <Float speed={1.4} rotationIntensity={0.6} floatIntensity={1.2}>
-      <mesh ref={meshRef}>
-        <icosahedronGeometry args={[1.6, 1]} />
-        <MeshDistortMaterial
-          color="#0a1a2a"
-          emissive="#00d4ff"
-          emissiveIntensity={0.35}
-          roughness={0.15}
-          metalness={0.9}
-          distort={0.35}
-          speed={1.5}
-        />
-      </mesh>
       <mesh ref={wireRef} scale={1.35}>
         <icosahedronGeometry args={[1.6, 1]} />
-        <meshBasicMaterial color="#22e8ff" wireframe transparent opacity={0.25} />
+        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.3} />
+      </mesh>
+      <mesh ref={innerRef}>
+        <icosahedronGeometry args={[1.6, 1]} />
+        <meshBasicMaterial color="#ffffff" wireframe transparent opacity={0.12} />
       </mesh>
     </Float>
   );
@@ -43,11 +35,11 @@ function Rings() {
     <group ref={ref}>
       <mesh rotation={[Math.PI / 2.4, 0, 0]}>
         <torusGeometry args={[2.6, 0.006, 16, 100]} />
-        <meshBasicMaterial color="#3b82f6" transparent opacity={0.4} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.3} />
       </mesh>
       <mesh rotation={[Math.PI / 1.8, 0.4, 0]}>
         <torusGeometry args={[3.1, 0.004, 16, 100]} />
-        <meshBasicMaterial color="#8b5cf6" transparent opacity={0.25} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.18} />
       </mesh>
     </group>
   );
@@ -82,9 +74,6 @@ const Hero3D = () => {
           }}
         >
           <Suspense fallback={null}>
-            <ambientLight intensity={0.4} />
-            <pointLight position={[5, 5, 5]} intensity={1} color="#22e8ff" />
-            <pointLight position={[-5, -3, -5]} intensity={0.6} color="#8b5cf6" />
             <Core />
             <Rings />
             <Stars radius={40} depth={20} count={1200} factor={2} saturation={0} fade speed={0.5} />
