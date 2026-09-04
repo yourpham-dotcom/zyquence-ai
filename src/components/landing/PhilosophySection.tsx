@@ -19,7 +19,7 @@ const PhilosophySection = () => {
             This platform has evolved{" "}
             <span className="text-foreground/20">considerably over the years.</span>{" "}
             From idea to ecosystem,{" "}
-            <span className="text-foreground/20">from tools to intelligence.</span>
+            <span className="text-[hsl(var(--zy-cyan)/0.7)]">from tools to intelligence.</span>
           </motion.p>
         </div>
       </div>

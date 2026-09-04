@@ -27,7 +27,7 @@ const EcosystemSection = () => {
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Built-in
-          <span className="inline-block ml-4 text-foreground/20">Tools</span>
+          <span className="inline-block ml-4 text-[hsl(var(--zy-cyan)/0.7)]">Tools</span>
         </h2>
       </motion.div>
 
@@ -38,11 +38,11 @@ const EcosystemSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: i * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="group border-t border-foreground/10 py-8 md:py-10 grid grid-cols-[auto_1fr] md:grid-cols-[60px_200px_1fr] gap-4 md:gap-8 items-start cursor-default"
+            className="group border-t border-[hsl(var(--zy-cyan)/0.1)] py-8 md:py-10 grid grid-cols-[auto_1fr] md:grid-cols-[60px_200px_1fr] gap-4 md:gap-8 items-start cursor-default hover:bg-[hsl(var(--zy-cyan)/0.02)] transition-colors duration-300"
           >
-            <span className="text-xs font-mono text-foreground/20 pt-1">{f.num}</span>
+            <span className="text-xs font-mono text-[hsl(var(--zy-cyan)/0.4)] pt-1">{f.num}</span>
             <h3
-              className="text-xl md:text-2xl font-semibold text-foreground group-hover:text-foreground/70 transition-colors duration-300"
+              className="text-xl md:text-2xl font-semibold text-foreground group-hover:text-[hsl(var(--zy-cyan))] transition-colors duration-300"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
               {f.title}
@@ -52,7 +52,7 @@ const EcosystemSection = () => {
             </p>
           </motion.div>
         ))}
-        <div className="border-t border-foreground/10" />
+        <div className="border-t border-[hsl(var(--zy-cyan)/0.1)]" />
       </div>
     </section>
   );

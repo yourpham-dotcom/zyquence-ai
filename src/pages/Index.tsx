@@ -24,7 +24,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="zy-landing min-h-screen bg-background">
       <LandingNav />
       <HeroSection />
       <CTASection />

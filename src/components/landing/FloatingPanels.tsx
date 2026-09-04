@@ -16,14 +16,14 @@ const FloatingPanels = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [-40, 40]);
 
   return (
-    <section ref={containerRef} className="relative bg-background py-32 md:py-48 px-6 md:px-12 overflow-hidden">
+    <section ref={containerRef} className="relative bg-background py-32 md:py-48 px-6 md:px-12 overflow-hidden zy-grid-bg">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-24"
+        className="relative mb-24"
       >
-        <span className="text-xs font-mono text-foreground/20 block mb-4">Interface Preview</span>
+        <span className="text-xs font-mono text-[hsl(var(--zy-cyan)/0.6)] block mb-4">Interface Preview</span>
         <h2
           className="text-5xl md:text-7xl font-bold tracking-tighter text-foreground"
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -33,7 +33,7 @@ const FloatingPanels = () => {
         </h2>
       </motion.div>
 
-      <div className="grid md:grid-cols-2 gap-6 max-w-4xl">
+      <div className="relative grid md:grid-cols-2 gap-6 max-w-4xl">
         {panels.map((p, i) => {
           const yMotion = i % 2 === 0 ? y1 : y2;
           return (
@@ -43,12 +43,12 @@ const FloatingPanels = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.1, duration: 0.6 }}
-              className="p-6 rounded-xl border border-foreground/[0.06] bg-foreground/[0.02]"
+              className="zy-panel zy-neon-border p-6 rounded-xl border transition-all duration-300"
             >
-              <span className="text-xs font-mono text-foreground/30 block mb-4">{p.title}</span>
+              <span className="text-xs font-mono text-[hsl(var(--zy-cyan)/0.5)] block mb-4">{p.title}</span>
               <div className="space-y-2">
                 {p.lines.map((line, li) => (
-                  <div key={li} className="text-sm text-foreground/50 py-2 px-3 rounded-lg bg-foreground/[0.03] border border-foreground/[0.04]">
+                  <div key={li} className="text-sm text-foreground/50 py-2 px-3 rounded-lg bg-foreground/[0.03] border border-[hsl(var(--zy-cyan)/0.08)]">
                     {line}
                   </div>
                 ))}

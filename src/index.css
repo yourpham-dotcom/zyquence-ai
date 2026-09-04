@@ -289,6 +289,17 @@ All colors MUST be HSL.
   }
 }
 
+/* Scoped tokens for the public landing page's 3D/techy visual language.
+   Kept separate from the app-wide theme tokens above so switching the
+   in-app theme (aurora/rainfall/etc.) never affects the marketing site. */
+.zy-landing {
+  --zy-cyan: 188 100% 55%;
+  --zy-blue: 217 91% 60%;
+  --zy-violet: 262 83% 66%;
+  --zy-glow: radial-gradient(circle, hsl(var(--zy-cyan) / 0.35), transparent 70%);
+  --zy-grid-line: hsl(var(--zy-cyan) / 0.08);
+}
+
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/80;
@@ -374,6 +385,49 @@ All colors MUST be HSL.
   .snowfall-bg {
     background: linear-gradient(180deg, hsl(225 30% 8%) 0%, hsl(230 25% 12%) 50%, hsl(220 20% 10%) 100%);
     background-attachment: fixed;
+  }
+
+  .zy-grid-bg {
+    background-image:
+      linear-gradient(to right, var(--zy-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--zy-grid-line) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, black 40%, transparent 100%);
+  }
+
+  .zy-neon-text {
+    text-shadow: 0 0 30px hsl(var(--zy-cyan) / 0.5), 0 0 80px hsl(var(--zy-blue) / 0.25);
+  }
+
+  .zy-neon-border {
+    border-color: hsl(var(--zy-cyan) / 0.25);
+    box-shadow: 0 0 0 1px hsl(var(--zy-cyan) / 0.08), 0 0 24px hsl(var(--zy-cyan) / 0.06);
+  }
+
+  .zy-neon-border:hover {
+    border-color: hsl(var(--zy-cyan) / 0.5);
+    box-shadow: 0 0 0 1px hsl(var(--zy-cyan) / 0.15), 0 0 32px hsl(var(--zy-cyan) / 0.15);
+  }
+
+  .zy-panel {
+    background: linear-gradient(180deg, hsl(var(--zy-cyan) / 0.05), transparent 60%),
+      hsl(var(--foreground) / 0.02);
+    backdrop-filter: blur(8px);
+  }
+
+  @keyframes zy-scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  .zy-scanline::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, hsl(var(--zy-cyan) / 0.06) 50%, transparent);
+    animation: zy-scan 6s linear infinite;
+    pointer-events: none;
   }
 }
 
